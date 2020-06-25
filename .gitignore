@@ -1,0 +1,42 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+__pycache__
+.ipynb_checkpoints
+.next
+out/
+
+.now
+deploy/nginx/build
+deploy/geolite2city.mmdb
+site.tgz
+tmp/
+deploy/node-app/site
+py/data/rt.csv
+GeoLite2-City*
+site/components/RTNavHeader.js
+py/data/smooth.csv
+py/data/out.csv
+py/data/staging*
+.vscode

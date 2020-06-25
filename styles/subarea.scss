@@ -1,0 +1,24 @@
+@import "./constants.scss";
+
+.rt-subarea-page-inner {
+  margin: 20px auto 0px auto;
+  max-width: $inner-max-width;
+}
+
+.rt-container-wide .rt-subarea-page-inner {
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+.rt-container-small .rt-subarea-page-inner {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.rt-subarea-stat-spark {
+  text-align: right;
+}
+
+.rt-container-small .rt-subarea-stat-spark {
+  display: none;
+}

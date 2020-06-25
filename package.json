@@ -1,0 +1,49 @@
+{
+  "name": "rtlive",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "export NODE_PORT=3300 && next dev -p $NODE_PORT",
+    "build": "rm -rf .next/server && rm -rf .next/static && next build",
+    "build_aws": "rm -rf .next/server && rm -rf .next/static && DEPLOY_TARGET=aws next build",
+    "start": "next start",
+    "export": "next export",
+    "export_aws": "DEPLOY_TARGET=aws next export",
+    "export_site_images": "node scripts/export_site_images.js --port 31384 --output tmp --start-next"
+  },
+  "dependencies": {
+    "@sentry/browser": "^5.17.0",
+    "@sentry/webpack-plugin": "^1.11.1",
+    "@ygoe/msgpack": "^1.0.2",
+    "@zeit/next-sass": "^1.0.1",
+    "@zeit/next-source-maps": "0.0.4-canary.1",
+    "aws-sdk": "^2.698.0",
+    "axios": "^0.19.2",
+    "d3": "^5.16.0",
+    "execa": "^4.0.2",
+    "next": "^9.4.4",
+    "node-cache": "^5.1.1",
+    "node-sass": "^4.14.1",
+    "puppeteer": "^3.3.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "styled-components": "^5.1.1",
+    "tmp-promise": "^2.1.1",
+    "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "babel-plugin-styled-components": "^1.10.7",
+    "html-loader": "^1.1.0",
+    "husky": "^4.2.5",
+    "markdown-loader": "^5.1.0",
+    "marked": "^1.1.0",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  }
+}

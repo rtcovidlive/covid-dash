@@ -1,0 +1,44 @@
+@import "./App.scss";
+
+.export-single-area {
+  padding: 20px;
+}
+.export-details {
+  padding-right: 10px;
+}
+
+.export-last-run {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.export-url {
+  color: $text-gray;
+}
+
+.export-title {
+  font-size: 34px;
+  font-weight: bold;
+  margin-top: 24px !important;
+  color: $text-black;
+}
+
+.export-rt-number {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.export-single-area {
+  height: 300px;
+  overflow: hidden;
+  margin: 0px 0px;
+}
+
+.export-single-area p {
+  margin: 0px;
+}
+
+.export-explanation {
+  font-size: 14px;
+  color: $text-gray;
+}
