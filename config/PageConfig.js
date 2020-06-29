@@ -7,7 +7,8 @@ const LOOPBACK_PORT = process.env["NODE_PORT"] || 3300;
 export const BASE_URL =
   process.env["NODE_ENV"] === "development"
     ? process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`
-    : "https://rt.live";
+    : // : "https://rt.live";
+      process.env["VERCEL_URL"];
 export const LOOPBACK_BASE_URL =
   process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`;
 // export const CDN_ROOT = "https://d14wlfuexuxgcm.cloudfront.net/covid";
