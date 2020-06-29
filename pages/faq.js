@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import "styles/App.scss";
 import { Title } from "components/Typography";
+import { HeaderInner } from "components/RTHeader"
 import dynamic from "next/dynamic";
 
 const faqMarkdown = require("markdown/faq.md");
@@ -25,6 +26,10 @@ const FAQWrapper = styled.div`
   max-width: 1500px;
   line-height: auto;
   color: black;
+
+  @media (max-width: 768px) {
+    padding-left: 10px;
+  }
 
   h2 {
     margin: 20px 0px 4px 0px;
@@ -51,11 +56,11 @@ export default function FAQ() {
     <div className="App">
       <div className="main-content">
         <div className="rt-header-wrapper">
-          <div className="rt-header">
+          <HeaderInner>
             <FAQTitle level={1}>
               R<sub>t</sub> Live FAQ & Known Issues
             </FAQTitle>
-          </div>
+          </HeaderInner>
           <FAQWrapper>
             <FAQInner dangerouslySetInnerHTML={getMarkdown()} />
           </FAQWrapper>
