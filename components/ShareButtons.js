@@ -39,7 +39,8 @@ export function ShareButtons(props) {
           <a
             href="https://twitter.com/share?ref_src=twsrc%5Etfw"
             className="twitter-share-button"
-            data-show-count="false"
+            data-url={props.href}
+            data-show-count="true"
           ></a>
         </TwitterWrapper>
         <div
