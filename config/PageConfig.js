@@ -3,14 +3,16 @@ import { CountriesByCode } from "./Countries";
 import Constants from "lib/Constants";
 
 // TODO these should be in a better place
-const LOOPBACK_PORT = process.env["NODE_PORT"] || 3000;
+const LOOPBACK_PORT = process.env["NODE_PORT"] || 3300;
 export const BASE_URL =
   process.env["NODE_ENV"] === "development"
     ? process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`
     : "https://rt.live";
 export const LOOPBACK_BASE_URL =
   process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`;
-export const CDN_ROOT = "https://d14wlfuexuxgcm.cloudfront.net/covid";
+// export const CDN_ROOT = "https://d14wlfuexuxgcm.cloudfront.net/covid";
+// export const CDN_ROOT = "http://localhost:8003/covid";
+export const CDN_ROOT = `${BASE_URL}`;
 
 class Config {
   constructor(
