@@ -65,11 +65,15 @@ This site is a public good. We have no intention of commercializing the site or 
 
 ## May I display your data elsewhere? (eg. my site, publication, etc)
 
-Yes, we just ask that you cite Rt.live as the source and link where appropriate.'
+Yes, we just ask that you cite Rt.live as the source and link where appropriate.
 
 ## Where can I find the source code to your model?
 
 It's located [here](https://github.com/rtcovidlive/covid-model).
+
+## Does your site have a privacy policy?
+
+Yes, it's available [here](/privacy).
 
 # Known Issues
 
