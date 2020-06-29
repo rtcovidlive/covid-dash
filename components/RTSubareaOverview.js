@@ -192,6 +192,7 @@ export function RTSubareaOverview(props) {
     >
       <ShareButtons
         align={shareRowOnTop ? "left" : "right"}
+        subarea={props.subarea}
         href={`https://rt.live/${props.config.code}/${props.subarea}?t=${rtData.modelLastRunDate.getTime()/1000}`}
       />
     </Col>
