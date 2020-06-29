@@ -113,7 +113,6 @@ function StatRow(props) {
   let lastRt = format(".2f")(offsetRtEntry.r0);
   let testsTotal = numFormat(series.sumBy((e) => e.tests_new));
   let positiveTotal = numFormat(series.sumBy((e) => e.cases_new));
-  let deathsTotal = numFormat(series.sumBy((e) => e.deaths_new));
   let colsPerStat = 8;
   return (
     <Row style={{ maxWidth: 500 }}>
@@ -184,8 +183,7 @@ export function RTSubareaOverview(props) {
     }),
   ];
 
-  let nameLength = areaName.length;
-  let shareRowOnTop = isSmallScreen && nameLength > 9;
+  let shareRowOnTop = isSmallScreen;
   let shareOptions = (
     <Col
       size={shareRowOnTop ? 24 : 12}
@@ -298,7 +296,7 @@ export function RTSubareaOverview(props) {
               <TestAdjustedChart
                 data={subAreaData}
                 width={contentWidth + 40}
-                height={chartHeight + 120}
+                height={chartHeight + 80}
               />
             )}
           </div>
