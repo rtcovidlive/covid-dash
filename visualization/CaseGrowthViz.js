@@ -181,7 +181,7 @@ class CaseGrowthViz {
 
     let xAxis = (g) => {
       g.attr("transform", xAxisTranslation)
-        .style("font", "12px " + Constants.fontStack)
+        .style("font", `${fontSize} ${Constants.fontStack}`)
         .style("color", Constants.mediumGray)
         .call((g) => {
           let axis = axisBottom(this.x)
