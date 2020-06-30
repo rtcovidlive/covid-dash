@@ -73,6 +73,10 @@ export function RTHeader(props) {
                 }}
               >
                 <div
+                  onClick={() => {
+                    window.ga &&
+                      window.ga("send", "event", "click", "header-state-promo");
+                  }}
                   className="rt-header-update-entry rt-header-update-entry-alert"
                   style={{ marginRight: 12, marginBottom: 0, paddingRight: 12 }}
                 >
