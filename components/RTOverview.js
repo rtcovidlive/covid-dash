@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { DataFetchContext } from "lib/DataFetchContext";
-// TODO make config
+import { useRouter } from "next/router";
 import { StatesWithIssues } from "config/USStates";
 import { Col, Row } from "./Grid";
 import _ from "lodash";
@@ -16,10 +16,12 @@ const footerRef = React.createRef();
 const rtRef = React.createRef();
 const heroRef = React.createRef();
 
-function stateClickHandler(stateCode) {
-  let stateWidget = refsByState[stateCode].current;
-  let offset = stateWidget.getBoundingClientRect();
-  window.scrollBy({ top: offset.top - 50, behavior: "smooth" });
+function stateClickHandler(router, stateCode) {
+  let navigationQuery = Util.getNavigationQuery(document.location.search);
+  router.push("/[countrycode]/[subarea]", {
+    pathname: `/us/${stateCode}`,
+    query: navigationQuery,
+  });
 }
 
 export function RTOverview(props) {
@@ -61,12 +63,16 @@ export function RTOverview(props) {
     colsPerChart = 6;
     rowCount = 4;
   }
+  let detectedState = Util.getCookie("statecode");
+  let router = useRouter();
   return (
     <>
       <RTHeader
         lastUpdated={lastUpdated}
         title={config.subAreaType}
         width={props.width}
+        areaName={detectedState && config.subAreas[detectedState]}
+        subArea={detectedState}
         useNewHeader={props.newHeader}
       />
       <div className="rt-container-wrapper">
@@ -83,7 +89,9 @@ export function RTOverview(props) {
             rtRef={rtRef}
             config={config}
             isSmallScreen={isSmallScreen}
-            stateClickHandler={stateClickHandler}
+            stateClickHandler={(stateCode) => {
+              stateClickHandler(router, stateCode);
+            }}
           />
           <Row className="stacked-states-outer">
             {rtData &&

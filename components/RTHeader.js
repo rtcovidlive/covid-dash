@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { ShareButtons } from "./ShareButtons";
+import { Util } from "lib/Util";
 
 export const MainTitle = styled(Title)`
   margin-left: -3px !important;
@@ -37,6 +38,7 @@ export function RTHeader(props) {
   });
   let shareOnTop = props.width < 768;
   let shareButtons = <ShareButtons href="https://rt.live" align="right" />;
+  let navigationQuery = Util.getNavigationQuery(document.location.search);
   return (
     <>
       <div className="rt-header-wrapper">
@@ -62,6 +64,22 @@ export function RTHeader(props) {
             .
           </p>
           <div className="rt-header-updates">
+            {props.areaName && (
+              <Link
+                href="/[countrycode]/[subarea]"
+                as={{
+                  pathname: `/us/${props.subArea}`,
+                  query: navigationQuery,
+                }}
+              >
+                <div
+                  className="rt-header-update-entry rt-header-update-entry-alert"
+                  style={{ marginRight: 12, marginBottom: 0, paddingRight: 12 }}
+                >
+                  See details about the spread in <b>{props.areaName}</b>
+                </div>
+              </Link>
+            )}
             <div
               onClick={() =>
                 document
@@ -73,18 +91,6 @@ export function RTHeader(props) {
               Data Last Updated:{" "}
               {timeFormat("%-m/%-d at %-I:%M%p")(props.lastUpdated)}
             </div>
-            <span
-              className="rt-header-update-entry rt-header-update-entry-alert"
-              onClick={() => window.open("/faq")}
-              style={{ marginRight: 0, marginBottom: 0, paddingRight: 12 }}
-            >
-              Major site update June 25th
-            </span>
-            <p>
-              We&rsquo;ve added detailed pages for each state, showing testing
-              volume and our test-adjusted positive case count. Click Details
-              next to the state name.
-            </p>
           </div>
         </HeaderInner>
       </div>

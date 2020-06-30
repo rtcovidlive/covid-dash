@@ -101,7 +101,6 @@ export const RTHero = React.forwardRef(function (props, ref) {
             height={480}
             onStateClicked={props.stateClickHandler}
             verticalMode={true}
-            detectedState={detectedState}
             subAreas={props.config.subAreas}
             data={decorateDataWithSortIndex(r0Data)}
           />
@@ -128,7 +127,6 @@ export const RTHero = React.forwardRef(function (props, ref) {
           height={480}
           subAreas={props.config.subAreas}
           onStateClicked={props.stateClickHandler}
-          detectedState={detectedState}
           verticalMode={false}
           data={decorateDataWithSortIndex(r0Data)}
         />

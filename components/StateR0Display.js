@@ -15,10 +15,7 @@ const DetailsLink = styled.div`
   font-size: 14px;
   cursor: pointer;
   text-align: right;
-
-  :hover {
-    text-decoration: underline;
-  }
+  ${(props) => props.hovered && "text-decoration: underline;"}
 `;
 const primaryColorScale = (region, i) => {
   return "black";
@@ -109,7 +106,7 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             href="/[countrycode]/[subarea]"
             as={{ pathname: `/us/${props.subArea}`, query: navigationQuery }}
           >
-            <DetailsLink>
+            <DetailsLink hovered={hovered}>
               Details{" "}
               <span
                 style={{ fontSize: 9, position: "relative", top: 0.5 }}
