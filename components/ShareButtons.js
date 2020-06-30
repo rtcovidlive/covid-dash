@@ -27,13 +27,13 @@ const TwitterWrapper = styled.div`
 
 function twitterTemplate(href) {
   return {
-    "__html": `<a
+    __html: `<a
             href="https://twitter.com/share?ref_src=twsrc%5Etfw"
             class="twitter-share-button"
             data-url=${href}
             data-show-count="true"
-          ></a>`
-  }
+          ></a>`,
+  };
 }
 
 export function ShareButtons(props) {
@@ -54,8 +54,10 @@ export function ShareButtons(props) {
   return (
     <ShareButtonWrapper align={props.align || "right"}>
       <ShareButtonInner>
-        <TwitterWrapper ref={twitterRef} dangerouslySetInnerHTML={twitterTemplate(props.href)}>
-        </TwitterWrapper>
+        <TwitterWrapper
+          ref={twitterRef}
+          dangerouslySetInnerHTML={twitterTemplate(props.href)}
+        ></TwitterWrapper>
         <div
           className="fb-share-button"
           data-href={props.href}

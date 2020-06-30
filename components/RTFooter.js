@@ -41,9 +41,11 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           Read more in our <a href="/faq">FAQ</a>.
         </p>
         <p>
-          Our <a href="https://github.com/rtcovidlive/covid-model">model code</a> and <a href="https://github.com/rtcovidlive/covid-dash">website source</a>
-            {" "}are available on GitHub
-          .
+          Our{" "}
+          <a href="https://github.com/rtcovidlive/covid-model">model code</a>{" "}
+          and{" "}
+          <a href="https://github.com/rtcovidlive/covid-dash">website source</a>{" "}
+          are available on GitHub .
         </p>
         <p>
           Case count data from{" "}

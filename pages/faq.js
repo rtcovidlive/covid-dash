@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import "styles/App.scss";
 import { Title } from "components/Typography";
-import { HeaderInner } from "components/RTHeader"
+import { HeaderInner } from "components/RTHeader";
 import dynamic from "next/dynamic";
 
 const faqMarkdown = require("markdown/faq.md");
