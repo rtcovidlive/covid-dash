@@ -14,38 +14,10 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
         ref={footerRef}
         style={{ maxWidth: props.maxWidth }}
       >
-        <Title level={2}>
-          Calculating R<sub>t</sub>
-        </Title>
-        <p>
-          R<sub>t</sub> represents the effective reproduction rate of the virus
-          calculated for each locale. It lets us estimate how many secondary
-          infections are likely to occur from a single infection in a specific
-          area. Values over 1.0 mean we should expect more cases in that area,
-          values under 1.0 mean we should expect fewer.
-        </p>
-        <p>
-          <a
-            className="external-link"
-            target="_new"
-            onClick={() => {
-              window.ga && window.ga("send", "event", "download", "rtcsv");
-              window.open("https://d14wlfuexuxgcm.cloudfront.net/covid/rt.csv");
-            }}
-            href="https://d14wlfuexuxgcm.cloudfront.net/covid/rt.csv"
-          >
-            Download calculated R<sub>t</sub> values per-state
-          </a>
-        </p>
-        <p>
-          Read more in our <a href="/faq">FAQ</a>.
-        </p>
+        <Title level={2}>Footer</Title>
         <p>
           Our model code is open source and{" "}
-          <a href="https://github.com/rtcovidlive/covid-model">
-            available on GitHub
-          </a>
-          .
+          <a href="https://github.com/covidestim">available on GitHub</a>.
         </p>
         <p>
           Case count data from{" "}
@@ -76,17 +48,40 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           </>
         )}
         <p>
-          While we may not be able to respond to every email, you can reach out{" "}
-          <a href="mailto:hello@rt.live">here</a>.
+          Contributors to this project include:{" "}
+          <a href="http://tedcohenlab.org/Melanie-Chitwood/">
+            Melanie H. Chitwood
+          </a>
+          , <a href="http://tedcohenlab.org/">Ted Cohen</a>,{" "}
+          <a href="http://tedcohenlab.org/kenneth-gunasekera-ba/">
+            Kenneth Gunasekera
+          </a>
+          ,{" "}
+          <a href="http://tedcohenlab.org/joshua-havumaki-phd/">
+            Joshua Havumaki
+          </a>
+          ,
+          <a href="https://www.hsph.harvard.edu/nicolas-menzies/">
+            Nicolas A. Menzies
+          </a>
+          ,{" "}
+          <a href="https://medicine.yale.edu/profile/virginia_pitzer/">
+            Virginia E. Pitzer
+          </a>
+          , <a href="http://tedcohenlab.org/marcus-russi/">Marcus Russi</a>,{" "}
+          <a href="https://medicine.yale.edu/profile/joshua_warren/">
+            Joshua L. Warren
+          </a>
+          , and{" "}
+          <a href="https://medicine.yale.edu/profile/daniel_weinberger/">
+            Daniel M. Weinberger
+          </a>
+          .
         </p>
         <p>
-          Model by <a href="https://twitter.com/kevin">Kevin Systrom</a> and{" "}
-          <a href="https://twitter.com/tvladeck">Thomas Vladeck</a>. Powered by{" "}
-          <a href="https://docs.pymc.io/">PyMC3</a>.
-        </p>
-        <p>
-          Site built by <a href="https://twitter.com/mikeyk">Mike Krieger</a>,
-          with thanks to Ryan O&rsquo;Rourke and Thomas Dimson.
+          Original site built by{" "}
+          <a href="https://twitter.com/mikeyk">Mike Krieger</a>, with thanks to
+          Ryan O&rsquo;Rourke and Thomas Dimson.
         </p>
         <p>
           Visualizations built using <a href="https://d3js.org">d3</a>; site
