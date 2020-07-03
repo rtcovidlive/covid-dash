@@ -425,8 +425,8 @@ export class StackViz {
             { fill: self._disabledColor, opacity: opacity, stroke: stroke },
           ];
         }
-        let high = self.r0ValueAtOffset(series, offset, "r0_h50");
-        let low = self.r0ValueAtOffset(series, offset, "r0_l50");
+        let high = self.r0ValueAtOffset(series, offset, "r0_h80");
+        let low = self.r0ValueAtOffset(series, offset, "r0_l80");
         let val = self.r0ValueAtOffset(series, offset, "r0");
         let fill = Util.colorCodeRt(
           identifier,
