@@ -12,6 +12,12 @@ export const LOOPBACK_BASE_URL =
   process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`;
 export const CDN_ROOT = "https://d14wlfuexuxgcm.cloudfront.net/covid";
 
+class ConfigFlags {
+  constructor(useYellowInColorCode) {
+    this.useYellowInColorCode = useYellowInColorCode;
+  }
+}
+
 class Config {
   constructor(
     code,
@@ -22,7 +28,8 @@ class Config {
     subAreas,
     regionFilterOptions,
     highlightOptions,
-    knownIssues = []
+    knownIssues = [],
+    flags = new ConfigFlags()
   ) {
     this.code = code;
     this.title = title;
@@ -33,6 +40,7 @@ class Config {
     this.dataURLBase = `${CDN_ROOT}/${dataPath}`;
     this.highlightOptions = highlightOptions;
     this.knownIssues = knownIssues;
+    this.flags = flags;
   }
 
   getURLForShareImageGeneration(subArea) {
@@ -65,6 +73,31 @@ class Config {
       return result;
     }
   }
+}
+
+function DemoLand() {
+  return new Config(
+    "demo",
+    "DemoLand",
+    "State",
+    "demo_parsed_for_js5",
+    {
+      Northern: ["Rivia", "Kaedwen", "Cintra", "Lyria", "Redania"],
+      Southern: ["Nilfgaard"],
+    },
+    {
+      RI: "Rivia",
+      KA: "Kaedwen",
+      CI: "Cintra",
+      LY: "Lyria",
+      RE: "Redania",
+      NI: "Nilfgaard",
+    },
+    ["All", "Northern", "Southern"],
+    ["All", "Northern", "Southern"],
+    [],
+    new ConfigFlags(true)
+  );
 }
 
 function US() {
@@ -163,9 +196,10 @@ function US() {
     "Midwest",
     "South",
   ];
+  let flags = new ConfigFlags(false);
   return new Config(
     "us",
-    "U.S. States",
+    "U.S.",
     "State",
     "parsed_for_js5",
     ussubSets,
@@ -180,31 +214,14 @@ function US() {
       "South",
     ],
     stateDropdownOptions,
-    knownIssues
-  );
-}
-
-function Global() {
-  let subsets = {
-    "North America": ["US", "CA", "MX"],
-  };
-
-  return new Config(
-    "global",
-    "Top Countries",
-    "Country",
-    "https://d14wlfuexuxgcm.cloudfront.net/covid/topcountries_for_js",
-    subsets,
-    CountriesByCode,
-    ["All", "N. America"],
-    ["G-7", "N. America", "S. America", "Africa"],
-    []
+    knownIssues,
+    flags
   );
 }
 
 function PageConfigInner() {
   this.us = US();
-  this.global = Global();
+  this.demo = DemoLand();
 }
 
 const PageConfig = new PageConfigInner();

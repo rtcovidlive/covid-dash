@@ -123,7 +123,8 @@ export class RTStackedChart extends Component {
       },
       () => {
         this.handleStateMouseout();
-      }
+      },
+      this.props.config.flags
     );
     if (this.props.data.length) {
       this._viz.setActiveStates(this.props.focusedStates, false);

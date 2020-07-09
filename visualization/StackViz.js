@@ -11,7 +11,13 @@ import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 
 export class StackViz {
-  constructor(el, stateClickedCallback, onStateMouseover, onStateMouseOut) {
+  constructor(
+    el,
+    stateClickedCallback,
+    onStateMouseover,
+    onStateMouseOut,
+    configFlags
+  ) {
     this._el = el;
     this._redColor = "rgba(235, 83, 88, 1.0)";
     this._greenColor = "rgba(53, 179, 46, 1.0)";
@@ -30,6 +36,7 @@ export class StackViz {
     this._onStateMouseOut = onStateMouseOut || function () {};
     this._currentOffset = -1 - Constants.daysOffsetSinceEnd;
     this._offsetQueue = [];
+    this._configFlags = configFlags;
     this.startup();
   }
 
@@ -432,7 +439,8 @@ export class StackViz {
           identifier,
           self.r0ValueAtOffset(series, offset, "r0"),
           low,
-          high
+          high,
+          this._configFlags.useYellowInColorCode
         );
         return [
           identifier,

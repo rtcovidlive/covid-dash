@@ -3,25 +3,26 @@ import _ from "lodash";
 import PageConfig from "config/PageConfig";
 import { RTBase } from "components/RTBase";
 import { RTSubareaOverview } from "components/RTSubareaOverview";
+import { getActiveCountries } from "config/ActiveConfig";
 
 export async function getStaticPaths() {
-  let active = _.keys(PageConfig);
+  let active = getActiveCountries();
   let staticPaths = {
     fallback: false,
     paths: _.flatten(
       active.map((country) => {
         return _.flatten(
-          _.map(_.keys(PageConfig[country].subAreas), (subArea) => {
+          _.map(_.keys(country.subAreas), (subArea) => {
             return [
               {
                 params: {
-                  countrycode: country,
+                  countrycode: country.code,
                   subarea: subArea,
                 },
               },
               {
                 params: {
-                  countrycode: country,
+                  countrycode: country.code,
                   subarea: subArea.toLowerCase(),
                 },
               },

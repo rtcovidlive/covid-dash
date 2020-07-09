@@ -99,6 +99,7 @@ export const RTHero = React.forwardRef(function (props, ref) {
               props.width
             }
             height={480}
+            config={props.config}
             onStateClicked={props.stateClickHandler}
             verticalMode={true}
             subAreas={props.config.subAreas}
@@ -124,6 +125,7 @@ export const RTHero = React.forwardRef(function (props, ref) {
             (rtRef.current && rtRef.current.getBoundingClientRect().width) ||
             props.width
           }
+          config={props.config}
           height={480}
           subAreas={props.config.subAreas}
           onStateClicked={props.stateClickHandler}

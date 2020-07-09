@@ -174,7 +174,7 @@ export function RTSubareaOverview(props) {
   });
   let navigationQuery = Util.getNavigationQuery(document.location.search);
   let subareaMenuItems = [
-    { key: "_overall", label: "Overall U.S." },
+    { key: "_overall", label: `Overall ${props.config.title}` },
     ..._.map(config.subAreas, (val, key) => {
       return {
         key: key,

@@ -1,17 +1,18 @@
 import _ from "lodash";
 import PageConfig from "config/PageConfig";
 import RTPage from "pages/[countrycode]/index";
+import { getActiveCountries } from "config/ActiveConfig";
 
 export async function getStaticPaths() {
-  let active = _.keys(PageConfig);
+  let active = getActiveCountries();
   let staticPaths = {
     fallback: false,
     paths: _.flatten(
       active.map((country) => {
-        return _.map(_.keys(PageConfig[country].subAreas), (subArea) => {
+        return _.map(_.keys(country.subAreas), (subArea) => {
           return {
             params: {
-              countrycode: country,
+              countrycode: country.code,
               subarea: subArea,
             },
           };

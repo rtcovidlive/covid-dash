@@ -1,17 +1,17 @@
 import _ from "lodash";
+import { getActiveCountries } from "config/ActiveConfig";
 import React, { useState, useEffect, useRef } from "react";
-import PageConfig from "config/PageConfig";
 import { RTOverview } from "components/RTOverview";
 import { RTBase } from "components/RTBase";
 
 export async function getStaticPaths() {
-  let active = _.keys(PageConfig);
+  let active = getActiveCountries();
   return {
     fallback: false,
     paths: active.map((country) => {
       return {
         params: {
-          countrycode: country,
+          countrycode: country.code,
         },
       };
     }),

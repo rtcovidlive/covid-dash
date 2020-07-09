@@ -1,5 +1,6 @@
 import "styles/export.scss";
 import _ from "lodash";
+import { getActiveCountries } from "config/ActiveConfig";
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 import { useRouter } from "next/router";
@@ -13,13 +14,13 @@ import Constants from "lib/Constants";
 import { Util } from "lib/Util";
 
 export async function getStaticPaths() {
-  let active = _.keys(PageConfig);
+  let active = getActiveCountries();
   return {
     fallback: false,
     paths: active.map((country) => {
       return {
         params: {
-          countrycode: country,
+          countrycode: country.code,
         },
       };
     }),
