@@ -26,7 +26,8 @@ var t=c[p];c[p]=function(a){m({p:a.reason});t&&t.apply(c,arguments)};f||setTimeo
           'TypeError: NetworkError when attempting to fetch resource.',
           'TypeError: Cancelled',
           'Error: timeout of 0ms exceeded',
-          'Error: Network Error'
+          'Error: Network Error',
+          'ResizeObserver loop limit exceeded'
         ]
       });
     });
