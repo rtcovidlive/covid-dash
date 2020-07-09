@@ -13,8 +13,9 @@ export const LOOPBACK_BASE_URL =
 export const CDN_ROOT = "https://d14wlfuexuxgcm.cloudfront.net/covid";
 
 class ConfigFlags {
-  constructor(useYellowInColorCode) {
+  constructor(useYellowInColorCode, allowSharing) {
     this.useYellowInColorCode = useYellowInColorCode;
+    this.allowSharing = allowSharing;
   }
 }
 
@@ -96,7 +97,7 @@ function DemoLand() {
     ["All", "Northern", "Southern"],
     ["All", "Northern", "Southern"],
     [],
-    new ConfigFlags(true)
+    new ConfigFlags(true, false)
   );
 }
 
@@ -196,7 +197,7 @@ function US() {
     "Midwest",
     "South",
   ];
-  let flags = new ConfigFlags(false);
+  let flags = new ConfigFlags(false, true);
   return new Config(
     "us",
     "U.S.",

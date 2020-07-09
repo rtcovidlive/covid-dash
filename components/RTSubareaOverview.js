@@ -213,7 +213,9 @@ export function RTSubareaOverview(props) {
           <div ref={rtRef} className="rt-subarea-page-inner">
             <Header>
               <HeaderRow>
-                {shareRowOnTop && shareOptions}
+                {shareRowOnTop &&
+                  props.config.flags.allowSharing &&
+                  shareOptions}
                 <Col size={shareRowOnTop ? 24 : 12}>
                   <Dropdown
                     options={subareaMenuItems}
@@ -243,7 +245,9 @@ export function RTSubareaOverview(props) {
                     </SubareaName>
                   </Dropdown>
                 </Col>
-                {!shareRowOnTop && shareOptions}
+                {!shareRowOnTop &&
+                  props.config.flags.allowSharing &&
+                  shareOptions}
               </HeaderRow>
               <StatRow
                 config={config}
