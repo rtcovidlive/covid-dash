@@ -57,7 +57,7 @@ Yes please! [hello@rt.live](mailto:hello@rt.live) – please note that due to an
 
 ## Who are you folks?
 
-Kevin Systrom and Mike Krieger are the co-founders of Instagram. Tom Vladeck is a data scientist and owner of Gradient Metrics. This projects is not affiliated with with either Instagram or Gradient Metrics.
+Kevin Systrom and Mike Krieger are the co-founders of Instagram. Tom Vladeck is a data scientist and owner of Gradient Metrics. This project is not affiliated with with either Instagram or Gradient Metrics.
 
 ## Why did you create this site?
 
