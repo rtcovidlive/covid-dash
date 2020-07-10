@@ -4,7 +4,6 @@ First, note that we changed the model significantly on June 19th. See the questi
 
 Otherwise, the reason historical values change is that we are not producing a single point each day, but rather a single curve. One of the constraints of the model is that this curve be connected and smooth. So, if new data suggests that R<sub>t</sub> should be higher, it will pull up previous values so that the newest point is connected. Imagine a rope lying on the ground. If you pick up the end of that rope, the rope needs to slope up to your hand. The same thing is roughly happening with the model. If all of a sudden a testing center releases far more tests than were expected, the R<sub>t</sub> curve increases which drags up previous values of R<sub>t</sub>. Since case data is staggered in its arrival, a bunch of new cases will sometimes rewrite its view of history given the new data. This is the most honest representation of the situation although it can feel disorienting if you don’t understand why it’s happening.
 
-
 ## If one state has a higher R<sub>t</sub> than another state, does that mean the situation is worse in the former vs. the latter?
 
 Not necessarily. To assess the situation, you should take into account both R<sub>t</sub> and the absolute number of cases. A state with 1000 new cases a day and R<sub>t</sub> = 1.0 is likely in worse shape than a state with 10 new cases per day and R<sub>t</sub> = 1.1. The worse-case scenario is R<sub>t</sub> >> 1 and many new cases per day.
@@ -57,7 +56,7 @@ Yes please! [hello@rt.live](mailto:hello@rt.live) – please note that due to an
 
 ## Who are you folks?
 
-Kevin Systrom and Mike Krieger are the co-founders of Instagram. Tom Vladeck is a data scientist and owner of Gradient Metrics. This project is not affiliated with with either Instagram or Gradient Metrics.
+Kevin Systrom and Mike Krieger are the co-founders of Instagram. Tom Vladeck is a data scientist and owner of Gradient Metrics. This project is not affiliated with either Instagram or Gradient Metrics.
 
 ## Why did you create this site?
 
@@ -78,6 +77,7 @@ Yes, it's available [here](/privacy).
 # Known Issues
 
 While we believe our model is very strong, all models have limitations because they reduce a complex reality into a simple system. You should be aware of the following limitations of this model when interpreting the results:
+
 - Our model relies upon valid data from COVIDTracking.com, and they in turn rely on states to provide timely and accurate data as well. Unfortunately, data can be noisy, incorrect, delayed, and otherwise wrong. While on average, we believe the data to be correct, there are times when an errant datapoint throws the model off. Please let us know if you see an instance of this.
 - Our model attempts to correct for testing by looking at what is essentially the positivity rate. This positivity rate changes over time because the group of people tested changes. If anything, our model may understate R<sub>t</sub> currently because far more people without symptoms are tested, thus driving the positive percentage down and overstating a downward trend in cases.
 - Our model relies upon a distribution for the delay between infection and reported positive test. Most of the data used to generate this distribution is from Germany and a handful of other countries – it is quite possible this delay distribution may look very different in the US and state by state.
