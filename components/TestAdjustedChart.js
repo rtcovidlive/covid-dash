@@ -32,19 +32,19 @@ export class TestAdjustedChart extends RTSubareaChart {
         <TopLegendContainer>
           <LegendRow>
             <LegendLine backgroundColor={this.state.viz._mainChartBars} />
-            <LegendLabel>Adjusted Positive</LegendLabel>
+            <LegendLabel>Cases</LegendLabel>
           </LegendRow>
           <LegendRow>
             <LegendLine
               backgroundColor={this.state.viz._mainChartCountStroke}
             />
-            <LegendLabel>De-noised Adjusted Positive</LegendLabel>
+            <LegendLabel>Fitted Cases</LegendLabel>
           </LegendRow>
           <LegendRow>
             <LegendLine
               backgroundColor={this.state.viz._mainChartInfectionStroke}
             />
-            <LegendLabel>Implied Infections</LegendLabel>
+            <LegendLabel>Infections</LegendLabel>
           </LegendRow>
         </TopLegendContainer>
       </>
@@ -57,15 +57,15 @@ export class TestAdjustedChart extends RTSubareaChart {
         <TooltipDate>
           {this._timeFormat(Util.dateFromISO(data.dataPoint.date))}
         </TooltipDate>
-        <TooltipLabel>Adjusted Positive</TooltipLabel>
+        <TooltipLabel>Cases</TooltipLabel>
         <TooltipStat color={this.state.viz._mainChartCountStroke} opacity={0.6}>
           {this._numberFormat(data.dataPoint.corr_cases_raw)}
         </TooltipStat>
-        <TooltipLabel>De-noised Adjusted Positive</TooltipLabel>
+        <TooltipLabel>Fitted Cases</TooltipLabel>
         <TooltipStat color={this.state.viz._mainChartCountStroke} opacity={0.9}>
           {this._numberFormat(data.dataPoint.corr_cases_new)}
         </TooltipStat>
-        <TooltipLabel>Implied Infections</TooltipLabel>
+        <TooltipLabel>Infections</TooltipLabel>
         <TooltipStat
           color={this.state.viz._mainChartInfectionStroke}
           opacity={0.7}
