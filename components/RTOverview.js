@@ -10,6 +10,7 @@ import { RTFooter } from "./RTFooter";
 import RTHeader from "./RTHeader";
 import RTHero from "./RTHero";
 import { Util } from "lib/Util";
+import Constants from "lib/Constants";
 
 const refsByState = {};
 const footerRef = React.createRef();
@@ -61,6 +62,19 @@ export function RTOverview(props) {
     colsPerChart = 6;
     rowCount = 4;
   }
+
+  let handleRadioButton = function (e) {
+    let name = e.target.value;
+    if (name === "r0") {
+      this.setState({ enabledModes: [Constants.MetricOptions.DerivedR0] });
+    } else if (name === "infections") {
+      this.setState({ enabledModes: [Constants.MetricOptions.TrueInfections] });
+    }
+    console.log(
+      `Did it! this.state.enabledModes is ${this.state.enabledModes}`
+    );
+  };
+
   return (
     <>
       <RTHeader
@@ -85,6 +99,31 @@ export function RTOverview(props) {
             isSmallScreen={isSmallScreen}
             stateClickHandler={stateClickHandler}
           />
+          <Row className="stacked-states-outer">
+            <div>
+              <input
+                onChange={handleRadioButton}
+                type="radio"
+                id="r0"
+                name="r0"
+                value="r0"
+              />
+              <label htmlFor="r0">
+                R<sub>t</sub>
+              </label>
+            </div>
+
+            <div>
+              <input
+                onChange={handleRadioButton}
+                type="radio"
+                id="infections"
+                name="infections"
+                value="infections"
+              />
+              <label htmlFor="infections">True infections</label>
+            </div>
+          </Row>
           <Row className="stacked-states-outer">
             {rtData &&
               _.map(
@@ -123,6 +162,8 @@ export function RTOverview(props) {
                           highlight={clickedOnState === state}
                           hasOwnRow={isSmallScreen}
                           data={rtData.dataSeries[state]}
+                          enabledModes={[Constants.MetricOptions.DerivedR0]}
+                          yDomain={[0.2, 2.0]}
                           contentWidth={props.width}
                         />
                       </div>

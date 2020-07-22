@@ -101,6 +101,30 @@ class CovidViz {
               let raw = dataPoint[metricOverride || "r0"];
               return Math.max(0, raw);
             },
+            p5: (dataPoint) => this.m(dataPoint, "r0_l80"),
+            p95: (dataPoint) => this.m(dataPoint, "r0_h80"),
+          };
+          break;
+        }
+        case Constants.MetricOptions.TrueInfections: {
+          conf = {
+            submetric: "onsets",
+            legend: "True infections",
+            label: "True infections",
+            colorCodeStroke: false,
+            tooltipPrecision: ",.0f",
+            showAnnotations:
+              this._showAnnotations && this._enabledModes.length === 1,
+            confidenceBounds: true,
+            lineColorForEntry: (identifier, entry) => {
+              return "black";
+            },
+            m: (dataPoint, metricOverride) => {
+              let raw = dataPoint[metricOverride || "onsets"];
+              return Math.max(0, raw);
+            },
+            p5: (dataPoint) => this.m(dataPoint, "onsets_l95"),
+            p95: (dataPoint) => this.m(dataPoint, "onsets_h95"),
           };
           break;
         }
@@ -118,8 +142,6 @@ class CovidViz {
         conf.m = (dataPoint, metricOverride) =>
           this.m(dataPoint, conf.submetric, metricOverride);
       }
-      conf.p5 = (dataPoint) => this.m(dataPoint, "r0_l80");
-      conf.p95 = (dataPoint) => this.m(dataPoint, "r0_h80");
       conf.i = (dataPoint) => this.i(dataPoint);
       conf.formatDatapointForTooltip = (identifier, dataPoint) => {
         let numberFormat = format(conf.tooltipPrecision);

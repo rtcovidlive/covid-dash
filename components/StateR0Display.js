@@ -133,10 +133,11 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             width={contentWidth}
             height={chartHeight}
             yAxisPosition={showCases ? "none" : "right"}
-            yDomain={[0.2, 2.0]}
+            yDomain={props.yDomain}
             drawOuterBorder={true}
             isHovered={hovered}
             isUnderlayed={showCases}
+            enabledModes={props.enabledModes}
           />
         </div>
       )}

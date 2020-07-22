@@ -37,7 +37,7 @@ export function StateRtChart(props) {
   return (
     <VisualizationChart
       data={[props.data]}
-      enabledModes={[Constants.MetricOptions.DerivedR0]}
+      enabledModes={props.enabledModes || [Constants.MetricOptions.DerivedR0]}
       logScale={false}
       indexing={Constants.IndexingOptions.ByDate}
       singleStateView={true}
