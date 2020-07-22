@@ -89,6 +89,12 @@ export function RTOverview(props) {
         yDomain: [0, 400],
         id: name,
       });
+    } else if (name === "seroprevalence") {
+      useSelectedData({
+        enabledModes: [Constants.MetricOptions.Seroprevalence],
+        yDomain: [0, 40],
+        id: name,
+      });
     }
   };
 
@@ -155,6 +161,18 @@ export function RTOverview(props) {
               <label htmlFor="infectionsPC">
                 Estimated infections per 100k
               </label>
+            </div>
+
+            <div>
+              <input
+                onChange={handleRadioButton}
+                checked={selectedData.id === "seroprevalence"}
+                type="radio"
+                id="seroprevalence"
+                name="seroprevalence"
+                value="seroprevalence"
+              />
+              <label htmlFor="seroprevalence">Seroprevalence</label>
             </div>
           </Row>
           <Row className="stacked-states-outer">
