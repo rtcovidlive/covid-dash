@@ -129,6 +129,29 @@ class CovidViz {
           };
           break;
         }
+        case Constants.MetricOptions.TrueInfectionsPC: {
+          conf = {
+            submetric: "onsetsPC",
+            legend: "Infections per 100k",
+            label: "Infections per 100k",
+            colorCodeStroke: false,
+            tooltipPrecision: ",.0f",
+            showAnnotations:
+              this._showAnnotations && this._enabledModes.length === 1,
+            confidenceBounds: true,
+            confidenceBoundsBackground: "rgba(185, 225, 245, 1)",
+            lineColorForEntry: (identifier, entry) => {
+              return "rgba(0, 145, 255, 1)";
+            },
+            m: (dataPoint, metricOverride) => {
+              let raw = dataPoint[metricOverride || "onsetsPC"];
+              return Math.max(0, raw);
+            },
+            p5: (dataPoint) => this.m(dataPoint, "onsetsPC_l95"),
+            p95: (dataPoint) => this.m(dataPoint, "onsetsPC_h95"),
+          };
+          break;
+        }
         default: {
           throw new Error("Unknown Metric");
         }

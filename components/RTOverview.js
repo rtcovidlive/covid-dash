@@ -75,13 +75,19 @@ export function RTOverview(props) {
       useSelectedData({
         enabledModes: [Constants.MetricOptions.DerivedR0],
         yDomain: [0.2, 2],
-        id: "r0",
+        id: name,
       });
     } else if (name === "infections") {
       useSelectedData({
         enabledModes: [Constants.MetricOptions.TrueInfections],
         yDomain: [0, 100000],
-        id: "infections",
+        id: name,
+      });
+    } else if (name === "infectionsPC") {
+      useSelectedData({
+        enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
+        yDomain: [0, 400],
+        id: name,
       });
     }
   };
@@ -134,7 +140,21 @@ export function RTOverview(props) {
                 name="infections"
                 value="infections"
               />
-              <label htmlFor="infections">True infections</label>
+              <label htmlFor="infections">Estimated infections</label>
+            </div>
+
+            <div>
+              <input
+                onChange={handleRadioButton}
+                checked={selectedData.id === "infectionsPC"}
+                type="radio"
+                id="infectionsPC"
+                name="infectionsPC"
+                value="infectionsPC"
+              />
+              <label htmlFor="infectionsPC">
+                Estimated infections per 100k
+              </label>
             </div>
           </Row>
           <Row className="stacked-states-outer">
