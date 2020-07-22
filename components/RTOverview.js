@@ -24,6 +24,12 @@ function stateClickHandler(stateCode) {
 }
 
 export function RTOverview(props) {
+  const [selectedData, useSelectedData] = useState({
+    yDomain: [0.2, 2],
+    enabledModes: [Constants.MetricOptions.DerivedR0],
+    id: "r0",
+  });
+
   let isSmallScreen = props.width <= 768;
   let config = props.config;
 
@@ -66,13 +72,18 @@ export function RTOverview(props) {
   let handleRadioButton = function (e) {
     let name = e.target.value;
     if (name === "r0") {
-      this.setState({ enabledModes: [Constants.MetricOptions.DerivedR0] });
+      useSelectedData({
+        enabledModes: [Constants.MetricOptions.DerivedR0],
+        yDomain: [0.2, 2],
+        id: "r0",
+      });
     } else if (name === "infections") {
-      this.setState({ enabledModes: [Constants.MetricOptions.TrueInfections] });
+      useSelectedData({
+        enabledModes: [Constants.MetricOptions.TrueInfections],
+        yDomain: [0, 100000],
+        id: "infections",
+      });
     }
-    console.log(
-      `Did it! this.state.enabledModes is ${this.state.enabledModes}`
-    );
   };
 
   return (
@@ -103,6 +114,7 @@ export function RTOverview(props) {
             <div>
               <input
                 onChange={handleRadioButton}
+                checked={selectedData.id === "r0"}
                 type="radio"
                 id="r0"
                 name="r0"
@@ -116,6 +128,7 @@ export function RTOverview(props) {
             <div>
               <input
                 onChange={handleRadioButton}
+                checked={selectedData.id === "infections"}
                 type="radio"
                 id="infections"
                 name="infections"
@@ -162,8 +175,8 @@ export function RTOverview(props) {
                           highlight={clickedOnState === state}
                           hasOwnRow={isSmallScreen}
                           data={rtData.dataSeries[state]}
-                          enabledModes={[Constants.MetricOptions.DerivedR0]}
-                          yDomain={[0.2, 2.0]}
+                          enabledModes={selectedData.enabledModes}
+                          yDomain={selectedData.yDomain}
                           contentWidth={props.width}
                         />
                       </div>

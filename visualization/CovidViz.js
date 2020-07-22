@@ -116,8 +116,9 @@ class CovidViz {
             showAnnotations:
               this._showAnnotations && this._enabledModes.length === 1,
             confidenceBounds: true,
+            confidenceBoundsBackground: "rgba(185, 225, 245, 1)",
             lineColorForEntry: (identifier, entry) => {
-              return "black";
+              return "rgba(0, 145, 255, 1)";
             },
             m: (dataPoint, metricOverride) => {
               let raw = dataPoint[metricOverride || "onsets"];
@@ -818,7 +819,10 @@ class CovidViz {
       .join("g")
       .style("pointer-events", "none")
       .attr("fill", (d) => {
-        return `url(#${this._backgroundGradientID})`;
+        return (
+          conf.confidenceBoundsBackground ||
+          `url(#${this._backgroundGradientID})`
+        );
       });
 
     areaContainer

@@ -3,7 +3,7 @@ import Constants from "lib/Constants";
 
 export function StateRtChart(props) {
   const primaryColorScale = (i) => {
-    return "black";
+    return "rgba(0, 145, 255, 1)";
   };
   var rightPadding;
   var leftPadding = 4;
