@@ -255,12 +255,13 @@ export function RTSubareaOverview(props) {
               />
             </Header>
             <ChartTitle level={2}>
-              Effective Reproduction Rate &middot; R<sub>t</sub>
+              Effective Reproduction Number &middot; R<sub>t</sub>
             </ChartTitle>
             <Explanation>
-              R<sub>t</sub> is the average number of people who become infected
-              by an infectious person. If it&rsquo;s above 1.0, COVID-19 will
-              spread quickly. If it&rsquo;s below 1.0, infections will slow.
+              R<sub>t</sub> is the average number of people that will become
+              infected by a person infected today. If it&rsquo;s above 1.0,
+              COVID-19 cases will increase in the near future. If it&rsquo;s
+              below 1.0, COVID-19 cases will decrease in the near future.
             </Explanation>
             {contentWidth && (
               <RTChartWrapper>
@@ -283,14 +284,12 @@ export function RTSubareaOverview(props) {
                 height={chartHeight + 120}
               />
             )}
-            <ChartTitle level={2}>
-              Adjusted Positive Tests & Implied Infections
-            </ChartTitle>
+            <ChartTitle level={2}>Fitted Cases and Infections</ChartTitle>
             <Explanation>
-              We adjust positive tests for the number of tests done. Then, we
-              calculate an implied infection curve. This uses a known
-              distribution of how much time passes between infection and a
-              confirmed positive report.
+              We estimate daily new COVID-19 infections and diagnosed cases
+              based on the daily number of reported cases and deaths. We account
+              for the delays from infection to symptom onset and from symptom
+              onset to diagnosis and the gaps in case detection.
             </Explanation>
             {contentWidth && (
               <TestAdjustedChart

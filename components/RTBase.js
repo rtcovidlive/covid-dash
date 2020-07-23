@@ -94,7 +94,7 @@ export function RTBase(props) {
           </DataFetchContext.Consumer>
         </DataFetchContext.Provider>
       </div>
-      <GoogleAnalyticsTag analyticsID="UA-163852138-1" />
+      <GoogleAnalyticsTag analyticsID="UA-173420256-1" />
     </div>
   );
 }
