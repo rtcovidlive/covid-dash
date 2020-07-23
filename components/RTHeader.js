@@ -60,7 +60,9 @@ export function RTHeader(props) {
             . You can also run our model with your own data, using the{" "}
             <a href="http://pkg.covidestim.org">covidestim R package</a>. Our
             data source for the following estimates is the{" "}
-            <a href="https://covidtracking.com/">COVID Tracking Project</a>.
+            <a href="https://covidtracking.com/">COVID Tracking Project</a>, and
+            our dashboard was adapted from{" "}
+            <a href="https://github.com/rtcovidlive/covid-dash">covid-dash</a>.
             Every part of our data pipeline can be viewed{" "}
             <a href="https://github.com/covidestim">here</a>.
           </p>
