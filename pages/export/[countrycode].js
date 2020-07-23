@@ -84,7 +84,7 @@ export default function RTExportPage(props) {
     <Row className="export-single-area image-me" data-image-key={subArea}>
       <Col className="export-details" size={12}>
         <p className="export-last-run">{lastModelRun}</p>
-        <p className="export-url">https://rt.live</p>
+        <p className="export-url">https://covidestim.org</p>
 
         <p className="export-title">{config.subAreas[subArea]}</p>
         <p

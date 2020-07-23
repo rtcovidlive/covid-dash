@@ -194,7 +194,7 @@ export function RTSubareaOverview(props) {
     >
       <ShareButtons
         align={shareRowOnTop ? "left" : "right"}
-        href={`https://rt.live/${props.config.code}/${props.subArea}`}
+        href={`https://covidestim.org/${props.config.code}/${props.subArea}`}
       />
     </Col>
   );
