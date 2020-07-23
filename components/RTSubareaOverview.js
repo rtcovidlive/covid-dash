@@ -288,8 +288,8 @@ export function RTSubareaOverview(props) {
             <Explanation>
               We estimate daily new COVID-19 infections and diagnosed cases
               based on the daily number of reported cases and deaths. We account
-              for the delays from infection to symptom onset and from symptom
-              onset to diagnosis and the gaps in case detection.
+              for the delays from infection to symptom onset, and from symptom
+              onset to diagnosis. Gaps in case detection are taken into account.
             </Explanation>
             {contentWidth && (
               <TestAdjustedChart
