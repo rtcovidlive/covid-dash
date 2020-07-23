@@ -25,9 +25,9 @@ function stateClickHandler(stateCode) {
 
 export function RTOverview(props) {
   const [selectedData, useSelectedData] = useState({
-    yDomain: [0.2, 2],
-    enabledModes: [Constants.MetricOptions.DerivedR0],
-    id: "r0",
+    enabledModes: [Constants.MetricOptions.TrueInfections],
+    yDomain: [0, 100000],
+    id: "infections",
   });
 
   let isSmallScreen = props.width <= 768;
@@ -114,29 +114,7 @@ export function RTOverview(props) {
             (isSmallScreen ? "rt-container-small" : "rt-container-wide")
           }
         >
-          <RTHero
-            ref={heroRef}
-            rtData={rtData}
-            rtRef={rtRef}
-            config={config}
-            isSmallScreen={isSmallScreen}
-            stateClickHandler={stateClickHandler}
-          />
           <Row className="stacked-states-outer">
-            <div>
-              <input
-                onChange={handleRadioButton}
-                checked={selectedData.id === "r0"}
-                type="radio"
-                id="r0"
-                name="r0"
-                value="r0"
-              />
-              <label htmlFor="r0">
-                R<sub>t</sub>
-              </label>
-            </div>
-
             <div>
               <input
                 onChange={handleRadioButton}
@@ -166,13 +144,27 @@ export function RTOverview(props) {
             <div>
               <input
                 onChange={handleRadioButton}
+                checked={selectedData.id === "r0"}
+                type="radio"
+                id="r0"
+                name="r0"
+                value="r0"
+              />
+              <label htmlFor="r0">
+                R<sub>t</sub>
+              </label>
+            </div>
+
+            <div>
+              <input
+                onChange={handleRadioButton}
                 checked={selectedData.id === "seroprevalence"}
                 type="radio"
                 id="seroprevalence"
                 name="seroprevalence"
                 value="seroprevalence"
               />
-              <label htmlFor="seroprevalence">Seroprevalence</label>
+              <label htmlFor="seroprevalence">Estimated seroprevalence</label>
             </div>
           </Row>
           <Row className="stacked-states-outer">
@@ -223,6 +215,14 @@ export function RTOverview(props) {
                 }
               )}
           </Row>
+          <RTHero
+            ref={heroRef}
+            rtData={rtData}
+            rtRef={rtRef}
+            config={config}
+            isSmallScreen={isSmallScreen}
+            stateClickHandler={stateClickHandler}
+          />
         </div>
       </div>
       <RTFooter
