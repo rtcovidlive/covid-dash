@@ -260,11 +260,7 @@ export function RTSubareaOverview(props) {
             <Explanation>
               R<sub>t</sub> is the average number of people who become infected
               by an infectious person. If it&rsquo;s above 1.0, COVID-19 will
-              spread quickly. If it&rsquo;s below 1.0, infections will slow.{" "}
-              <Link href="/faq" as="/faq">
-                <a>Learn More</a>
-              </Link>
-              .{" "}
+              spread quickly. If it&rsquo;s below 1.0, infections will slow.
             </Explanation>
             {contentWidth && (
               <RTChartWrapper>
