@@ -62,7 +62,7 @@ export class VisualizationChart extends Component {
         width={this.props.width}
         height={this.props.height}
         className="svg-container"
-        style={{ overflow: "hidden" }}
+        style={{ overflow: "visible" }}
         ref={this.containerRef}
       ></svg>
     );
