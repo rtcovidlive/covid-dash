@@ -11,6 +11,7 @@ import RTHeader from "./RTHeader";
 import RTHero from "./RTHero";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
+import { Button } from "./Button";
 
 const refsByState = {};
 const footerRef = React.createRef();
@@ -24,11 +25,44 @@ function stateClickHandler(stateCode) {
 }
 
 export function RTOverview(props) {
-  const [selectedData, useSelectedData] = useState({
-    enabledModes: [Constants.MetricOptions.TrueInfections],
-    yDomain: [0, 100000],
-    id: "infections",
-  });
+  let outcomeTypes = {
+    infections: {
+      enabledModes: [Constants.MetricOptions.TrueInfections],
+      yDomain: [0, 100000],
+      id: "infections",
+      label: "Estimated infections",
+    },
+    infectionsPC: {
+      enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
+      yDomain: [0, 400],
+      id: "infectionsPC",
+      label: "Estimated infections per 100k",
+    },
+    r0: {
+      enabledModes: [Constants.MetricOptions.DerivedR0],
+      yDomain: [0.2, 2],
+      id: "r0",
+      label: (
+        <span>
+          R<sub>t</sub>
+        </span>
+      ),
+    },
+    seroprevalence: {
+      enabledModes: [Constants.MetricOptions.Seroprevalence],
+      yDomain: [0, 40],
+      id: "seroprevalence",
+      label: "Estimated seroprevalence",
+    },
+  };
+
+  const [selectedOutcome, useSelectedOutcome] = useState(
+    outcomeTypes.infections
+  );
+
+  let handleRadioButton = function (name) {
+    useSelectedOutcome(outcomeTypes[name]);
+  };
 
   let isSmallScreen = props.width <= 768;
   let config = props.config;
@@ -69,35 +103,6 @@ export function RTOverview(props) {
     rowCount = 4;
   }
 
-  let handleRadioButton = function (e) {
-    let name = e.target.value;
-    if (name === "r0") {
-      useSelectedData({
-        enabledModes: [Constants.MetricOptions.DerivedR0],
-        yDomain: [0.2, 2],
-        id: name,
-      });
-    } else if (name === "infections") {
-      useSelectedData({
-        enabledModes: [Constants.MetricOptions.TrueInfections],
-        yDomain: [0, 100000],
-        id: name,
-      });
-    } else if (name === "infectionsPC") {
-      useSelectedData({
-        enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
-        yDomain: [0, 400],
-        id: name,
-      });
-    } else if (name === "seroprevalence") {
-      useSelectedData({
-        enabledModes: [Constants.MetricOptions.Seroprevalence],
-        yDomain: [0, 40],
-        id: name,
-      });
-    }
-  };
-
   return (
     <>
       <RTHeader
@@ -114,58 +119,27 @@ export function RTOverview(props) {
             (isSmallScreen ? "rt-container-small" : "rt-container-wide")
           }
         >
-          <Row className="stacked-states-outer">
-            <div>
-              <input
-                onChange={handleRadioButton}
-                checked={selectedData.id === "infections"}
-                type="radio"
-                id="infections"
-                name="infections"
-                value="infections"
-              />
-              <label htmlFor="infections">Estimated infections</label>
-            </div>
-
-            <div>
-              <input
-                onChange={handleRadioButton}
-                checked={selectedData.id === "infectionsPC"}
-                type="radio"
-                id="infectionsPC"
-                name="infectionsPC"
-                value="infectionsPC"
-              />
-              <label htmlFor="infectionsPC">
-                Estimated infections per 100k
-              </label>
-            </div>
-
-            <div>
-              <input
-                onChange={handleRadioButton}
-                checked={selectedData.id === "r0"}
-                type="radio"
-                id="r0"
-                name="r0"
-                value="r0"
-              />
-              <label htmlFor="r0">
-                R<sub>t</sub>
-              </label>
-            </div>
-
-            <div>
-              <input
-                onChange={handleRadioButton}
-                checked={selectedData.id === "seroprevalence"}
-                type="radio"
-                id="seroprevalence"
-                name="seroprevalence"
-                value="seroprevalence"
-              />
-              <label htmlFor="seroprevalence">Estimated seroprevalence</label>
-            </div>
+          <Row className="stacked-chart-controls">
+            {_.map(outcomeTypes, (outcome) => {
+              return (
+                <Button
+                  onClick={() => handleRadioButton(outcome.id)}
+                  key={outcome.id}
+                  active={selectedOutcome.id === outcome.id}
+                  shape="round"
+                >
+                  <input
+                    checked={selectedOutcome.id === outcome.id}
+                    type="radio"
+                    id={outcome.id}
+                    name={outcome.id}
+                    value={outcome.id}
+                    readOnly
+                  />
+                  <label htmlFor={outcome.id}>{outcome.label}</label>
+                </Button>
+              );
+            })}
           </Row>
           <Row className="stacked-states-outer">
             {rtData &&
@@ -205,8 +179,8 @@ export function RTOverview(props) {
                           highlight={clickedOnState === state}
                           hasOwnRow={isSmallScreen}
                           data={rtData.dataSeries[state]}
-                          enabledModes={selectedData.enabledModes}
-                          yDomain={selectedData.yDomain}
+                          enabledModes={selectedOutcome.enabledModes}
+                          yDomain={selectedOutcome.yDomain}
                           contentWidth={props.width}
                         />
                       </div>

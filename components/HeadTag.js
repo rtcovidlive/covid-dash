@@ -7,7 +7,9 @@ export default function HeadTag(props) {
   } else {
     ogURL = "https://covidestim.org/";
   }
-  let ogTitle = props.pageTitle ? props.pageTitle.split(":")[0] : "Rt COVID-19";
+  let ogTitle = props.pageTitle
+    ? props.pageTitle.split(":")[0]
+    : "covidestim: COVID-19 nowcasting";
   return (
     <Head>
       <meta charSet="utf-8" />

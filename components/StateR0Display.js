@@ -17,6 +17,7 @@ const DetailsLink = styled.div`
   text-align: right;
 
   :hover {
+    font-weight: bold;
     text-decoration: underline;
   }
 `;
@@ -112,7 +113,12 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             <DetailsLink>
               Details{" "}
               <span
-                style={{ fontSize: 9, position: "relative", top: 0.5 }}
+                style={{
+                  fontSize: 9,
+                  position: "relative",
+                  top: 0.5,
+                  color: "goldenrod",
+                }}
                 className="icon-chevron-right"
               ></span>
             </DetailsLink>

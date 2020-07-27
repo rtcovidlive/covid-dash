@@ -36,18 +36,51 @@ export function RTHeader(props) {
     window.FB && window.FB.XFBML.parse();
   });
   let shareButtons = (
-    <ShareButtons href="https://covid-dash-murex.vercel.app/" align="right" />
+    <ShareButtons href="https://covidestim.org/" align="right" />
   );
   return (
     <>
       <div className="rt-header-wrapper">
         <HeaderInner>
+          {shareButtons}
           <Row>
-            {shareButtons}
             <Col size={24}>
+              <img src="icon.png" style={{ height: "60px", width: "60px" }} />
               <MainTitle level={1}>covidestim · COVID-19 nowcasting</MainTitle>
             </Col>
           </Row>
+          <div className="rt-header-updates">
+            <div
+              onClick={() =>
+                document
+                  .getElementById("footer")
+                  .scrollIntoView({ behavior: "smooth" })
+              }
+              className="rt-header-update-entry"
+            >
+              Last model run:{" "}
+              {timeFormat("%-m/%-d at %-I:%M%p")(props.lastUpdated)}
+            </div>
+            <div className="rt-header-update-entry rt-header-update-entry-alert">
+              <a
+                href={timeFormat(
+                  "https://github.com/covidestim/covidestim-products/raw/master/%Y-%m-%d-allstates-ctp/summary.csv"
+                )(props.lastUpdated)}
+                style={{ color: "inherit", textDecoration: "inherit" }}
+              >
+                ⬇ Download CSV
+              </a>
+            </div>
+            {/*
+              <span
+                className="rt-header-update-entry rt-header-update-entry-alert"
+                onClick={() => window.open("/faq")}
+                style={{ marginRight: 0, marginBottom: 0, paddingRight: 12 }}
+              >
+                Major site update June 25th
+              </span>
+            */}
+          </div>
           <p>
             We make estimates about the COVID-19 epidemic using a statistical
             model that combines information about reported cases, reported
@@ -63,31 +96,9 @@ export function RTHeader(props) {
             <a href="https://covidtracking.com/">COVID Tracking Project</a>, and
             our dashboard was adapted from{" "}
             <a href="https://github.com/rtcovidlive/covid-dash">covid-dash</a>.
-            Every part of our data pipeline can be viewed{" "}
-            <a href="https://github.com/covidestim">here</a>.
+            Our computational pipeline can be viewed at our{" "}
+            <a href="https://github.com/covidestim">GitHub organization</a>.
           </p>
-          <div className="rt-header-updates">
-            <div
-              onClick={() =>
-                document
-                  .getElementById("footer")
-                  .scrollIntoView({ behavior: "smooth" })
-              }
-              className="rt-header-update-entry"
-            >
-              Data Last Updated:{" "}
-              {timeFormat("%-m/%-d at %-I:%M%p")(props.lastUpdated)}
-            </div>
-            {/*
-              <span
-                className="rt-header-update-entry rt-header-update-entry-alert"
-                onClick={() => window.open("/faq")}
-                style={{ marginRight: 0, marginBottom: 0, paddingRight: 12 }}
-              >
-                Major site update June 25th
-              </span>
-            */}
-          </div>
         </HeaderInner>
       </div>
     </>
