@@ -12,7 +12,7 @@ Not necessarily. To assess the situation, you should take into account both R<su
 
 Even if there is only one person sick and that one person infects six people, R<sub>t</sub> will be 6.0. So to evaluate how bad a situation is for a given state, you need to understand both R<sub>t</sub>, but also the absolute number of cases. A high R<sub>t</sub> is manageable in the very short run as long as there are not many people sick to begin with. Smaller states like Vermont or Alaska often see this issue.
 
-## What is the difference between "postives" and "test-adjusted positives"? Why don't the lines match up when I "show cases"?
+## What is the difference between "positives" and "test-adjusted positives"? Why don't the lines match up when I "show cases"?
 
 Our model attempts to correct for testing volume. The dotted black line shows actual new cases reported, the blue line shows what the model believes actual cases would have been if you correct for testing volume. If today you tested 100 people and 10 came back positive and tomorrow you tested 500 people, you might assume you'd get 5x the number of postives back (all things being equal).
 
