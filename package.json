@@ -29,6 +29,8 @@
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.1",
     "tmp-promise": "^2.1.1",
+    "topojson": "^3.0.2",
+    "topojson-client": "^3.1.0",
     "yargs": "^15.3.1"
   },
   "devDependencies": {

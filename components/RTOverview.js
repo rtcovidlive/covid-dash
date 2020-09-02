@@ -8,6 +8,7 @@ import { StateR0Display } from "./StateR0Display";
 import { ScrollToTopPill } from "./ScrollToTopPill";
 import { RTFooter } from "./RTFooter";
 import RTHeader from "./RTHeader";
+import OverviewMapSuper from "./OverviewMap";
 import RTHero from "./RTHero";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
@@ -111,6 +112,7 @@ export function RTOverview(props) {
         width={props.width}
         useNewHeader={props.newHeader}
       />
+      <OverviewMapSuper />
       <div className="rt-container-wrapper">
         <div
           ref={rtRef}

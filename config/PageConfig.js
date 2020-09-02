@@ -14,9 +14,8 @@ console.log(`Base URL is ${BASE_URL}`);
 
 export const LOOPBACK_BASE_URL =
   process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`;
-// export const CDN_ROOT = "https://d14wlfuexuxgcm.cloudfront.net/covid";
-// export const CDN_ROOT = `${BASE_URL}`;
 export const CDN_ROOT = "https://covidestim.github.io/covidestim-products";
+// export const CDN_ROOT = "http://localhost:3300"
 
 class Config {
   constructor(
