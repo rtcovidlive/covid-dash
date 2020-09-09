@@ -17,7 +17,8 @@ export function OverviewMapSuper(props) {
   const [boundsIsLoaded, setBoundsIsLoaded] = useState(false);
 
   const url = "https://covidestim.s3.us-east-2.amazonaws.com/map-demo.pack.gz";
-  const albersURL = "https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json";
+  const albersURL =
+    "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
 
   useEffect(() => {
     axios.get(url, { responseType: "arraybuffer" }).then(
@@ -27,9 +28,7 @@ export function OverviewMapSuper(props) {
         setMapData(decoded);
         setDataIsLoaded(true);
       },
-      (error) => {
-        setDataIsLoaded(false);
-      }
+      (error) => setDataIsLoaded(false)
     );
   }, []);
 
@@ -39,9 +38,7 @@ export function OverviewMapSuper(props) {
         setMapBoundaries(result.data);
         setBoundsIsLoaded(true);
       },
-      (error) => {
-        setIsLoaded(false);
-      }
+      (error) => setBoundsIsLoaded(false)
     );
   }, []);
 
@@ -60,6 +57,7 @@ export class OverviewMapChart extends RTSubareaChart {
   constructor(props) {
     super(props);
     this._vizClass = OverviewMap;
+    this.overflow = "hidden";
   }
 
   renderLegend() {

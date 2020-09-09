@@ -36,10 +36,10 @@ export const LegendLabel = styled.span`
 `;
 
 const CustomSVG = styled.svg`
-  overflow: visible;
   .tick line {
     display: none;
   }
+  overflow: ${(props) => props.overflow};
 `;
 
 export const TooltipWrapper = styled.div`
@@ -83,6 +83,8 @@ export class RTSubareaChart extends Component {
       tooltipContents: null,
     };
     this.containerRef = React.createRef();
+
+    this.overflow = "visible";
   }
   renderChart() {
     if (!this.state.viz) {
@@ -140,6 +142,7 @@ export class RTSubareaChart extends Component {
             height={this.props.height}
             className="svg-container"
             ref={this.containerRef}
+            overflow={this.overflow}
           ></CustomSVG>
         </div>
       </div>
