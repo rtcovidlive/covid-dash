@@ -131,11 +131,6 @@ class OverviewMap {
       const [[x0, y0], [x1, y1]] = path.bounds(states.get(d.id.slice(0, 2)));
       event.stopPropagation();
 
-      console.log(x0);
-      console.log(y0);
-      console.log(x1);
-      console.log(y1);
-
       self._svg
         .transition()
         .duration(750)

@@ -9,7 +9,7 @@ import { LegendContainer, RTSubareaChart } from "./RTSubareaChart";
 
 import OverviewMap from "visualization/OverviewMap";
 
-export function OverviewMapSuper(props) {
+export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapData, setMapData] = useState(null);
   const [dataIsLoaded, setDataIsLoaded] = useState(false);
 
@@ -44,12 +44,40 @@ export function OverviewMapSuper(props) {
 
   let data = { mapData: mapData, mapBoundaries: mapBoundaries };
 
-  if (dataIsLoaded && boundsIsLoaded) {
-    return <OverviewMapChart data={data} width={975} height={610} />;
+  const [contentWidth, setContentWidth] = useState(null);
+  useEffect(() => {
+    // TODO duplicated from index.js
+    var resizeTimer;
+    function setNewWidth() {
+      if (ref.current) {
+        setContentWidth(Math.ceil(ref.current.getBoundingClientRect().width));
+      }
+    }
+    setNewWidth();
+    window.addEventListener("resize", () => {
+      if (resizeTimer) {
+        window.clearTimeout(resizeTimer);
+      }
+      resizeTimer = window.setTimeout(() => {
+        setNewWidth();
+      }, 500);
+    });
+  }, [ref]);
+
+  if (dataIsLoaded && boundsIsLoaded && contentWidth) {
+    return (
+      <div ref={ref}>
+        <OverviewMapChart
+          data={data}
+          width={contentWidth}
+          height={Math.floor(0.625 * contentWidth)}
+        />
+      </div>
+    );
   } else {
-    return <div>Loading map...</div>;
+    return <div ref={ref}> it's not loaded </div>;
   }
-}
+});
 
 export default OverviewMapSuper;
 

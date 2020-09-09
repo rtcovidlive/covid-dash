@@ -15,6 +15,7 @@ import Constants from "lib/Constants";
 import { Button } from "./Button";
 
 const refsByState = {};
+const mapRef = React.createRef();
 const footerRef = React.createRef();
 const rtRef = React.createRef();
 const heroRef = React.createRef();
@@ -112,7 +113,15 @@ export function RTOverview(props) {
         width={props.width}
         useNewHeader={props.newHeader}
       />
-      <OverviewMapSuper />
+      <div className="rt-container-wrapper">
+        <div className="rt-container rt-container-wide">
+          <Row className="stacked-states-outer">
+            <Col size={24}>
+              <OverviewMapSuper ref={mapRef} />
+            </Col>
+          </Row>
+        </div>
+      </div>
       <div className="rt-container-wrapper">
         <div
           ref={rtRef}
