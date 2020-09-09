@@ -1,12 +1,13 @@
 import { select, event, mouse } from "d3-selection";
 import { scaleSequential } from "d3-scale";
 import { interpolateMagma } from "d3-scale-chromatic";
-import { geoPath } from "d3-geo";
+import { geoPath, geoIdentity } from "d3-geo";
 import { timeFormat } from "d3-time-format";
 import { nest } from "d3-collection";
 import { zoom, zoomIdentity, zoomTransform } from "d3-zoom";
 import { mesh, feature } from "topojson";
 import _ from "lodash";
+import legend from "./ColorLegend";
 
 class OverviewMap {
   constructor(el, onMouseover, onMouseout) {
@@ -40,7 +41,6 @@ class OverviewMap {
     const color = scaleSequential([0, 200], interpolateMagma).unknown(
       "rgba(0, 0, 0, 0)"
     );
-    const path = geoPath();
 
     let dateLambda = (d) => {
       let obj = new Date(d * 24 * 3600 * 1000);
@@ -82,6 +82,12 @@ class OverviewMap {
       .attr("viewBox", [0, 0, this._width, this._height])
       .on("click", reset);
 
+    const transform = geoIdentity().fitSize(
+      [this._width, this._height],
+      feature(us, us.objects.nation)
+    );
+    const path = geoPath().projection(transform);
+
     const bg = this._svg
       .append("rect")
       .attr("width", "100%")
@@ -89,6 +95,31 @@ class OverviewMap {
       .attr("fill", "rgb(7, 59, 79)");
 
     const g = this._svg.append("g");
+
+    630 / 975, 20 / 610;
+
+    260 / 975;
+
+    const legendX = Math.round((this._width * 630) / 975);
+    const legendY = Math.round((this._height * 20) / 610);
+    const legendWidth = Math.round((this._width * 260) / 975);
+
+    this._svg
+      .append("g")
+      .attr("transform", `translate(${legendX}, ${legendY})`)
+      .append(() =>
+        legend({
+          color,
+          title: "Infections / 100k / day",
+          width: legendWidth,
+          marginRight: 15,
+          marginLeft: 15,
+        })
+      )
+      .insert("rect", ":first-child")
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr("fill", "rgb(255, 255, 255, 0.8)");
 
     let counties = g
       .append("g")
