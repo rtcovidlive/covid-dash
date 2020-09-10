@@ -1,9 +1,13 @@
 import "styles/App.scss";
 import _ from "lodash";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Fragment } from "react";
 import DataFetcher from "lib/DataFetcher";
 import axios from "axios";
 import { decode } from "@ygoe/msgpack";
+import { nest } from "d3-collection";
+import { timeFormat } from "d3-time-format";
+import { StateRtChart } from "./StateRtChart";
+import { Row, Col } from "./Grid";
 
 import {
   TooltipWrapper,
@@ -19,6 +23,52 @@ import {
 
 import OverviewMap from "visualization/OverviewMap";
 
+function reformatMapData(data) {
+  let dateLambda = (d) => {
+    let obj = new Date(d * 24 * 3600 * 1000);
+    return timeFormat("%Y-%m-%d")(obj);
+  };
+
+  const zipped = _.zipWith(
+    data.Rt,
+    data.date,
+    data.infections,
+    data.fips,
+    (r, d, i, f) => ({
+      r0: +r / 100,
+      date: dateLambda(d),
+      onsets: i,
+      fips: f,
+      identifier: f,
+    })
+  );
+
+  const nested = nest()
+    .key((d) => d.date)
+    .key((d) => d.fips)
+    .rollup((d) => d[0])
+    .map(zipped);
+
+  return nested;
+}
+
+function dataForCounty(data, fips) {
+  let series = [];
+
+  console.log(data);
+
+  data.each((vals, date) => {
+    let dataForDate = vals.get(fips);
+
+    if (dataForDate) series.push(dataForDate);
+  });
+
+  return {
+    identifier: fips,
+    series: _.sortBy(series, (d) => d.date),
+  };
+}
+
 export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapData, setMapData] = useState(null);
   const [dataIsLoaded, setDataIsLoaded] = useState(false);
@@ -26,19 +76,32 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapBoundaries, setMapBoundaries] = useState(null);
   const [boundsIsLoaded, setBoundsIsLoaded] = useState(false);
 
-  const [fips, setFips] = useState(null);
+  const [hoverFips, setHoverFips] = useState(null);
+  const [fips, setFips] = useState([]);
 
   const url = "https://covidestim.s3.us-east-2.amazonaws.com/map-demo.pack.gz";
   const albersURL =
     "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
 
+  let addFips = (newFips) => {
+    if (fips.indexOf(newFips) === -1) setFips(fips.concat(newFips));
+  };
+
+  let addHoverFips = (newFips) => {
+    setHoverFips(newFips);
+  };
+
   useEffect(() => {
     axios.get(url, { responseType: "arraybuffer" }).then(
       (result) => {
         let decoded = decode(result.data);
+        let reformatted = reformatMapData(decoded);
 
-        setMapData(decoded);
+        setMapData(reformatted);
         setDataIsLoaded(true);
+
+        console.log(reformatted);
+        console.log(dataForCounty(reformatted, "01001"));
       },
       (error) => setDataIsLoaded(false)
     );
@@ -78,15 +141,57 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
-      <div ref={ref}>
-        <OverviewMapChart
-          data={data}
-          width={contentWidth}
-          height={Math.floor(0.625 * contentWidth)}
-          setFips={setFips}
-        />
-        {fips && <span>{fips}</span>}
-      </div>
+      <Fragment>
+        <div ref={ref}>
+          <OverviewMapChart
+            data={data}
+            width={contentWidth}
+            height={Math.floor(0.625 * contentWidth)}
+            addFips={addFips}
+            addHoverFips={addHoverFips}
+          />
+        </div>
+        {hoverFips &&
+          _.map([hoverFips], (f) => {
+            const data = dataForCounty(mapData, f);
+
+            if (data.series.length > 0)
+              return (
+                <StateRtChart
+                  data={data}
+                  drawOuterBorder={true}
+                  enabledModes={["True infections no UI"]}
+                  height={250}
+                  isHovered={false}
+                  isUnderlayed={false}
+                  width={333}
+                  yAxisPosition={"right"}
+                  yDomain={[0, 5000]}
+                />
+              );
+            else return <div> insufficient data </div>;
+          })}
+        {fips &&
+          _.map(fips, (f) => {
+            const data = dataForCounty(mapData, f);
+
+            if (data.series.length > 0)
+              return (
+                <StateRtChart
+                  data={data}
+                  drawOuterBorder={true}
+                  enabledModes={["True infections no UI"]}
+                  height={250}
+                  isHovered={false}
+                  isUnderlayed={false}
+                  width={333}
+                  yAxisPosition={"right"}
+                  yDomain={[0, 5000]}
+                />
+              );
+            else return <div> insufficient data </div>;
+          })}
+      </Fragment>
     );
   } else {
     return <div ref={ref}> it's not loaded </div>;

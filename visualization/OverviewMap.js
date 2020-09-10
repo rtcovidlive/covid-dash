@@ -10,12 +10,13 @@ import _ from "lodash";
 import legend from "./ColorLegend";
 
 class OverviewMap {
-  constructor(el, onMouseover, onMouseout, setFips) {
+  constructor(el, onMouseover, onMouseout, addFips, addHoverFips) {
     this._el = el;
     this._svg = select(el);
     this._onMouseover = onMouseover;
     this._onMouseout = onMouseout;
-    this._setFips = setFips;
+    this._addFips = addFips;
+    this._addHoverFips = addHoverFips;
   }
 
   setDimensions(width, height) {
@@ -60,26 +61,7 @@ class OverviewMap {
 
     this._data = data.mapData;
 
-    this._data = _.zipWith(
-      this._data.Rt,
-      this._data.date,
-      this._data.infections,
-      this._data.fips,
-      (r, d, i, f) => ({
-        Rt: +r / 100,
-        date: dateLambda(d),
-        infections: i,
-        fips: f,
-      })
-    );
-
     this._boundaries = data.mapBoundaries;
-
-    this._dataIndexed = nest()
-      .key((d) => d.date)
-      .key((d) => d.fips)
-      .rollup((d) => d[0].infections)
-      .map(this._data);
 
     let us = this._boundaries;
 
@@ -104,10 +86,6 @@ class OverviewMap {
       .attr("fill", "rgb(7, 59, 79)");
 
     const g = this._svg.append("g");
-
-    630 / 975, 20 / 610;
-
-    260 / 975;
 
     const legendX = Math.round((this._width * 630) / 975);
     const legendY = Math.round((this._height * 20) / 610);
@@ -138,23 +116,23 @@ class OverviewMap {
       .attr("d", path)
       .on("click", clicked)
       .on("mouseover", function (d, i) {
-        let bounds = this.getBoundingClientRect();
-        // let x = bounds.x + bounds.width / 2;
-        // let y = bounds.y - 10;
-        let x = bounds.x;
-        let y = bounds.y - bounds.height - 10;
+        const bounds = this.getBBox();
+        const preX = bounds.x + bounds.width / 2;
+        const preY = bounds.y + bounds.height / 2 - 10;
+
+        const [x, y] = zoomTransform(this).apply([preX, preY]);
+
         self.handleMouseover(x, y, d);
-        self._setFips(d.id);
+        self._addHoverFips(d.id);
       })
       .on("mouseout", function (d) {
         self.handleMouseout();
       });
 
-    counties
-      .join("path")
-      .attr("fill", (d) =>
-        color(this._dataIndexed.get("2020-08-15").get(d.id))
-      );
+    counties.join("path").attr("fill", (d) => {
+      const record = this._data.get("2020-08-01").get(d.id);
+      return color(record ? record.onsets : undefined);
+    });
 
     g.append("path")
       .datum(mesh(us, us.objects.states))
@@ -182,6 +160,8 @@ class OverviewMap {
     function clicked(d) {
       const [[x0, y0], [x1, y1]] = path.bounds(states.get(d.id.slice(0, 2)));
       event.stopPropagation();
+
+      self._addFips(d.id);
 
       self._svg
         .transition()

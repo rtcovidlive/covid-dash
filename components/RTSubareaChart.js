@@ -103,7 +103,10 @@ export class RTSubareaChart extends Component {
         this.setState({ tooltipShowing: false });
       },
       (fips) => {
-        this.props.setFips(fips);
+        this.props.addFips(fips);
+      },
+      (fips) => {
+        this.props.addHoverFips(fips);
       }
     );
     this.setState({ viz: viz });

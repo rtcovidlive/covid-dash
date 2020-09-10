@@ -129,6 +129,26 @@ class CovidViz {
           };
           break;
         }
+        case Constants.MetricOptions.TrueInfectionsNoUI: {
+          conf = {
+            submetric: "onsets",
+            legend: "True infections",
+            label: "True infections",
+            colorCodeStroke: false,
+            tooltipPrecision: ",.0f",
+            showAnnotations:
+              this._showAnnotations && this._enabledModes.length === 1,
+            confidenceBounds: false,
+            lineColorForEntry: (identifier, entry) => {
+              return "rgba(0, 145, 255, 1)";
+            },
+            m: (dataPoint, metricOverride) => {
+              let raw = dataPoint[metricOverride || "onsets"];
+              return Math.max(0, raw);
+            },
+          };
+          break;
+        }
         case Constants.MetricOptions.TrueInfectionsPC: {
           conf = {
             submetric: "onsetsPC",
