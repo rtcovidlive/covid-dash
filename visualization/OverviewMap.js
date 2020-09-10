@@ -10,11 +10,12 @@ import _ from "lodash";
 import legend from "./ColorLegend";
 
 class OverviewMap {
-  constructor(el, onMouseover, onMouseout) {
+  constructor(el, onMouseover, onMouseout, setFips) {
     this._el = el;
     this._svg = select(el);
     this._onMouseover = onMouseover;
     this._onMouseout = onMouseout;
+    this._setFips = setFips;
   }
 
   setDimensions(width, height) {
@@ -26,9 +27,17 @@ class OverviewMap {
     // Nowhere is this function called, yet
   }
 
-  handleMouseout() {}
+  handleMouseout() {
+    this._onMouseout();
+  }
 
-  handleMouseover(x, y, dataPoint) {}
+  handleMouseover(x, y, dataPoint) {
+    this._onMouseover({
+      x: x,
+      y: y,
+      dataPoint: dataPoint,
+    });
+  }
 
   render(data) {
     let self = this;
@@ -127,7 +136,19 @@ class OverviewMap {
       .data(feature(us, us.objects.counties).features, (d) => d.id)
       .join("path")
       .attr("d", path)
-      .on("click", clicked);
+      .on("click", clicked)
+      .on("mouseover", function (d, i) {
+        let bounds = this.getBoundingClientRect();
+        // let x = bounds.x + bounds.width / 2;
+        // let y = bounds.y - 10;
+        let x = bounds.x;
+        let y = bounds.y - bounds.height - 10;
+        self.handleMouseover(x, y, d);
+        self._setFips(d.id);
+      })
+      .on("mouseout", function (d) {
+        self.handleMouseout();
+      });
 
     counties
       .join("path")

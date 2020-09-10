@@ -5,7 +5,17 @@ import DataFetcher from "lib/DataFetcher";
 import axios from "axios";
 import { decode } from "@ygoe/msgpack";
 
-import { LegendContainer, RTSubareaChart } from "./RTSubareaChart";
+import {
+  TooltipWrapper,
+  TooltipDate,
+  TooltipStat,
+  TooltipLabel,
+  RTSubareaChart,
+  LegendContainer,
+  LegendRow,
+  LegendLine,
+  LegendLabel,
+} from "./RTSubareaChart";
 
 import OverviewMap from "visualization/OverviewMap";
 
@@ -15,6 +25,8 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
   const [mapBoundaries, setMapBoundaries] = useState(null);
   const [boundsIsLoaded, setBoundsIsLoaded] = useState(false);
+
+  const [fips, setFips] = useState(null);
 
   const url = "https://covidestim.s3.us-east-2.amazonaws.com/map-demo.pack.gz";
   const albersURL =
@@ -71,7 +83,9 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
           data={data}
           width={contentWidth}
           height={Math.floor(0.625 * contentWidth)}
+          setFips={setFips}
         />
+        {fips && <span>{fips}</span>}
       </div>
     );
   } else {
@@ -88,11 +102,49 @@ export class OverviewMapChart extends RTSubareaChart {
     this.overflow = "hidden";
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (
+      this.props.width != nextProps.width ||
+      this.props.height != nextProps.height
+    )
+      return true;
+
+    if (this.state != nextState) return true;
+
+    return false;
+  }
+
   renderLegend() {
     return <LegendContainer>Lol</LegendContainer>;
   }
 
   handleMouseover(data) {
-    console.log("handleMouseover(data) called");
+    // let tooltipContents = (
+    //   <TooltipWrapper>
+    //     <TooltipDate>
+    //       {this._timeFormat(Util.dateFromISO(data.dataPoint.date))}
+    //     </TooltipDate>
+    //     <TooltipLabel>Positive (Reported)</TooltipLabel>
+    //     <TooltipStat color={this.state.viz._mainChartStroke} opacity={0.7}>
+    //       {this._numberFormat(data.dataPoint.cases_new)}
+    //     </TooltipStat>
+    //     <TooltipLabel>Testing Volume</TooltipLabel>
+    //     <TooltipStat color={this.state.viz._testChartDark}>
+    //       {this._numberFormat(data.dataPoint.tests_new)}
+    //     </TooltipStat>
+    //   </TooltipWrapper>
+    // );
+    let tooltipContents = (
+      <TooltipWrapper>
+        <TooltipLabel>{data.dataPoint.properties.name}</TooltipLabel>
+        <TooltipStat color={"blue"}>{this._numberFormat(1337)}</TooltipStat>
+      </TooltipWrapper>
+    );
+    this.setState({
+      tooltipX: data.x,
+      tooltipY: data.y,
+      tooltipShowing: true,
+      tooltipContents: tooltipContents,
+    });
   }
 }
