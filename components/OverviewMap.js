@@ -8,6 +8,9 @@ import { nest } from "d3-collection";
 import { timeFormat } from "d3-time-format";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
+import { Slider } from "antd";
+
+import "../styles/antd.scss";
 
 import {
   TooltipWrapper,
@@ -137,6 +140,9 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
+        <div>
+          <Slider defaultValue={30} />
+        </div>
         <div ref={ref}>
           <OverviewMapChart
             data={data}
