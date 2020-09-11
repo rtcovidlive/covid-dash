@@ -5,10 +5,11 @@ import DataFetcher from "lib/DataFetcher";
 import axios from "axios";
 import { decode } from "@ygoe/msgpack";
 import { nest } from "d3-collection";
+import { extent } from "d3-array";
 import { timeFormat } from "d3-time-format";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
-import { Slider } from "antd";
+import { Slider, Spin } from "antd";
 
 import "../styles/antd.scss";
 
@@ -26,12 +27,14 @@ import {
 
 import OverviewMap from "visualization/OverviewMap";
 
-function reformatMapData(data) {
-  let dateLambda = (d) => {
-    let obj = new Date(d * 24 * 3600 * 1000);
-    return timeFormat("%Y-%m-%d")(obj);
-  };
+let toEpoch = (d) => Math.floor(new Date(d).valueOf() / (1000 * 60 * 60 * 24));
 
+let fromEpoch = (d) => {
+  let obj = new Date(d * 24 * 3600 * 1000);
+  return timeFormat("%Y-%m-%d")(obj);
+};
+
+function reformatMapData(data) {
   const zipped = _.zipWith(
     data.Rt,
     data.date,
@@ -39,7 +42,7 @@ function reformatMapData(data) {
     data.fips,
     (r, d, i, f) => ({
       r0: +r / 100,
-      date: dateLambda(d),
+      date: fromEpoch(d),
       onsets: i,
       fips: f,
       identifier: f,
@@ -74,6 +77,9 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapData, setMapData] = useState(null);
   const [dataIsLoaded, setDataIsLoaded] = useState(false);
 
+  const [dateMinMax, setDateMinMax] = useState([null, null]);
+  const [dateToDisplay, setDateToDisplay] = useState(null);
+
   const [mapBoundaries, setMapBoundaries] = useState(null);
   const [boundsIsLoaded, setBoundsIsLoaded] = useState(false);
 
@@ -98,7 +104,14 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
         let decoded = decode(result.data);
         let reformatted = reformatMapData(decoded);
 
+        // Minimum, maximum date in the timeseries
+        let [min, max] = extent(reformatted.keys());
+
+        console.log(`min=${min}, max=${max}`);
+
         setMapData(reformatted);
+        setDateMinMax(["2020-02-01", max]);
+        setDateToDisplay(max);
         setDataIsLoaded(true);
       },
       (error) => setDataIsLoaded(false)
@@ -137,11 +150,26 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     });
   }, [ref]);
 
+  let handleSliderChange = (val) => {
+    console.log(fromEpoch(val));
+    setDateToDisplay(fromEpoch(val));
+  };
+
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
+    console.log(dateMinMax);
+    console.log(toEpoch(dateMinMax[1]));
+    console.log(fromEpoch(dateMinMax[1]));
     return (
       <Fragment>
         <div>
-          <Slider defaultValue={30} />
+          <Slider
+            defaultValue={toEpoch(dateMinMax[1])}
+            tooltipVisible={true}
+            min={toEpoch(dateMinMax[0])}
+            max={toEpoch(dateMinMax[1])}
+            tipFormatter={fromEpoch}
+            onChange={handleSliderChange}
+          />
         </div>
         <div ref={ref}>
           <OverviewMapChart
@@ -150,6 +178,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             height={Math.floor(0.625 * contentWidth)}
             addFips={addFips}
             addHoverFips={addHoverFips}
+            dateToDisplay={dateToDisplay}
           />
         </div>
         {hoverFips &&
@@ -159,6 +188,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             if (data.series.length > 0)
               return (
                 <StateRtChart
+                  key={f}
                   data={data}
                   drawOuterBorder={true}
                   enabledModes={["True infections no UI"]}
@@ -167,7 +197,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
                   isUnderlayed={false}
                   width={333}
                   yAxisPosition={"right"}
-                  yDomain={[0, 5000]}
+                  yDomain={[0, 300]}
                 />
               );
             else return <div> insufficient data </div>;
@@ -179,6 +209,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             if (data.series.length > 0)
               return (
                 <StateRtChart
+                  key={f}
                   data={data}
                   drawOuterBorder={true}
                   enabledModes={["True infections no UI"]}
@@ -187,7 +218,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
                   isUnderlayed={false}
                   width={333}
                   yAxisPosition={"right"}
-                  yDomain={[0, 5000]}
+                  yDomain={[0, 300]}
                 />
               );
             else return <div> insufficient data </div>;
@@ -195,7 +226,11 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
       </Fragment>
     );
   } else {
-    return <div ref={ref}> it's not loaded </div>;
+    return (
+      <div ref={ref}>
+        <Spin size="large" tip="Loading map..." />
+      </div>
+    );
   }
 });
 
@@ -206,6 +241,7 @@ export class OverviewMapChart extends RTSubareaChart {
     super(props);
     this._vizClass = OverviewMap;
     this.overflow = "hidden";
+    this._vizType = "OverviewMap";
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -217,11 +253,10 @@ export class OverviewMapChart extends RTSubareaChart {
 
     if (this.state != nextState) return true;
 
-    return false;
-  }
+    if (this.props.dateToDisplay != nextProps.dateToDisplay)
+      this.handleDateChange(nextProps.dateToDisplay);
 
-  renderLegend() {
-    return <LegendContainer>Lol</LegendContainer>;
+    return false;
   }
 
   handleMouseover(data) {

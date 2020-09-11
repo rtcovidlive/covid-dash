@@ -91,7 +91,7 @@ export class RTSubareaChart extends Component {
       return;
     }
     this.state.viz.setDimensions(this.props.width, this.props.height);
-    this.state.viz.render(this.props.data);
+    this.state.viz.render(this.props.data, this.props);
   }
   componentDidMount() {
     let viz = new this._vizClass(
@@ -111,7 +111,12 @@ export class RTSubareaChart extends Component {
     );
     this.setState({ viz: viz });
   }
+
   handleMouseover(data) {}
+
+  handleDateChange(val) {
+    this.state.viz.handleDateChange(val);
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.width !== this.props.width) {
@@ -129,6 +134,7 @@ export class RTSubareaChart extends Component {
       }
     }
   }
+
   renderLegend() {}
 
   render() {

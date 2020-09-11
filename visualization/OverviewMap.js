@@ -40,7 +40,14 @@ class OverviewMap {
     });
   }
 
-  render(data) {
+  handleDateChange(val) {
+    this._counties.join("path").attr("fill", (d) => {
+      const record = this._data.get(val).get(d.id);
+      return this.color(record ? record.onsets : undefined);
+    });
+  }
+
+  render(data, props) {
     let self = this;
 
     this._svg.selectAll("g").remove();
@@ -48,7 +55,7 @@ class OverviewMap {
     // this._svg.selectAll("div").remove();
     this._svg.selectAll("rect").remove();
 
-    const color = scaleSequential([0, 200], interpolateMagma).unknown(
+    this.color = scaleSequential([0, 200], interpolateMagma).unknown(
       "rgba(0, 0, 0, 0)"
     );
 
@@ -96,7 +103,7 @@ class OverviewMap {
       .attr("transform", `translate(${legendX}, ${legendY})`)
       .append(() =>
         legend({
-          color,
+          color: this.color,
           title: "Infections / 100k / day",
           width: legendWidth,
           marginRight: 15,
@@ -108,7 +115,7 @@ class OverviewMap {
       .attr("height", "100%")
       .attr("fill", "rgb(255, 255, 255, 0.8)");
 
-    let counties = g
+    this._counties = g
       .append("g")
       .selectAll("path")
       .data(feature(us, us.objects.counties).features, (d) => d.id)
@@ -129,10 +136,7 @@ class OverviewMap {
         self.handleMouseout();
       });
 
-    counties.join("path").attr("fill", (d) => {
-      const record = this._data.get("2020-08-01").get(d.id);
-      return color(record ? record.onsets : undefined);
-    });
+    this.handleDateChange(props.dateToDisplay);
 
     g.append("path")
       .datum(mesh(us, us.objects.states))
