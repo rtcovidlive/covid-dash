@@ -87,7 +87,8 @@ export const StateR0Display = React.forwardRef((props, ref) => {
       <Row style={{ marginRight: 32 }}>
         <Col verticalAlign="middle" size={16}>
           <Title className="state-rt-display-name" level={2}>
-            {props.config.subAreas[props.subArea]}
+            {(props.config && props.config.subAreas[props.subArea]) ||
+              props.subArea}
             {props.hasDataIssue && (
               <span>
                 &nbsp;

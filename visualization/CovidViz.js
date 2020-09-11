@@ -106,6 +106,26 @@ class CovidViz {
           };
           break;
         }
+        case Constants.MetricOptions.DerivedR0NoUI: {
+          conf = {
+            submetric: "r0",
+            legend: "Rt",
+            label: "Rt",
+            colorCodeStroke: true,
+            tooltipPrecision: ",.2f",
+            showAnnotations:
+              this._showAnnotations && this._enabledModes.length === 1,
+            lineColorForEntry: (identifier, entry) => {
+              return Util.colorCodeRt(identifier, entry.r0, entry.r0, entry.r0);
+            },
+            drawYAxisLines: [1.0],
+            m: (dataPoint, metricOverride) => {
+              let raw = dataPoint[metricOverride || "r0"];
+              return Math.max(0, raw);
+            },
+          };
+          break;
+        }
         case Constants.MetricOptions.TrueInfections: {
           conf = {
             submetric: "onsets",

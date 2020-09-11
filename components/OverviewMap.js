@@ -2,6 +2,7 @@ import "styles/App.scss";
 import _ from "lodash";
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import DataFetcher from "lib/DataFetcher";
+import { StateR0Display } from "./StateR0Display";
 import axios from "axios";
 import { decode } from "@ygoe/msgpack";
 import { nest } from "d3-collection";
@@ -33,6 +34,8 @@ let fromEpoch = (d) => {
   let obj = new Date(d * 24 * 3600 * 1000);
   return timeFormat("%Y-%m-%d")(obj);
 };
+
+const refsByFIPS = {};
 
 function reformatMapData(data) {
   const zipped = _.zipWith(
@@ -152,6 +155,16 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     setDateToDisplay(fromEpoch(val));
   };
 
+  let modes = _.map(props.selectedOutcome.enabledModes, (mode) => {
+    if (mode === "True infections") return "True infections no UI";
+    if (mode === "Infection rate") return "Infection rate no UI";
+
+    if (mode === "True infections no UI") return mode;
+    if (mode === "Infection rate no UI") return mode;
+
+    return "Infection rate no UI";
+  });
+
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
@@ -176,46 +189,55 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
           />
         </Col>
         {hoverFips &&
-          _.map([hoverFips], (f) => {
-            const data = dataForCounty(mapData, f);
-
+          _.map([hoverFips, ...fips], (fips, i) => {
+            const data = dataForCounty(mapData, fips);
+            // selectedOutcome.enabledModes
+            var align;
+            switch (i % props.rowCount) {
+              case 0:
+                align = "left";
+                break;
+              case props.rowCount - 1:
+                align = "right";
+                break;
+              default:
+                align = "center";
+                break;
+            }
+            refsByFIPS[fips] = refsByFIPS[fips] || React.createRef();
             if (data.series.length > 0)
               return (
-                <StateRtChart
-                  key={f}
-                  data={data}
-                  drawOuterBorder={true}
-                  enabledModes={["True infections no UI"]}
-                  height={250}
-                  isHovered={false}
-                  isUnderlayed={false}
-                  width={333}
-                  yAxisPosition={"right"}
-                  yDomain={[0, 300]}
-                />
+                <Col
+                  key={fips + (i === 0)}
+                  size={props.colsPerChart}
+                  align={align}
+                  offset={align === "center" ? props.spacerOffset : 0}
+                >
+                  <div className="stacked-state-wrapper">
+                    <StateR0Display
+                      ref={refsByFIPS[fips]}
+                      config={null}
+                      subArea={fips}
+                      highlight={false}
+                      hasOwnRow={props.isSmallScreen}
+                      data={data}
+                      enabledModes={modes}
+                      yDomain={
+                        modes[0] === "True infections no UI"
+                          ? [0, 400]
+                          : [0.5, 1.5]
+                      }
+                      contentWidth={contentWidth}
+                    />
+                  </div>
+                </Col>
               );
-            else return <div> insufficient data </div>;
-          })}
-        {fips &&
-          _.map(fips, (f) => {
-            const data = dataForCounty(mapData, f);
-
-            if (data.series.length > 0)
+            else
               return (
-                <StateRtChart
-                  key={f}
-                  data={data}
-                  drawOuterBorder={true}
-                  enabledModes={["True infections no UI"]}
-                  height={250}
-                  isHovered={false}
-                  isUnderlayed={false}
-                  width={333}
-                  yAxisPosition={"right"}
-                  yDomain={[0, 300]}
-                />
+                <Col key={fips} size={props.colsPerChart} align="left">
+                  No data
+                </Col>
               );
-            else return <div> insufficient data </div>;
           })}
       </Fragment>
     );
