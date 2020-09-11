@@ -107,8 +107,6 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
         // Minimum, maximum date in the timeseries
         let [min, max] = extent(reformatted.keys());
 
-        console.log(`min=${min}, max=${max}`);
-
         setMapData(reformatted);
         setDateMinMax(["2020-02-01", max]);
         setDateToDisplay(max);
@@ -151,14 +149,10 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   }, [ref]);
 
   let handleSliderChange = (val) => {
-    console.log(fromEpoch(val));
     setDateToDisplay(fromEpoch(val));
   };
 
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
-    console.log(dateMinMax);
-    console.log(toEpoch(dateMinMax[1]));
-    console.log(fromEpoch(dateMinMax[1]));
     return (
       <Fragment>
         <div>
