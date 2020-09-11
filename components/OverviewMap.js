@@ -32,7 +32,7 @@ function reformatMapData(data) {
   const zipped = _.zipWith(
     data.Rt,
     data.date,
-    data.infections,
+    data.infectionsPC,
     data.fips,
     (r, d, i, f) => ({
       r0: +r / 100,
@@ -54,8 +54,6 @@ function reformatMapData(data) {
 
 function dataForCounty(data, fips) {
   let series = [];
-
-  console.log(data);
 
   data.each((vals, date) => {
     let dataForDate = vals.get(fips);
@@ -84,7 +82,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
 
   let addFips = (newFips) => {
-    if (fips.indexOf(newFips) === -1) setFips(fips.concat(newFips));
+    if (fips.indexOf(newFips) === -1) setFips([newFips].concat(fips));
   };
 
   let addHoverFips = (newFips) => {
@@ -99,9 +97,6 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
         setMapData(reformatted);
         setDataIsLoaded(true);
-
-        console.log(reformatted);
-        console.log(dataForCounty(reformatted, "01001"));
       },
       (error) => setDataIsLoaded(false)
     );
