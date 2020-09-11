@@ -155,7 +155,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
-        <div>
+        <Col size={24}>
           <Slider
             defaultValue={toEpoch(dateMinMax[1])}
             tooltipVisible={true}
@@ -164,8 +164,8 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             tipFormatter={fromEpoch}
             onChange={handleSliderChange}
           />
-        </div>
-        <div ref={ref}>
+        </Col>
+        <Col size={24} align="center" ref={ref}>
           <OverviewMapChart
             data={data}
             width={contentWidth}
@@ -174,7 +174,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             addHoverFips={addHoverFips}
             dateToDisplay={dateToDisplay}
           />
-        </div>
+        </Col>
         {hoverFips &&
           _.map([hoverFips], (f) => {
             const data = dataForCounty(mapData, f);
@@ -221,9 +221,9 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     );
   } else {
     return (
-      <div ref={ref}>
+      <Col size={24} ref={ref}>
         <Spin size="large" tip="Loading map..." />
-      </div>
+      </Col>
     );
   }
 });
@@ -272,7 +272,6 @@ export class OverviewMapChart extends RTSubareaChart {
     let tooltipContents = (
       <TooltipWrapper>
         <TooltipLabel>{data.dataPoint.properties.name}</TooltipLabel>
-        <TooltipStat color={"blue"}>{this._numberFormat(1337)}</TooltipStat>
       </TooltipWrapper>
     );
     this.setState({

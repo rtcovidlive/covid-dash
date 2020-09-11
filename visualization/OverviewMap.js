@@ -125,7 +125,7 @@ class OverviewMap {
       .on("mouseover", function (d, i) {
         const bounds = this.getBBox();
         const preX = bounds.x + bounds.width / 2;
-        const preY = bounds.y + bounds.height / 2 - 10;
+        const preY = bounds.y + bounds.height / 2 - 30;
 
         const [x, y] = zoomTransform(this).apply([preX, preY]);
 
