@@ -117,7 +117,10 @@ export function RTOverview(props) {
         <div className="rt-container rt-container-wide">
           <Row className="stacked-states-outer">
             <Col size={24}>
-              <OverviewMapSuper ref={mapRef} />
+              <OverviewMapSuper
+                ref={mapRef}
+                enabledModes={selectedOutcome.enabledModes}
+              />
             </Col>
           </Row>
         </div>
