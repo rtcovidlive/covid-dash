@@ -43,8 +43,19 @@ class OverviewMap {
   handleDateChange(val) {
     this._counties.join("path").attr("fill", (d) => {
       const record = this._data.get(val).get(d.id);
-      return this.color(record ? record.onsets : undefined);
+      return this.color(record ? record.onsetsPC : undefined);
     });
+  }
+
+  getStateName(fips, data) {
+    const stateData = data.objects.states.geometries;
+
+    let stateFips = String(Math.floor(fips / 1000));
+    if (stateFips.length === 1) stateFips = "0" + stateFips;
+
+    const state = _.find(stateData, (d) => stateFips === d.id);
+
+    return state ? state.properties.name : "";
   }
 
   render(data, props) {
@@ -125,12 +136,16 @@ class OverviewMap {
       .on("mouseover", function (d, i) {
         const bounds = this.getBBox();
         const preX = bounds.x + bounds.width / 2;
-        const preY = bounds.y + bounds.height / 2 - 30;
+        const preY = bounds.y + bounds.height / 2;
 
         const [x, y] = zoomTransform(this).apply([preX, preY]);
 
         self.handleMouseover(x, y, d);
-        self._addHoverFips(d.id);
+        self._addHoverFips({
+          fips: d.id,
+          name: d.properties.name,
+          state: self.getStateName(d.id, self._boundaries),
+        });
       })
       .on("mouseout", function (d) {
         self.handleMouseout();
@@ -165,7 +180,11 @@ class OverviewMap {
       const [[x0, y0], [x1, y1]] = path.bounds(states.get(d.id.slice(0, 2)));
       event.stopPropagation();
 
-      self._addFips(d.id);
+      self._addFips({
+        fips: d.id,
+        name: d.properties.name,
+        state: self.getStateName(d.id, self._boundaries),
+      });
 
       self._svg
         .transition()

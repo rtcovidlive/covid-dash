@@ -141,7 +141,13 @@ export class RTSubareaChart extends Component {
     return (
       <div style={{ position: "relative" }}>
         {this.state.viz && this.renderLegend()}
-        <div style={{ position: "relative", marginLeft: -30 }}>
+        <div
+          style={{
+            position: "relative",
+            marginLeft:
+              this.props.marginLeft !== undefined ? this.props.marginLeft : -30,
+          }}
+        >
           <ChartTooltip
             leftPosition={this.state.tooltipX}
             topPosition={this.state.tooltipY}

@@ -1,6 +1,12 @@
 import "styles/App.scss";
 import _ from "lodash";
-import React, { useState, useEffect, useRef, Fragment } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  PureComponent,
+  Fragment,
+} from "react";
 import DataFetcher from "lib/DataFetcher";
 import { StateR0Display } from "./StateR0Display";
 import axios from "axios";
@@ -11,6 +17,7 @@ import { timeFormat } from "d3-time-format";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
 import { Slider, Spin } from "antd";
+import { Util } from "lib/Util";
 
 import "../styles/antd.scss";
 
@@ -35,8 +42,6 @@ let fromEpoch = (d) => {
   return timeFormat("%Y-%m-%d")(obj);
 };
 
-const refsByFIPS = {};
-
 function reformatMapData(data) {
   const zipped = _.zipWith(
     data.Rt,
@@ -46,7 +51,7 @@ function reformatMapData(data) {
     (r, d, i, f) => ({
       r0: +r / 100,
       date: fromEpoch(d),
-      onsets: i,
+      onsetsPC: i,
       fips: f,
       identifier: f,
     })
@@ -86,19 +91,24 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapBoundaries, setMapBoundaries] = useState(null);
   const [boundsIsLoaded, setBoundsIsLoaded] = useState(false);
 
-  const [hoverFips, setHoverFips] = useState(null);
+  const [hoverFips, setHoverFips] = useState([]);
   const [fips, setFips] = useState([]);
 
   const url = "https://covidestim.s3.us-east-2.amazonaws.com/map-demo.pack.gz";
   const albersURL =
     "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
 
-  let addFips = (newFips) => {
-    if (fips.indexOf(newFips) === -1) setFips([newFips].concat(fips));
+  let addFips = (info) => {
+    if (_.findIndex(fips, (d) => info.fips === d.fips) === -1)
+      setFips([info].concat(fips));
   };
 
-  let addHoverFips = (newFips) => {
-    setHoverFips(newFips);
+  let addHoverFips = (info) => {
+    setHoverFips([info]);
+  };
+
+  let removeFips = (fipsToRemove) => {
+    setFips(_.filter(fips, (f) => f.fips !== fipsToRemove));
   };
 
   useEffect(() => {
@@ -155,16 +165,6 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     setDateToDisplay(fromEpoch(val));
   };
 
-  let modes = _.map(props.selectedOutcome.enabledModes, (mode) => {
-    if (mode === "True infections") return "True infections no UI";
-    if (mode === "Infection rate") return "Infection rate no UI";
-
-    if (mode === "True infections no UI") return mode;
-    if (mode === "Infection rate no UI") return mode;
-
-    return "Infection rate no UI";
-  });
-
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
@@ -186,59 +186,32 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             addFips={addFips}
             addHoverFips={addHoverFips}
             dateToDisplay={dateToDisplay}
+            marginLeft={0}
           />
         </Col>
-        {hoverFips &&
-          _.map([hoverFips, ...fips], (fips, i) => {
-            const data = dataForCounty(mapData, fips);
-            // selectedOutcome.enabledModes
-            var align;
-            switch (i % props.rowCount) {
-              case 0:
-                align = "left";
-                break;
-              case props.rowCount - 1:
-                align = "right";
-                break;
-              default:
-                align = "center";
-                break;
-            }
-            refsByFIPS[fips] = refsByFIPS[fips] || React.createRef();
-            if (data.series.length > 0)
-              return (
-                <Col
-                  key={fips + (i === 0)}
-                  size={props.colsPerChart}
-                  align={align}
-                  offset={align === "center" ? props.spacerOffset : 0}
-                >
-                  <div className="stacked-state-wrapper">
-                    <StateR0Display
-                      ref={refsByFIPS[fips]}
-                      config={null}
-                      subArea={fips}
-                      highlight={false}
-                      hasOwnRow={props.isSmallScreen}
-                      data={data}
-                      enabledModes={modes}
-                      yDomain={
-                        modes[0] === "True infections no UI"
-                          ? [0, 400]
-                          : [0.5, 1.5]
-                      }
-                      contentWidth={contentWidth}
-                    />
-                  </div>
-                </Col>
-              );
-            else
-              return (
-                <Col key={fips} size={props.colsPerChart} align="left">
-                  No data
-                </Col>
-              );
-          })}
+        <TrayCharts
+          key="traychart-1"
+          selectedCounties={hoverFips}
+          mapData={mapData}
+          rowCount={props.rowCount}
+          colsPerChart={props.colsPerChart}
+          isSmallScreen={props.isSmallScreen}
+          selectedOutcome={props.selectedOutcome}
+          contentWidth={contentWidth}
+          isHover={true}
+        />
+        <TrayCharts
+          key="traychart-2"
+          selectedCounties={fips}
+          mapData={mapData}
+          rowCount={props.rowCount}
+          colsPerChart={props.colsPerChart}
+          isSmallScreen={props.isSmallScreen}
+          selectedOutcome={props.selectedOutcome}
+          contentWidth={contentWidth}
+          handleRemoveFIPS={removeFips}
+          isHover={false}
+        />
       </Fragment>
     );
   } else {
@@ -276,21 +249,6 @@ export class OverviewMapChart extends RTSubareaChart {
   }
 
   handleMouseover(data) {
-    // let tooltipContents = (
-    //   <TooltipWrapper>
-    //     <TooltipDate>
-    //       {this._timeFormat(Util.dateFromISO(data.dataPoint.date))}
-    //     </TooltipDate>
-    //     <TooltipLabel>Positive (Reported)</TooltipLabel>
-    //     <TooltipStat color={this.state.viz._mainChartStroke} opacity={0.7}>
-    //       {this._numberFormat(data.dataPoint.cases_new)}
-    //     </TooltipStat>
-    //     <TooltipLabel>Testing Volume</TooltipLabel>
-    //     <TooltipStat color={this.state.viz._testChartDark}>
-    //       {this._numberFormat(data.dataPoint.tests_new)}
-    //     </TooltipStat>
-    //   </TooltipWrapper>
-    // );
     let tooltipContents = (
       <TooltipWrapper>
         <TooltipLabel>{data.dataPoint.properties.name}</TooltipLabel>
@@ -301,6 +259,91 @@ export class OverviewMapChart extends RTSubareaChart {
       tooltipY: data.y,
       tooltipShowing: true,
       tooltipContents: tooltipContents,
+    });
+  }
+}
+
+export class TrayCharts extends PureComponent {
+  modes(selectedOutcome) {
+    return _.map(selectedOutcome.enabledModes, (mode) => {
+      if (mode === "True infections") return "True infections per 100k no UI";
+      if (mode === "True infections per 100k")
+        return "True infections per 100k no UI";
+      if (mode === "True infections per 100k no UI") return mode;
+
+      if (mode === "Infection rate") return "Infection rate no UI";
+      if (mode === "Infection rate no UI") return mode;
+
+      return "Infection rate no UI";
+    });
+  }
+
+  render() {
+    let props = this.props;
+    let modes = this.modes(props.selectedOutcome);
+    let refsByFIPS = {};
+
+    return _.map(props.selectedCounties, (county, i) => {
+      const fips = county.fips;
+      const data = dataForCounty(props.mapData, fips);
+
+      const stateAbbr = Util.abbrState(county.state, "abbr");
+
+      var align;
+      switch (i % props.rowCount) {
+        case 0:
+          align = "left";
+          break;
+        case props.rowCount - 1:
+          align = "right";
+          break;
+        default:
+          align = "center";
+          break;
+      }
+
+      refsByFIPS[fips] = refsByFIPS[fips] || React.createRef();
+
+      if (data.series.length === 0)
+        return (
+          <Col key={fips + "0"} size={props.colsPerChart} align="left">
+            No data!
+          </Col>
+        );
+
+      return (
+        <Col
+          key={`${fips},${this.props.isHover ? "-1" : "-0"}`}
+          size={props.colsPerChart}
+          align={align}
+          offset={align === "center" ? props.spacerOffset : 0}
+        >
+          <div
+            className="stacked-state-wrapper"
+            onClick={
+              this.props.handleRemoveFIPS
+                ? (e) => this.props.handleRemoveFIPS(fips)
+                : null
+            }
+          >
+            <StateR0Display
+              ref={refsByFIPS[fips]}
+              config={null}
+              subArea={`${county.name}, ${stateAbbr}`}
+              highlight={false}
+              hasOwnRow={props.isSmallScreen}
+              data={data}
+              enabledModes={modes}
+              yDomain={
+                modes[0] === "True infections per 100k no UI"
+                  ? [0, 400]
+                  : [0.5, 1.5]
+              }
+              contentWidth={props.contentWidth}
+            />
+          </div>
+        </Col>
+      );
     });
   }
 }

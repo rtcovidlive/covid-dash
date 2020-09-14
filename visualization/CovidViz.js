@@ -111,10 +111,12 @@ class CovidViz {
             submetric: "r0",
             legend: "Rt",
             label: "Rt",
-            colorCodeStroke: true,
+            colorCodeStroke: false,
+            confidenceBounds: false,
             tooltipPrecision: ",.2f",
             showAnnotations:
               this._showAnnotations && this._enabledModes.length === 1,
+            confidenceBounds: false,
             lineColorForEntry: (identifier, entry) => {
               return Util.colorCodeRt(identifier, entry.r0, entry.r0, entry.r0);
             },
@@ -149,26 +151,6 @@ class CovidViz {
           };
           break;
         }
-        case Constants.MetricOptions.TrueInfectionsNoUI: {
-          conf = {
-            submetric: "onsets",
-            legend: "True infections",
-            label: "True infections",
-            colorCodeStroke: false,
-            tooltipPrecision: ",.0f",
-            showAnnotations:
-              this._showAnnotations && this._enabledModes.length === 1,
-            confidenceBounds: false,
-            lineColorForEntry: (identifier, entry) => {
-              return "rgba(0, 145, 255, 1)";
-            },
-            m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "onsets"];
-              return Math.max(0, raw);
-            },
-          };
-          break;
-        }
         case Constants.MetricOptions.TrueInfectionsPC: {
           conf = {
             submetric: "onsetsPC",
@@ -189,6 +171,26 @@ class CovidViz {
             },
             p5: (dataPoint) => this.m(dataPoint, "onsetsPC_l95"),
             p95: (dataPoint) => this.m(dataPoint, "onsetsPC_h95"),
+          };
+          break;
+        }
+        case Constants.MetricOptions.TrueInfectionsPCNoUI: {
+          conf = {
+            submetric: "onsetsPC",
+            legend: "True infections per 100k",
+            label: "True infections per 100k",
+            colorCodeStroke: false,
+            tooltipPrecision: ",.0f",
+            showAnnotations:
+              this._showAnnotations && this._enabledModes.length === 1,
+            confidenceBounds: false,
+            lineColorForEntry: (identifier, entry) => {
+              return "rgba(0, 145, 255, 1)";
+            },
+            m: (dataPoint, metricOverride) => {
+              let raw = dataPoint[metricOverride || "onsetsPC"];
+              return Math.max(0, raw);
+            },
           };
           break;
         }

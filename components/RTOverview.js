@@ -28,12 +28,6 @@ function stateClickHandler(stateCode) {
 
 export function RTOverview(props) {
   let outcomeTypes = {
-    infections: {
-      enabledModes: [Constants.MetricOptions.TrueInfections],
-      yDomain: [0, 100000],
-      id: "infections",
-      label: "Estimated infections",
-    },
     infectionsPC: {
       enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
       yDomain: [0, 400],
@@ -56,10 +50,16 @@ export function RTOverview(props) {
       id: "seroprevalence",
       label: "Estimated seroprevalence",
     },
+    infections: {
+      enabledModes: [Constants.MetricOptions.TrueInfections],
+      yDomain: [0, 100000],
+      id: "infections",
+      label: "Estimated infections",
+    },
   };
 
   const [selectedOutcome, useSelectedOutcome] = useState(
-    outcomeTypes.infections
+    outcomeTypes.infectionsPC
   );
 
   let handleRadioButton = function (name) {
@@ -85,23 +85,29 @@ export function RTOverview(props) {
 
   let isLgSize = props.width >= 991 && props.width < 1200;
   var colsPerChart;
+  var smallColsPerChart;
   var spacerOffset = 4;
   var rowCount;
   if (props.width < 576) {
     colsPerChart = 24;
+    smallColsPerChart = 24;
     rowCount = 1;
   } else if (props.width < 768) {
     colsPerChart = 12;
+    smallColsPerChart = 8;
     rowCount = 2;
   } else if (props.width < 992) {
     colsPerChart = 11;
+    smallColsPerChart = 8;
     spacerOffset = 2;
     rowCount = 2;
   } else if (props.width < 1200) {
     colsPerChart = 8;
+    smallColsPerChart = 6;
     rowCount = 3;
   } else {
     colsPerChart = 6;
+    smallColsPerChart = 4;
     rowCount = 4;
   }
 
@@ -119,7 +125,7 @@ export function RTOverview(props) {
             <OverviewMapSuper
               ref={mapRef}
               selectedOutcome={selectedOutcome}
-              colsPerChart={colsPerChart}
+              colsPerChart={smallColsPerChart}
               isSmallScreen={isSmallScreen}
               rowCount={rowCount}
               spacerOffset={spacerOffset}
