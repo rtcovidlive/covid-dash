@@ -43,6 +43,10 @@ let fromEpoch = (d) => {
 };
 
 function reformatMapData(data) {
+  // Reimplementing `fromEpoch` here to avoid unneccessary construction of
+  // large numbers of classes.
+  const tf = timeFormat("%Y-%m-%d");
+
   const zipped = _.zipWith(
     data.Rt,
     data.date,
@@ -50,7 +54,7 @@ function reformatMapData(data) {
     data.fips,
     (r, d, i, f) => ({
       r0: +r / 100,
-      date: fromEpoch(d),
+      date: tf(new Date(d * 24 * 60 * 60 * 1000)),
       onsetsPC: i,
       fips: f,
       identifier: f,
@@ -100,7 +104,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
   let addFips = (info) => {
     if (_.findIndex(fips, (d) => info.fips === d.fips) === -1)
-      setFips([info].concat(fips));
+      setFips(fips.concat([info]));
   };
 
   let addHoverFips = (info) => {
@@ -168,16 +172,6 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
-        <Col size={24}>
-          <Slider
-            defaultValue={toEpoch(dateMinMax[1])}
-            tooltipVisible={true}
-            min={toEpoch(dateMinMax[0])}
-            max={toEpoch(dateMinMax[1])}
-            tipFormatter={fromEpoch}
-            onChange={handleSliderChange}
-          />
-        </Col>
         <Col size={24} align="center" ref={ref}>
           <OverviewMapChart
             data={data}
@@ -186,7 +180,18 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             addFips={addFips}
             addHoverFips={addHoverFips}
             dateToDisplay={dateToDisplay}
+            selectedOutcome={props.selectedOutcome}
             marginLeft={0}
+          />
+        </Col>
+        <Col size={24}>
+          <Slider
+            defaultValue={toEpoch(dateMinMax[1])}
+            tooltipVisible={true}
+            min={toEpoch(dateMinMax[0])}
+            max={toEpoch(dateMinMax[1])}
+            tipFormatter={fromEpoch}
+            onChange={handleSliderChange}
           />
         </Col>
         <TrayCharts
@@ -225,6 +230,20 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
 export default OverviewMapSuper;
 
+let modeMap = function (modes) {
+  return _.map(modes, (mode) => {
+    if (mode === "True infections") return "True infections per 100k no UI";
+    if (mode === "True infections per 100k")
+      return "True infections per 100k no UI";
+    if (mode === "True infections per 100k no UI") return mode;
+
+    if (mode === "Infection rate") return "Infection rate no UI";
+    if (mode === "Infection rate no UI") return mode;
+
+    return "Infection rate no UI";
+  });
+};
+
 export class OverviewMapChart extends RTSubareaChart {
   constructor(props) {
     super(props);
@@ -242,40 +261,37 @@ export class OverviewMapChart extends RTSubareaChart {
 
     if (this.state != nextState) return true;
 
-    if (this.props.dateToDisplay != nextProps.dateToDisplay)
-      this.handleDateChange(nextProps.dateToDisplay);
+    if (
+      this.props.dateToDisplay != nextProps.dateToDisplay ||
+      this.props.selectedOutcome != nextProps.selectedOutcome
+    ) {
+      this.handleMetricChange(
+        nextProps.dateToDisplay,
+        modeMap(nextProps.selectedOutcome.enabledModes)
+      );
+    }
 
     return false;
   }
 
   handleMouseover(data) {
-    let tooltipContents = (
-      <TooltipWrapper>
-        <TooltipLabel>{data.dataPoint.properties.name}</TooltipLabel>
-      </TooltipWrapper>
-    );
-    this.setState({
-      tooltipX: data.x,
-      tooltipY: data.y,
-      tooltipShowing: true,
-      tooltipContents: tooltipContents,
-    });
+    // let tooltipContents = (
+    //   <TooltipWrapper>
+    //     <TooltipLabel>{data.dataPoint.properties.name}</TooltipLabel>
+    //   </TooltipWrapper>
+    // );
+    // this.setState({
+    //   tooltipX: data.x,
+    //   tooltipY: data.y,
+    //   tooltipShowing: true,
+    //   tooltipContents: tooltipContents,
+    // });
   }
 }
 
 export class TrayCharts extends PureComponent {
   modes(selectedOutcome) {
-    return _.map(selectedOutcome.enabledModes, (mode) => {
-      if (mode === "True infections") return "True infections per 100k no UI";
-      if (mode === "True infections per 100k")
-        return "True infections per 100k no UI";
-      if (mode === "True infections per 100k no UI") return mode;
-
-      if (mode === "Infection rate") return "Infection rate no UI";
-      if (mode === "Infection rate no UI") return mode;
-
-      return "Infection rate no UI";
-    });
+    return modeMap(selectedOutcome.enabledModes);
   }
 
   render() {

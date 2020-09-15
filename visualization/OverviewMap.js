@@ -1,12 +1,13 @@
 import { select, event, mouse } from "d3-selection";
-import { scaleSequential } from "d3-scale";
-import { interpolateMagma } from "d3-scale-chromatic";
+import { scaleSequential, scaleDiverging } from "d3-scale";
+import { interpolateMagma, interpolateRdGy } from "d3-scale-chromatic";
 import { geoPath, geoIdentity } from "d3-geo";
 import { timeFormat } from "d3-time-format";
 import { nest } from "d3-collection";
 import { zoom, zoomIdentity, zoomTransform } from "d3-zoom";
 import { mesh, feature } from "topojson";
 import _ from "lodash";
+import Constants from "lib/Constants";
 import legend from "./ColorLegend";
 
 class OverviewMap {
@@ -17,6 +18,18 @@ class OverviewMap {
     this._onMouseout = onMouseout;
     this._addFips = addFips;
     this._addHoverFips = addHoverFips;
+
+    this.ColorInfections = scaleSequential([0, 200], interpolateMagma).unknown(
+      "rgba(0, 0, 0, 0)"
+    );
+
+    this.ColorR0 = scaleDiverging([0.5, 1.0, 1.38], (t) =>
+      interpolateRdGy(1 - t)
+    ).unknown("rgba(0,0,0,0)");
+
+    this.color = this.ColorInfections;
+    this.accessor = "onsetsPC";
+    this.date = null;
   }
 
   setDimensions(width, height) {
@@ -40,11 +53,45 @@ class OverviewMap {
     });
   }
 
-  handleDateChange(val) {
+  titleLegend() {
+    return this.accessor === r0
+      ? "Effective reproduction number (Rt)"
+      : "Estimated infections / 100k / day";
+  }
+
+  handleMetricChange(dateToDisplay, enabledModes) {
+    let reRenderLegend = false;
+
+    if (dateToDisplay === this.date) reRenderLegend = true;
+
+    this.date = dateToDisplay;
+
+    switch (enabledModes[0]) {
+      case Constants.MetricOptions.DerivedR0NoUI: {
+        this.color = this.ColorR0;
+        this.accessor = "r0";
+        break;
+      }
+      case Constants.MetricOptions.TrueInfectionsPCNoUI: {
+        this.color = this.ColorInfections;
+        this.accessor = "onsetsPC";
+        break;
+      }
+      default: {
+        this.color = this.ColorInfections;
+        this.accessor = "onsetsPC";
+        break;
+      }
+    }
+
     this._counties.join("path").attr("fill", (d) => {
-      const record = this._data.get(val).get(d.id);
-      return this.color(record ? record.onsetsPC : undefined);
+      const record = this._data.get(this.date).get(d.id);
+      return this.color(record ? record[this.accessor] : undefined);
     });
+
+    if (reRenderLegend) {
+      this.renderLegend(this.titleLegend());
+    }
   }
 
   getStateName(fips, data) {
@@ -58,6 +105,32 @@ class OverviewMap {
     return state ? state.properties.name : "";
   }
 
+  renderLegend(title) {
+    if (this._legend) this._legend.remove();
+
+    const legendX = Math.round((this._width * 630) / 975);
+    const legendY = Math.round((this._height * 20) / 610);
+    const legendWidth = Math.round((this._width * 260) / 975);
+
+    this._legend = this._svg.append("g");
+
+    this._legend
+      .attr("transform", `translate(${legendX}, ${legendY})`)
+      .append(() =>
+        legend({
+          color: this.color,
+          title: title,
+          width: legendWidth,
+          marginRight: 15,
+          marginLeft: 15,
+        })
+      )
+      .insert("rect", ":first-child")
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr("fill", "rgb(255, 255, 255, 0.8)");
+  }
+
   render(data, props) {
     let self = this;
 
@@ -65,10 +138,6 @@ class OverviewMap {
     this._svg.selectAll("path").remove();
     // this._svg.selectAll("div").remove();
     this._svg.selectAll("rect").remove();
-
-    this.color = scaleSequential([0, 200], interpolateMagma).unknown(
-      "rgba(0, 0, 0, 0)"
-    );
 
     let dateLambda = (d) => {
       let obj = new Date(d * 24 * 3600 * 1000);
@@ -105,26 +174,7 @@ class OverviewMap {
 
     const g = this._svg.append("g");
 
-    const legendX = Math.round((this._width * 630) / 975);
-    const legendY = Math.round((this._height * 20) / 610);
-    const legendWidth = Math.round((this._width * 260) / 975);
-
-    this._svg
-      .append("g")
-      .attr("transform", `translate(${legendX}, ${legendY})`)
-      .append(() =>
-        legend({
-          color: this.color,
-          title: "Infections / 100k / day",
-          width: legendWidth,
-          marginRight: 15,
-          marginLeft: 15,
-        })
-      )
-      .insert("rect", ":first-child")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .attr("fill", "rgb(255, 255, 255, 0.8)");
+    this.renderLegend(this.titleLegend());
 
     this._counties = g
       .append("g")
@@ -151,7 +201,10 @@ class OverviewMap {
         self.handleMouseout();
       });
 
-    this.handleDateChange(props.dateToDisplay);
+    this.handleMetricChange(
+      props.dateToDisplay,
+      Constants.MetricOptions.TrueInfectionsPCNoUI
+    );
 
     g.append("path")
       .datum(mesh(us, us.objects.states))
@@ -177,7 +230,6 @@ class OverviewMap {
     }
 
     function clicked(d) {
-      const [[x0, y0], [x1, y1]] = path.bounds(states.get(d.id.slice(0, 2)));
       event.stopPropagation();
 
       self._addFips({
@@ -185,24 +237,6 @@ class OverviewMap {
         name: d.properties.name,
         state: self.getStateName(d.id, self._boundaries),
       });
-
-      self._svg
-        .transition()
-        .duration(750)
-        .call(
-          zoomer.transform,
-          zoomIdentity
-            .translate(self._width / 2, self._height / 2)
-            .scale(
-              Math.min(
-                8,
-                0.9 /
-                  Math.max((x1 - x0) / self._width, (y1 - y0) / self._height)
-              )
-            )
-            .translate(-(x0 + x1) / 2, -(y0 + y1) / 2),
-          mouse(self._svg.node())
-        );
     }
 
     function zoomed() {

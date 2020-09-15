@@ -114,8 +114,8 @@ export class RTSubareaChart extends Component {
 
   handleMouseover(data) {}
 
-  handleDateChange(val) {
-    this.state.viz.handleDateChange(val);
+  handleMetricChange(dateToDisplay, modes) {
+    this.state.viz.handleMetricChange(dateToDisplay, modes);
   }
 
   componentDidUpdate(prevProps, prevState) {
