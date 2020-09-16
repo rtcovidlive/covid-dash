@@ -85,7 +85,7 @@ export const StateR0Display = React.forwardRef((props, ref) => {
       }
     >
       <Row style={{ marginRight: 32 }}>
-        <Col verticalAlign="middle" size={16}>
+        <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
           <Title className="state-rt-display-name" level={2}>
             {(props.config && props.config.subAreas[props.subArea]) ||
               props.subArea}
@@ -106,25 +106,27 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             )}
           </Title>{" "}
         </Col>
-        <Col verticalAlign="middle" textAlign="right" size={8}>
-          <Link
-            href="/[countrycode]/[subarea]"
-            as={{ pathname: `/us/${props.subArea}`, query: navigationQuery }}
-          >
-            <DetailsLink>
-              Details{" "}
-              <span
-                style={{
-                  fontSize: 9,
-                  position: "relative",
-                  top: 0.5,
-                  color: "goldenrod",
-                }}
-                className="icon-chevron-right"
-              ></span>
-            </DetailsLink>
-          </Link>
-        </Col>
+        {props.linkAvailable && (
+          <Col verticalAlign="middle" textAlign="right" size={8}>
+            <Link
+              href="/[countrycode]/[subarea]"
+              as={{ pathname: `/us/${props.subArea}`, query: navigationQuery }}
+            >
+              <DetailsLink>
+                Details{" "}
+                <span
+                  style={{
+                    fontSize: 9,
+                    position: "relative",
+                    top: 0.5,
+                    color: "goldenrod",
+                  }}
+                  className="icon-chevron-right"
+                ></span>
+              </DetailsLink>
+            </Link>
+          </Col>
+        )}
       </Row>
       {contentWidth && (
         <div

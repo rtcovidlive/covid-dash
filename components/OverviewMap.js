@@ -169,14 +169,18 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     setDateToDisplay(fromEpoch(val));
   };
 
+  const svgWidth = Math.min(1000, contentWidth);
+  // const svgHeight = Math.floor(0.625 * svgWidth);
+  const svgHeight = Math.floor(0.5 * svgWidth);
+
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
         <Col size={24} align="center" ref={ref}>
           <OverviewMapChart
             data={data}
-            width={contentWidth}
-            height={Math.floor(0.625 * contentWidth)}
+            width={svgWidth}
+            height={svgHeight}
             addFips={addFips}
             addHoverFips={addHoverFips}
             dateToDisplay={dateToDisplay}
@@ -345,7 +349,7 @@ export class TrayCharts extends PureComponent {
             <StateR0Display
               ref={refsByFIPS[fips]}
               config={null}
-              subArea={`${county.name}, ${stateAbbr}`}
+              subArea={`${stateAbbr} - ${county.name}`}
               highlight={false}
               hasOwnRow={props.isSmallScreen}
               data={data}
@@ -356,6 +360,7 @@ export class TrayCharts extends PureComponent {
                   : [0.5, 1.5]
               }
               contentWidth={props.contentWidth}
+              linkAvailable={false}
             />
           </div>
         </Col>
