@@ -14,6 +14,11 @@ import { decode } from "@ygoe/msgpack";
 import { nest } from "d3-collection";
 import { extent } from "d3-array";
 import { timeFormat } from "d3-time-format";
+import {
+  differenceInDays,
+  eachMonthOfInterval,
+  format as dateFormat,
+} from "date-fns";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
 import { Slider, Spin } from "antd";
@@ -169,9 +174,25 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     setDateToDisplay(fromEpoch(val));
   };
 
-  const svgWidth = Math.min(1000, contentWidth);
-  // const svgHeight = Math.floor(0.625 * svgWidth);
-  const svgHeight = Math.floor(0.5 * svgWidth);
+  const svgWidth = contentWidth;
+  const svgHeight = Math.floor(Math.min(500, 0.5 * contentWidth));
+
+  let sliderMarks = ([min, max]) => {
+    const months = eachMonthOfInterval({
+      start: new Date(min),
+      end: new Date(max),
+    });
+
+    let monthsFormatted = _.zipObject(
+      _.map(months, toEpoch),
+      _.map(months, (d) => dateFormat(d, "MMM"))
+    );
+
+    // Add on day-name of latest date of model data
+    monthsFormatted[toEpoch(max)] = dateFormat(new Date(max), "eee");
+
+    return monthsFormatted;
+  };
 
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
@@ -190,11 +211,20 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
         </Col>
         <Col size={24}>
           <Slider
+            marks={sliderMarks(dateMinMax)}
             defaultValue={toEpoch(dateMinMax[1])}
             tooltipVisible={true}
             min={toEpoch(dateMinMax[0])}
             max={toEpoch(dateMinMax[1])}
-            tipFormatter={fromEpoch}
+            tipFormatter={(epoch) => {
+              const d = new Date(fromEpoch(epoch));
+              const md = dateFormat(d, "LLL d");
+              const diff = differenceInDays(new Date(), d);
+
+              if (diff <= 40) return `${md}, ${diff}d ago`;
+
+              return md;
+            }}
             onChange={handleSliderChange}
           />
         </Col>
@@ -226,7 +256,23 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   } else {
     return (
       <Col size={24} ref={ref}>
-        <Spin size="large" tip="Loading map..." />
+        <div style={{ margin: "20px" }}>
+          <Spin
+            size="large"
+            tip={
+              <>
+                <p>
+                  {boundsIsLoaded ? <strong>Loaded</strong> : "Loading"}{" "}
+                  boundaries
+                </p>
+                <p>
+                  {dataIsLoaded ? <strong>Loaded</strong> : "Loading"} model
+                  data
+                </p>
+              </>
+            }
+          />
+        </div>
       </Col>
     );
   }
@@ -349,7 +395,8 @@ export class TrayCharts extends PureComponent {
             <StateR0Display
               ref={refsByFIPS[fips]}
               config={null}
-              subArea={`${stateAbbr} - ${county.name}`}
+              stateInitials={stateAbbr}
+              subArea={`${county.name}`}
               highlight={false}
               hasOwnRow={props.isSmallScreen}
               data={data}

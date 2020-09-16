@@ -86,6 +86,19 @@ export const StateR0Display = React.forwardRef((props, ref) => {
     >
       <Row style={{ marginRight: 32 }}>
         <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
+          {props.stateInitials && (
+            <span
+              style={{
+                backgroundColor: "#d9d9d9",
+                padding: "0px 4px 0px 4px",
+                borderRadius: "3px",
+                marginRight: "5px",
+                fontSize: "12px",
+              }}
+            >
+              {props.stateInitials}
+            </span>
+          )}
           <Title className="state-rt-display-name" level={2}>
             {(props.config && props.config.subAreas[props.subArea]) ||
               props.subArea}

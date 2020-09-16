@@ -23,7 +23,7 @@ class OverviewMap {
       "rgba(0, 0, 0, 0)"
     );
 
-    this.ColorR0 = scaleDiverging([0.5, 1.0, 1.38], (t) =>
+    this.ColorR0 = scaleDiverging([0.7, 1.0, 1.3], (t) =>
       interpolateRdGy(1 - t)
     ).unknown("rgba(0,0,0,0)");
 
@@ -54,7 +54,7 @@ class OverviewMap {
   }
 
   titleLegend() {
-    return this.accessor === r0
+    return this.accessor === "r0"
       ? "Effective reproduction number (Rt)"
       : "Estimated infections / 100k / day";
   }
@@ -108,9 +108,9 @@ class OverviewMap {
   renderLegend(title) {
     if (this._legend) this._legend.remove();
 
-    const legendX = Math.round((this._width * 630) / 975);
-    const legendY = Math.round((this._height * 20) / 610);
-    const legendWidth = Math.round((this._width * 260) / 975);
+    const legendX = Math.round((this._width * 15) / 975);
+    const legendY = Math.round((this._height * 530) / 610);
+    const legendWidth = Math.round((this._width * 180) / 975);
 
     this._legend = this._svg.append("g");
 

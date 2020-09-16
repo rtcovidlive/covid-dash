@@ -7,11 +7,14 @@ import { Title } from "./Typography";
 import { ShareButtons } from "./ShareButtons";
 
 export const MainTitle = styled(Title)`
-  margin-left: -3px !important;
   font-weight: 600;
-  font-size: 42px;
+  font-size: 36px;
+  padding-left: 17px;
+  display: inline-block;
   letter-spacing: -0.5px;
   @media (max-width: 768px) {
+    display: block;
+    padding-left: 0;
     margin-left: -1px !important;
     font-size: 34px !important;
   }
@@ -45,7 +48,10 @@ export function RTHeader(props) {
           {shareButtons}
           <Row>
             <Col size={24}>
-              <img src="icon.png" style={{ height: "60px", width: "60px" }} />
+              <img
+                src="icon.png"
+                style={{ height: "60px", width: "60px", verticalAlign: "top" }}
+              />
               <MainTitle level={1}>covidestim · COVID-19 nowcasting</MainTitle>
             </Col>
           </Row>
