@@ -12,6 +12,7 @@
     "export_site_images": "node scripts/export_site_images.js --port 31384 --output tmp --start-next"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.2.2",
     "@sentry/browser": "^5.17.0",
     "@sentry/webpack-plugin": "^1.11.1",
     "@ygoe/msgpack": "^1.0.2",

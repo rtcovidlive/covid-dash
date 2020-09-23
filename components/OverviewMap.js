@@ -22,7 +22,13 @@ import {
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
 import { Slider, Spin } from "antd";
+import {
+  SelectOutlined,
+  LeftOutlined,
+  ZoomInOutlined,
+} from "@ant-design/icons";
 import { Util } from "lib/Util";
+import { Title } from "./Typography";
 
 import "../styles/antd.scss";
 
@@ -349,7 +355,49 @@ export class TrayCharts extends PureComponent {
     let modes = this.modes(props.selectedOutcome);
     let refsByFIPS = {};
 
-    return _.map(props.selectedCounties, (county, i) => {
+    let hoverHelp = (
+      <Col key="placeholder" size={props.colsPerChart} align="left">
+        <div className="state-rt-display">
+          <Row style={{ marginRight: 32 }}>
+            <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
+              <Title className="state-rt-display-name" level={2}>
+                <ZoomInOutlined /> Hover county for detail
+              </Title>
+            </Col>
+          </Row>
+        </div>
+      </Col>
+    );
+
+    let addHelp = (
+      <Col key="placeholder" size={props.colsPerChart} align="left">
+        <div className="state-rt-display">
+          <Row style={{ marginRight: 32 }}>
+            <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
+              <Title className="state-rt-display-name" level={2}>
+                <SelectOutlined /> Click county to add
+              </Title>
+            </Col>
+          </Row>
+        </div>
+      </Col>
+    );
+
+    let closeHelp = (
+      <Col key="placeholder" size={props.colsPerChart} align="left">
+        <div className="state-rt-display">
+          <Row style={{ marginRight: 32 }}>
+            <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
+              <Title className="state-rt-display-name" level={2}>
+                <LeftOutlined /> Click to remove
+              </Title>
+            </Col>
+          </Row>
+        </div>
+      </Col>
+    );
+
+    let countyCharts = _.map(props.selectedCounties, (county, i) => {
       const fips = county.fips;
       const data = dataForCounty(props.mapData, fips);
 
@@ -413,5 +461,12 @@ export class TrayCharts extends PureComponent {
         </Col>
       );
     });
+
+    if (props.selectedCounties.length === 0 && props.isHover)
+      return [hoverHelp];
+    else if (props.isHover) return [...countyCharts];
+    else if (props.selectedCounties.length === 0 && !props.isHover)
+      return [addHelp];
+    else return [...countyCharts, closeHelp];
   }
 }
