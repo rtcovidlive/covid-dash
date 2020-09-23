@@ -110,7 +110,7 @@ class OverviewMap {
 
     const legendX = Math.round((this._width * 15) / 975);
     const legendY = Math.round((this._height * 530) / 610);
-    const legendWidth = Math.round((this._width * 180) / 975);
+    const legendWidth = Math.max(220, Math.round((this._width * 180) / 975));
 
     this._legend = this._svg.append("g");
 
