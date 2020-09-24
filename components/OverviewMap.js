@@ -181,7 +181,9 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   };
 
   const svgWidth = contentWidth;
-  const svgHeight = Math.floor(Math.min(500, 0.5 * contentWidth));
+  let svgHeight = Math.floor(Math.min(500, 0.5 * contentWidth));
+
+  if (svgWidth < 500) svgHeight = 1.8 * svgWidth;
 
   let sliderMarks = ([min, max]) => {
     const months = eachMonthOfInterval({
@@ -234,17 +236,19 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             onChange={handleSliderChange}
           />
         </Col>
-        <TrayCharts
-          key="traychart-1"
-          selectedCounties={hoverFips}
-          mapData={mapData}
-          rowCount={props.rowCount}
-          colsPerChart={props.colsPerChart}
-          isSmallScreen={props.isSmallScreen}
-          selectedOutcome={props.selectedOutcome}
-          contentWidth={contentWidth}
-          isHover={true}
-        />
+        {!props.isSmallScreen && (
+          <TrayCharts
+            key="traychart-1"
+            selectedCounties={hoverFips}
+            mapData={mapData}
+            rowCount={props.rowCount}
+            colsPerChart={props.colsPerChart}
+            isSmallScreen={props.isSmallScreen}
+            selectedOutcome={props.selectedOutcome}
+            contentWidth={contentWidth}
+            isHover={true}
+          />
+        )}
         <TrayCharts
           key="traychart-2"
           selectedCounties={fips}
