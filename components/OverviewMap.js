@@ -28,7 +28,7 @@ import {
   ZoomInOutlined,
 } from "@ant-design/icons";
 import { Util } from "lib/Util";
-import { Title } from "./Typography";
+import { Title, HelperTitle } from "./Typography";
 
 import "../styles/antd.scss";
 
@@ -364,9 +364,9 @@ export class TrayCharts extends PureComponent {
         <div className="state-rt-display">
           <Row style={{ marginRight: 32 }}>
             <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
-              <Title className="state-rt-display-name" level={2}>
+              <HelperTitle className="state-rt-display-name" level={2}>
                 <ZoomInOutlined /> Hover county for detail
-              </Title>
+              </HelperTitle>
             </Col>
           </Row>
         </div>
@@ -378,9 +378,9 @@ export class TrayCharts extends PureComponent {
         <div className="state-rt-display">
           <Row style={{ marginRight: 32 }}>
             <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
-              <Title className="state-rt-display-name" level={2}>
+              <HelperTitle className="state-rt-display-name" level={2}>
                 <SelectOutlined /> Click county to add
-              </Title>
+              </HelperTitle>
             </Col>
           </Row>
         </div>
@@ -392,9 +392,9 @@ export class TrayCharts extends PureComponent {
         <div className="state-rt-display">
           <Row style={{ marginRight: 32 }}>
             <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
-              <Title className="state-rt-display-name" level={2}>
+              <HelperTitle className="state-rt-display-name" level={2}>
                 <LeftOutlined /> Click to remove
-              </Title>
+              </HelperTitle>
             </Col>
           </Row>
         </div>

@@ -25,3 +25,11 @@ export const Title = styled.h1`
   color: black;
   margin: 0;
 `;
+
+export const HelperTitle = styled.h1`
+  font-size: ${(props) => LEVEL_TO_FONT_SIZE[props.level]};
+  line-height: ${(props) => LEVEL_TO_LINE_HEIGHT[props.level]};
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.4);
+  margin: 0;
+`;

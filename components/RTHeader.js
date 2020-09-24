@@ -90,9 +90,8 @@ export function RTHeader(props) {
           <p>
             We make estimates about the COVID-19 epidemic using a statistical
             model that combines information about reported cases, reported
-            deaths, the fraction of positive tests each day (an indicator of
-            testing capacity), disease stage duration, and disease severity and
-            mortality risks. You can read a preprint of our methodology at{" "}
+            deaths, disease stage duration, and disease severity and mortality
+            risks. You can read a preprint of our methodology at{" "}
             <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v1">
               medRxiv
             </a>
