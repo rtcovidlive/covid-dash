@@ -106,16 +106,28 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapBoundaries, setMapBoundaries] = useState(null);
   const [boundsIsLoaded, setBoundsIsLoaded] = useState(false);
 
+  let cookieFips = Util.getCookie("fips")
+    ? Util.getCookie("fips")
+        .split(",")
+        .map((d) => _.zipObject(["fips", "name", "state"], d.split("+")))
+    : [];
+
   const [hoverFips, setHoverFips] = useState([]);
-  const [fips, setFips] = useState([]);
+  const [fips, setFips] = useState(cookieFips);
 
   const url = "https://covidestim.s3.us-east-2.amazonaws.com/map-demo.pack.gz";
   const albersURL =
     "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
 
   let addFips = (info) => {
-    if (_.findIndex(fips, (d) => info.fips === d.fips) === -1)
-      setFips(fips.concat([info]));
+    if (_.findIndex(fips, (d) => info.fips === d.fips) === -1) {
+      const newFips = fips.concat([info]);
+      setFips(newFips);
+
+      document.cookie = `fips=${newFips
+        .map((d) => [d.fips, d.name, d.state].join("+"))
+        .join(",")}`;
+    }
   };
 
   let addHoverFips = (info) => {
@@ -123,7 +135,12 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   };
 
   let removeFips = (fipsToRemove) => {
-    setFips(_.filter(fips, (f) => f.fips !== fipsToRemove));
+    const newFips = _.filter(fips, (f) => f.fips !== fipsToRemove);
+    setFips(newFips);
+
+    document.cookie = `fips=${newFips
+      .map((d) => [d.fips, d.name, d.state].join("+"))
+      .join(",")}`;
   };
 
   useEffect(() => {
