@@ -58,6 +58,12 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
             </ul>
           </>
         )}
+        <div style={{ marginTop: "25px" }}>
+          <img src="ysph.png" width={450} />
+        </div>
+        <div style={{ marginTop: "25px" }}>
+          <img src="hsph.png" width={450} />
+        </div>
         <p>
           Contributors to this project include:{" "}
           <a href="http://tedcohenlab.org/Melanie-Chitwood/">
@@ -98,12 +104,6 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           Visualizations built using <a href="https://d3js.org">d3</a>; site
           built using <a href="https://nextjs.org/">Next.js</a>.
         </p>
-        <div style={{ marginTop: "25px" }}>
-          <img src="ysph.png" width={450} />
-        </div>
-        <div style={{ marginTop: "25px" }}>
-          <img src="hsph.png" width={450} />
-        </div>
       </div>
     </Row>
   );

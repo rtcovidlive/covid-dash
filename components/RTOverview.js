@@ -9,7 +9,6 @@ import { ScrollToTopPill } from "./ScrollToTopPill";
 import { RTFooter } from "./RTFooter";
 import RTHeader from "./RTHeader";
 import OverviewMapSuper from "./OverviewMap";
-import RTHero from "./RTHero";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 import { Button } from "./Button";
@@ -212,14 +211,6 @@ export function RTOverview(props) {
                 }
               )}
           </Row>
-          <RTHero
-            ref={heroRef}
-            rtData={rtData}
-            rtRef={rtRef}
-            config={config}
-            isSmallScreen={isSmallScreen}
-            stateClickHandler={stateClickHandler}
-          />
         </div>
       </div>
       <RTFooter
