@@ -111,8 +111,7 @@ class CovidViz {
             submetric: "r0",
             legend: "Rt",
             label: "Rt",
-            colorCodeStroke: false,
-            confidenceBounds: false,
+            colorCodeStroke: true,
             tooltipPrecision: ",.2f",
             showAnnotations:
               this._showAnnotations && this._enabledModes.length === 1,
@@ -663,8 +662,10 @@ class CovidViz {
         .attr("stroke", Constants.graphContainerStrokeColor)
         .attr("height", this._height - this._margin.bottom - this._margin.top);
     }
+
+    this.defineGradient(chartContent);
+
     if (conf.confidenceBounds) {
-      this.defineGradient(chartContent);
       this.renderConfidenceBounds(chartContent, conf);
     }
     if (index === 0) {
