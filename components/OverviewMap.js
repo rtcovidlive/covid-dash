@@ -13,7 +13,7 @@ import axios from "axios";
 import { decode } from "@ygoe/msgpack";
 import { nest } from "d3-collection";
 import { extent } from "d3-array";
-import { timeFormat } from "d3-time-format";
+import { utcFormat } from "d3-time-format";
 import {
   differenceInDays,
   eachMonthOfInterval,
@@ -50,13 +50,13 @@ let toEpoch = (d) => Math.floor(new Date(d).valueOf() / (1000 * 60 * 60 * 24));
 
 let fromEpoch = (d) => {
   let obj = new Date(d * 24 * 3600 * 1000);
-  return timeFormat("%Y-%m-%d")(obj);
+  return utcFormat("%Y-%m-%d")(obj);
 };
 
 function reformatMapData(data) {
   // Reimplementing `fromEpoch` here to avoid unneccessary construction of
   // large numbers of classes.
-  const tf = timeFormat("%Y-%m-%d");
+  const tf = utcFormat("%Y-%m-%d");
 
   const zipped = _.zipWith(
     data.Rt,
@@ -243,8 +243,8 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             min={toEpoch(dateMinMax[0])}
             max={toEpoch(dateMinMax[1])}
             tipFormatter={(epoch) => {
-              const d = new Date(fromEpoch(epoch));
-              const md = dateFormat(d, "LLL d");
+              const d = new Date(epoch * 24 * 3600 * 1000);
+              const md = utcFormat("%b %d")(d);
               const diff = differenceInDays(new Date(), d);
 
               if (diff <= 40) return `${md}, ${diff}d ago`;
