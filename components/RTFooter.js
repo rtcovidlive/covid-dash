@@ -59,10 +59,10 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           </>
         )}
         <div style={{ marginTop: "25px" }}>
-          <img src="ysph.png" width={450} />
+          <img src="/ysph.png" width={450} />
         </div>
         <div style={{ marginTop: "25px" }}>
-          <img src="hsph.png" width={450} />
+          <img src="/hsph.png" width={450} />
         </div>
         <p>
           Contributors to this project include:{" "}
