@@ -107,7 +107,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [boundsIsLoaded, setBoundsIsLoaded] = useState(false);
 
   let cookieFips = Util.getCookie("fips")
-    ? Util.getCookie("fips")
+    ? decodeURIComponent(Util.getCookie("fips"))
         .split(",")
         .map((d) => _.zipObject(["fips", "name", "state"], d.split("+")))
     : [];
@@ -125,9 +125,11 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
       const newFips = fips.concat([info]);
       setFips(newFips);
 
-      document.cookie = `fips=${newFips
+      const str = newFips
         .map((d) => [d.fips, d.name, d.state].join("+"))
-        .join(",")}`;
+        .join(",");
+
+      document.cookie = `fips=${encodeURIComponent(str)}`;
     }
   };
 
@@ -139,9 +141,11 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     const newFips = _.filter(fips, (f) => f.fips !== fipsToRemove);
     setFips(newFips);
 
-    document.cookie = `fips=${newFips
+    const str = newFips
       .map((d) => [d.fips, d.name, d.state].join("+"))
-      .join(",")}`;
+      .join(",");
+
+    document.cookie = `fips=${encodeURIComponent(str)}`;
   };
 
   useEffect(() => {
