@@ -147,7 +147,7 @@ class OverviewMap {
       return timeFormat("%Y-%m-%d")(obj);
     };
 
-    const zoomer = zoom().scaleExtent([1, 8]).on("zoom", zoomed);
+    const zoomer = zoom().scaleExtent([1, 30]).on("zoom", zoomed);
 
     this._data = data.mapData;
 
