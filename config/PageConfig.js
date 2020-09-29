@@ -14,8 +14,7 @@ console.log(`Base URL is ${BASE_URL}`);
 
 export const LOOPBACK_BASE_URL =
   process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`;
-export const CDN_ROOT = "https://covidestim.github.io/covidestim-products";
-// export const CDN_ROOT = "http://localhost:3300"
+export const CDN_ROOT = "https://covidestim.s3.us-east-2.amazonaws.com/latest";
 
 class Config {
   constructor(
@@ -172,7 +171,7 @@ function US() {
     "us",
     "U.S. States",
     "State",
-    "current_summary",
+    "state/summary",
     ussubSets,
     USStatesByCode,
     [
