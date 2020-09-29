@@ -488,10 +488,8 @@ export class TrayCharts extends PureComponent {
               data={data}
               enabledModes={modes}
               yDomain={
-                //                modes[0] === "True infections per 100k no UI"
-                //                  ? [0, 400]
-                //                  : [0.5, 1.5]
-                props.selectedOutcome.yDomain
+                props.selectedOutcome.yDomainCounty ||
+                props.selectedCounties.yDomain
               }
               contentWidth={props.contentWidth}
               linkAvailable={false}

@@ -52,6 +52,7 @@ export function RTOverview(props) {
     infections: {
       enabledModes: [Constants.MetricOptions.TrueInfections],
       yDomain: [0, 100000],
+      yDomainCounty: [0, 8000],
       id: "infections",
       label: "Estimated infections",
     },
