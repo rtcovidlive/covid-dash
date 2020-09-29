@@ -218,6 +218,7 @@ class OverviewMap {
       .data(feature(us, us.objects.counties).features, (d) => d.id)
       .join("path")
       .attr("d", path)
+      .attr("cursor", "copy")
       .on("click", clicked)
       .on("mouseover", function (d, i) {
         const bounds = this.getBBox();
