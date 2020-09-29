@@ -63,10 +63,14 @@ function reformatMapData(data) {
     data.date,
     data.infectionsPC,
     data.fips,
-    (r, d, i, f) => ({
+    data.seroprevalence,
+    data.infections,
+    (r, d, i, f, sp, inf) => ({
       r0: +r / 100,
       date: tf(new Date(d * 24 * 60 * 60 * 1000)),
       onsetsPC: i,
+      cumulative: sp,
+      onsets: inf,
       fips: f,
       identifier: f,
     })
@@ -116,7 +120,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [fips, setFips] = useState(cookieFips);
 
   const url =
-    "https://covidestim.s3.us-east-2.amazonaws.com/latest/summary.pack.gz";
+    "https://covidestim.s3.us-east-2.amazonaws.com/latest/summary-experimental.pack.gz";
   const albersURL =
     "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
 
@@ -315,13 +319,18 @@ export default OverviewMapSuper;
 
 let modeMap = function (modes) {
   return _.map(modes, (mode) => {
-    if (mode === "True infections") return "True infections per 100k no UI";
+    if (mode === "True infections") return "True infections no UI";
+    if (mode === "True infections no UI") return mode;
+
     if (mode === "True infections per 100k")
       return "True infections per 100k no UI";
     if (mode === "True infections per 100k no UI") return mode;
 
     if (mode === "Infection rate") return "Infection rate no UI";
     if (mode === "Infection rate no UI") return mode;
+
+    if (mode === "Seroprevalence") return "Seroprevalence no UI";
+    if (mode === "Seroprevalence no UI") return mode;
 
     return "Infection rate no UI";
   });
@@ -348,6 +357,8 @@ export class OverviewMapChart extends RTSubareaChart {
       this.props.dateToDisplay != nextProps.dateToDisplay ||
       this.props.selectedOutcome != nextProps.selectedOutcome
     ) {
+      console.log("changing metric to");
+      console.log(modeMap(nextProps.selectedOutcome.enabledModes));
       this.handleMetricChange(
         nextProps.dateToDisplay,
         modeMap(nextProps.selectedOutcome.enabledModes)
@@ -477,9 +488,10 @@ export class TrayCharts extends PureComponent {
               data={data}
               enabledModes={modes}
               yDomain={
-                modes[0] === "True infections per 100k no UI"
-                  ? [0, 400]
-                  : [0.5, 1.5]
+                //                modes[0] === "True infections per 100k no UI"
+                //                  ? [0, 400]
+                //                  : [0.5, 1.5]
+                props.selectedOutcome.yDomain
               }
               contentWidth={props.contentWidth}
               linkAvailable={false}

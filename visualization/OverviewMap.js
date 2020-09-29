@@ -1,6 +1,10 @@
 import { select, event, mouse } from "d3-selection";
 import { scaleSequential, scaleDiverging } from "d3-scale";
-import { interpolateMagma, interpolateRdGy } from "d3-scale-chromatic";
+import {
+  interpolateYlGnBu,
+  interpolateMagma,
+  interpolateRdGy,
+} from "d3-scale-chromatic";
 import { geoPath, geoIdentity } from "d3-geo";
 import { timeFormat } from "d3-time-format";
 import { nest } from "d3-collection";
@@ -19,15 +23,25 @@ class OverviewMap {
     this._addFips = addFips;
     this._addHoverFips = addHoverFips;
 
-    this.ColorInfections = scaleSequential([0, 200], interpolateMagma).unknown(
+    this.ColorSeroprevalence = scaleSequential(
+      [0, 40],
+      interpolateYlGnBu
+    ).unknown("rgba(0, 0, 0, 0)");
+
+    this.ColorInfections = scaleSequential([0, 1000], interpolateMagma).unknown(
       "rgba(0, 0, 0, 0)"
     );
+
+    this.ColorInfectionsPC = scaleSequential(
+      [0, 200],
+      interpolateMagma
+    ).unknown("rgba(0, 0, 0, 0)");
 
     this.ColorR0 = scaleDiverging([0.6, 1.0, 1.6], (t) =>
       interpolateRdGy(1 - t)
     ).unknown("rgba(0,0,0,0)");
 
-    this.color = this.ColorInfections;
+    this.color = this.ColorInfectionsPC;
     this.accessor = "onsetsPC";
     this.date = null;
   }
@@ -54,9 +68,13 @@ class OverviewMap {
   }
 
   titleLegend() {
-    return this.accessor === "r0"
-      ? "Effective reproduction number (Rt)"
-      : "Estimated infections / 100k / day";
+    if (this.accessor === "r0") return "Effective reproduction number (Rt)";
+    else if (this.accessor === "onsetsPC")
+      return "Estimated infections / 100k / day";
+    else if (this.accessor === "onsets") return "Estimated infections / day";
+    else if (this.accessor === "cumulative")
+      return "Estimated seroprevalence (%)";
+    else return "Invalid accessor!!";
   }
 
   handleMetricChange(dateToDisplay, enabledModes) {
@@ -68,17 +86,32 @@ class OverviewMap {
 
     switch (enabledModes[0]) {
       case Constants.MetricOptions.DerivedR0NoUI: {
+        console.log("r0");
         this.color = this.ColorR0;
         this.accessor = "r0";
         break;
       }
       case Constants.MetricOptions.TrueInfectionsPCNoUI: {
-        this.color = this.ColorInfections;
+        console.log("infections pc");
+        this.color = this.ColorInfectionsPC;
         this.accessor = "onsetsPC";
         break;
       }
-      default: {
+      case Constants.MetricOptions.TrueInfectionsNoUI: {
+        console.log("raw infections");
         this.color = this.ColorInfections;
+        this.accessor = "onsets";
+        break;
+      }
+      case Constants.MetricOptions.SeroprevalenceNoUI: {
+        console.log("seroprevalence");
+        this.color = this.ColorSeroprevalence;
+        this.accessor = "cumulative";
+        break;
+      }
+      default: {
+        console.log("default");
+        this.color = this.ColorInfectionsPC;
         this.accessor = "onsetsPC";
         break;
       }
