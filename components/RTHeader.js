@@ -69,12 +69,22 @@ export function RTHeader(props) {
             </div>
             <div className="rt-header-update-entry rt-header-update-entry-alert">
               <a
-                href={timeFormat(
-                  "https://github.com/covidestim/covidestim-products/raw/master/%Y-%m-%d-allstates-ctp/summary.csv"
-                )(props.lastUpdated)}
+                href={
+                  "https://covidestim.s3.us-east-2.amazonaws.com/latest/estimates.csv"
+                }
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
-                ⬇ Download CSV
+                ⬇ County estimates
+              </a>
+            </div>
+            <div className="rt-header-update-entry rt-header-update-entry-alert">
+              <a
+                href={
+                  "https://covidestim.s3.us-east-2.amazonaws.com/latest/state/estimates.csv"
+                }
+                style={{ color: "inherit", textDecoration: "inherit" }}
+              >
+                ⬇ State estimates
               </a>
             </div>
             {/*
