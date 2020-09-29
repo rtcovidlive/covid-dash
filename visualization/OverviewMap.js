@@ -23,7 +23,7 @@ class OverviewMap {
       "rgba(0, 0, 0, 0)"
     );
 
-    this.ColorR0 = scaleDiverging([0.7, 1.0, 1.3], (t) =>
+    this.ColorR0 = scaleDiverging([0.6, 1.0, 1.6], (t) =>
       interpolateRdGy(1 - t)
     ).unknown("rgba(0,0,0,0)");
 
