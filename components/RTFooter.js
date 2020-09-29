@@ -77,7 +77,7 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           <a href="http://tedcohenlab.org/joshua-havumaki-phd/">
             Joshua Havumaki
           </a>
-          ,
+          ,{" "}
           <a href="https://www.hsph.harvard.edu/nicolas-menzies/">
             Nicolas A. Menzies
           </a>
