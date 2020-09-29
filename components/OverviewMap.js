@@ -211,11 +211,12 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
     let monthsFormatted = _.zipObject(
       _.map(months, toEpoch),
-      _.map(months, (d) => dateFormat(d, "MMM"))
+      _.map(months, (d) => utcFormat("%b")(d))
     );
 
     // Add on day-name of latest date of model data
-    monthsFormatted[toEpoch(max)] = dateFormat(new Date(max), "eee");
+    // monthsFormatted[toEpoch(max)] = dateFormat(new Date(max), "eee");
+    monthsFormatted[toEpoch(max)] = utcFormat("%a")(new Date(max));
 
     return monthsFormatted;
   };
