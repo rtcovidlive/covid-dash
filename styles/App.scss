@@ -516,6 +516,13 @@ p {
 .rt-header-update-entry-alert:hover {
   background-color: rgba(235, 83, 88, 0.25) !important;
 }
+.rt-header-update-entry-yellow {
+  background-color: rgba(233, 221, 83, 0.25);
+  color: $yellow-link-color;
+}
+.rt-header-update-entry-yellow:hover {
+  background-color: rgba(233, 221, 83, 0.15) !important;
+}
 
 .rt-header-update-entry:hover {
   background-color: $mid-blue-bg-color;

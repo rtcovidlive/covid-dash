@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { ShareButtons } from "./ShareButtons";
+import { DiffOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 
 export const MainTitle = styled(Title)`
   font-weight: 600;
@@ -56,6 +57,14 @@ export function RTHeader(props) {
             </Col>
           </Row>
           <div className="rt-header-updates">
+            <div className="rt-header-update-entry rt-header-update-entry-yellow">
+              <a
+                href={"/updates.pdf"}
+                style={{ color: "inherit", textDecoration: "inherit" }}
+              >
+                <DiffOutlined /> <strong>New model changes</strong>
+              </a>
+            </div>
             <div
               onClick={() =>
                 document
@@ -74,7 +83,7 @@ export function RTHeader(props) {
                 }
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
-                ⬇ County estimates
+                <VerticalAlignBottomOutlined /> County estimates
               </a>
             </div>
             <div className="rt-header-update-entry rt-header-update-entry-alert">
@@ -84,7 +93,7 @@ export function RTHeader(props) {
                 }
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
-                ⬇ State estimates
+                <VerticalAlignBottomOutlined /> State estimates
               </a>
             </div>
             {/*
@@ -101,17 +110,20 @@ export function RTHeader(props) {
             We make estimates about the COVID-19 epidemic using a statistical
             model that combines information about reported cases, reported
             deaths, disease stage duration, and disease severity and mortality
-            risks. You can read a preprint of our methodology at{" "}
+            risks. Our methodology can be found on{" "}
             <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v1">
               medRxiv
             </a>
-            . You can also run our model with your own data, using the{" "}
-            <a href="https://pkg.covidestim.org">covidestim R package</a>. Our
-            data source for the following estimates is the{" "}
+            , however, be sure to review recent changes we have made, documented
+            above. You can run our model with your own data, using the{" "}
+            <a href="https://pkg.covidestim.org">covidestim R package</a>.
+            State-level data is sourced from the{" "}
             <a href="https://covidtracking.com/">COVID Tracking Project</a>, and
-            our dashboard was adapted from{" "}
-            <a href="https://github.com/rtcovidlive/covid-dash">covid-dash</a>.
-            Our computational pipeline can be viewed at our{" "}
+            county-level data comes from{" "}
+            <a href="https://github.com/CSSEGISandData/COVID-19">
+              Johns Hopkins CSSE
+            </a>
+            . Our computational pipeline can be viewed at our{" "}
             <a href="https://github.com/covidestim">GitHub organization</a>.
           </p>
         </HeaderInner>
