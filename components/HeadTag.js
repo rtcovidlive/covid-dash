@@ -24,9 +24,7 @@ export default function HeadTag(props) {
       />
       <meta
         property="og:image"
-        content={
-          props.shareImageURL || "https://covidestim.org/hero-screen.png?1"
-        }
+        content={props.shareImageURL || "https://covidestim.org/hero-new.png"}
       />
       <meta property="og:type" content="website" />
       <title>{props.pageTitle || "covidestim: COVID-19 nowcasting"}</title>
