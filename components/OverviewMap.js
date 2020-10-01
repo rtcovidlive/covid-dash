@@ -489,7 +489,7 @@ export class TrayCharts extends PureComponent {
               enabledModes={modes}
               yDomain={
                 props.selectedOutcome.yDomainCounty ||
-                props.selectedCounties.yDomain
+                props.selectedOutcome.yDomain
               }
               contentWidth={props.contentWidth}
               linkAvailable={false}

@@ -46,13 +46,14 @@ export function RTOverview(props) {
     seroprevalence: {
       enabledModes: [Constants.MetricOptions.Seroprevalence],
       yDomain: [0, 40],
+      yDomainCounty: [0, 80],
       id: "seroprevalence",
       label: "Estimated seroprevalence",
     },
     infections: {
       enabledModes: [Constants.MetricOptions.TrueInfections],
       yDomain: [0, 100000],
-      yDomainCounty: [0, 8000],
+      yDomainCounty: [0, 5000],
       id: "infections",
       label: "Estimated infections",
     },

@@ -24,9 +24,9 @@ class OverviewMap {
     this._addHoverFips = addHoverFips;
 
     this.ColorSeroprevalence = scaleSequential(
-      [0, 40],
+      [0, 75],
       interpolateYlGnBu
-    ).unknown("rgba(0, 0, 0, 0)");
+    ).unknown("rgba(194, 171, 207)");
 
     this.ColorInfections = scaleSequential([0, 1000], interpolateMagma).unknown(
       "rgba(0, 0, 0, 0)"
@@ -86,31 +86,26 @@ class OverviewMap {
 
     switch (enabledModes[0]) {
       case Constants.MetricOptions.DerivedR0NoUI: {
-        console.log("r0");
         this.color = this.ColorR0;
         this.accessor = "r0";
         break;
       }
       case Constants.MetricOptions.TrueInfectionsPCNoUI: {
-        console.log("infections pc");
         this.color = this.ColorInfectionsPC;
         this.accessor = "onsetsPC";
         break;
       }
       case Constants.MetricOptions.TrueInfectionsNoUI: {
-        console.log("raw infections");
         this.color = this.ColorInfections;
         this.accessor = "onsets";
         break;
       }
       case Constants.MetricOptions.SeroprevalenceNoUI: {
-        console.log("seroprevalence");
         this.color = this.ColorSeroprevalence;
         this.accessor = "cumulative";
         break;
       }
       default: {
-        console.log("default");
         this.color = this.ColorInfectionsPC;
         this.accessor = "onsetsPC";
         break;
@@ -218,7 +213,7 @@ class OverviewMap {
       .data(feature(us, us.objects.counties).features, (d) => d.id)
       .join("path")
       .attr("d", path)
-      .attr("cursor", "copy")
+      .attr("cursor", "pointer")
       .on("click", clicked)
       .on("mouseover", function (d, i) {
         const bounds = this.getBBox();

@@ -20,7 +20,7 @@ export default function HeadTag(props) {
       <meta property="og:title" content={ogTitle} />
       <meta
         property="og:description"
-        content="covidestim: COVID-19 nowcasting"
+        content="Up-to-date estimates of key covid-19 metrics for your county or state"
       />
       <meta
         property="og:image"

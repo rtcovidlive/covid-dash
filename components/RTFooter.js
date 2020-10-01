@@ -14,7 +14,16 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
         ref={footerRef}
         style={{ maxWidth: props.maxWidth }}
       >
-        <Title level={2}>Details</Title>
+        <div style={{ marginTop: "25px" }}>
+          <a href="https://publichealth.yale.edu/">
+            <img src="/ysph.png" width={450} />
+          </a>
+        </div>
+        <div style={{ marginTop: "25px", marginBottom: "25px" }}>
+          <a href="https://www.hsph.harvard.edu/">
+            <img src="/hsph.png" width={450} />
+          </a>
+        </div>
         <p>
           The effective reproductive number (R<sub>t</sub>) is an important
           metric of epidemic growth. R<sub>t</sub> describes the average number
@@ -58,12 +67,6 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
             </ul>
           </>
         )}
-        <div style={{ marginTop: "25px" }}>
-          <img src="/ysph.png" width={450} />
-        </div>
-        <div style={{ marginTop: "25px" }}>
-          <img src="/hsph.png" width={450} />
-        </div>
         <p>
           Contributors to this project include:{" "}
           <a href="http://tedcohenlab.org/Melanie-Chitwood/">
