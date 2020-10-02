@@ -14,7 +14,7 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
         ref={footerRef}
         style={{ maxWidth: props.maxWidth }}
       >
-        <div style={{ marginTop: "25px" }}>
+        <div style={{ marginTop: "25px", marginBottom: "25px" }}>
           <a href="https://publichealth.yale.edu/">
             <img src="/ysph.png" width={450} />
           </a>
