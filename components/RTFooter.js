@@ -15,12 +15,12 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
         style={{ maxWidth: props.maxWidth }}
       >
         <div style={{ marginTop: "25px", marginBottom: "25px" }}>
-          <a href="https://publichealth.yale.edu/">
+          <a href="https://publichealth.yale.edu/emd/">
             <img src="/ysph.png" width={Math.min(450, props.maxWidth)} />
           </a>
         </div>
         <div style={{ marginTop: "25px", marginBottom: "25px" }}>
-          <a href="https://www.hsph.harvard.edu/">
+          <a href="https://www.hsph.harvard.edu/global-health-and-population/">
             <img src="/hsph.png" width={Math.min(450, props.maxWidth)} />
           </a>
         </div>
