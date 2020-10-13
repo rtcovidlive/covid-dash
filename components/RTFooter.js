@@ -99,6 +99,12 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           .
         </p>
         <p>
+          Computational support provided by the{" "}
+          <a href="https://research.computing.yale.edu/">
+            Yale Center for Research Computing
+          </a>
+        </p>
+        <p>
           Original site built by{" "}
           <a href="https://twitter.com/mikeyk">Mike Krieger</a>, with thanks to
           Ryan O&rsquo;Rourke and Thomas Dimson.
