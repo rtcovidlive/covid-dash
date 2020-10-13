@@ -15,15 +15,15 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
         style={{ maxWidth: props.maxWidth }}
       >
         <div style={{ marginTop: "25px", marginBottom: "25px" }}>
-          <a href="https://publichealth.yale.edu/">
-            <img src="/ysph.png" width={450} />
+          <a href="https://publichealth.yale.edu/emd/">
+            <img src="/ysph.png" width={Math.min(450, props.maxWidth)} />
           </a>
         </div>
-        {/*<div style={{ marginTop: "25px", marginBottom: "25px" }}>
-          <a href="https://www.hsph.harvard.edu/">
-            <img src="/hsph.png" width={450} />
+        <div style={{ marginTop: "25px", marginBottom: "25px" }}>
+          <a href="https://www.hsph.harvard.edu/global-health-and-population/">
+            <img src="/hsph.png" width={Math.min(450, props.maxWidth)} />
           </a>
-        </div>*/}
+        </div>
         <p>
           The effective reproductive number (R<sub>t</sub>) is an important
           metric of epidemic growth. R<sub>t</sub> describes the average number
