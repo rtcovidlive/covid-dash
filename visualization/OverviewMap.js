@@ -5,6 +5,7 @@ import {
   interpolateMagma,
   interpolateRdGy,
 } from "d3-scale-chromatic";
+import { interpolateRgbBasis } from "d3-interpolate";
 import { geoPath, geoIdentity } from "d3-geo";
 import { timeFormat } from "d3-time-format";
 import { nest } from "d3-collection";
@@ -32,10 +33,13 @@ class OverviewMap {
       "rgba(0, 0, 0, 0)"
     );
 
-    this.ColorInfectionsPC = scaleSequential(
-      [0, 200],
-      interpolateMagma
-    ).unknown("rgba(0, 0, 0, 0)");
+    this.ColorInfectionsPC = scaleDiverging([0, 200, 1000], (t) => {
+      if (t <= 0.5) return interpolateMagma(2 * t);
+      else
+        return interpolateRgbBasis([interpolateMagma(1), "#f5f7ff", "#d2f8ff"])(
+          2 * (t - 0.5)
+        );
+    }).unknown("rgba(0, 0, 0, 0)");
 
     this.ColorR0 = scaleDiverging([0.6, 1.0, 1.6], (t) =>
       interpolateRdGy(1 - t)

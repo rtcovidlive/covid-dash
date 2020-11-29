@@ -126,6 +126,12 @@ export function RTHeader(props) {
             . Our computational pipeline can be viewed at our{" "}
             <a href="https://github.com/covidestim">GitHub organization</a>.
           </p>
+          <p>
+            <strong>11/28: </strong>
+            {
+              "We have extended the infections/100k color scale beyond 200 (yellow) to better display very high incidences."
+            }
+          </p>
         </HeaderInner>
       </div>
     </>
