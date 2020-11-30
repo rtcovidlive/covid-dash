@@ -10,11 +10,12 @@ import { Row, Col } from "./Grid";
 import Constants from "lib/Constants";
 import { Util } from "lib/Util";
 
-const DetailsLink = styled.div`
+const DetailsLink = styled.a`
   background-color: white;
   font-size: 14px;
   cursor: pointer;
   text-align: right;
+  font-weight: normal;
 
   :hover {
     font-weight: bold;
@@ -122,8 +123,9 @@ export const StateR0Display = React.forwardRef((props, ref) => {
         {props.linkAvailable && (
           <Col verticalAlign="middle" textAlign="right" size={8}>
             <Link
-              href="/[countrycode]/[subarea]"
+              href={`/us/${props.subArea}`}
               as={{ pathname: `/us/${props.subArea}`, query: navigationQuery }}
+              passHref
             >
               <DetailsLink>
                 Details{" "}
