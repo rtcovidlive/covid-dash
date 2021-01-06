@@ -18,7 +18,7 @@
     "@zeit/next-sass": "^1.0.1",
     "@zeit/next-source-maps": "0.0.4-canary.1",
     "aws-sdk": "^2.706.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "d3": "^5.16.0",
     "execa": "^4.0.2",
     "next": "^9.4.4",
