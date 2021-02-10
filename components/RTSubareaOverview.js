@@ -295,24 +295,9 @@ export function RTSubareaOverview(props) {
               <TestAdjustedChart
                 data={subAreaData}
                 width={contentWidth + 40}
-                height={chartHeight + 120}
+                height={chartHeight + 170}
               />
             )}
-            <ChartTitle level={2}>
-              R<sub>t</sub> estimate history
-            </ChartTitle>
-            <Explanation>
-              As time goes on, our R<sub>t</sub> estimates for a particular day
-              will change. Here is an animation showing the changes observed in
-              every model run since July 1st, 2020.
-            </Explanation>
-            <video controls width={contentWidth}>
-              <source
-                src={`${MOVIE_CDN_URL}${props.subarea}.mp4`}
-                type="video/mp4"
-              />
-              Sorry, your browser doesn't support embedded videos.
-            </video>
           </div>
         </div>
       </div>

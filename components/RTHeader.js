@@ -62,7 +62,7 @@ export function RTHeader(props) {
                 href={"/updates.pdf"}
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
-                <DiffOutlined /> <strong>New model changes</strong>
+                <DiffOutlined /> <strong>(2/10) New model changes</strong>
               </a>
             </div>
             <div
@@ -125,12 +125,6 @@ export function RTHeader(props) {
             </a>
             . Our computational pipeline can be viewed at our{" "}
             <a href="https://github.com/covidestim">GitHub organization</a>.
-          </p>
-          <p>
-            <strong>11/28: </strong>
-            {
-              "We have extended the infections/100k color scale beyond 200 (yellow) to better display very high incidences."
-            }
           </p>
         </HeaderInner>
       </div>

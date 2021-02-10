@@ -36,6 +36,7 @@ export function ScrollToTopPill(props) {
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
         ↑ Scroll to top
+        {props.children}
       </span>
     </div>
   );

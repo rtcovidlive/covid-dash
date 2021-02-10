@@ -5,7 +5,7 @@ import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 import { line, area, curveBasis } from "d3-shape";
 import { scaleLinear, scaleTime } from "d3-scale";
-import { timeDay, timeWeek } from "d3-time";
+import { timeDay, timeWeek, timeMonth } from "d3-time";
 import { axisBottom, axisRight, axisLeft } from "d3-axis";
 import { bisector } from "d3-array";
 import Constants from "lib/Constants";
@@ -455,7 +455,7 @@ class CovidViz {
         this._height - this._margin.bottom + 5
       );
       if (this._width > 600) {
-        ticks = timeWeek;
+        ticks = timeMonth;
         firstIndexToShow = 1;
         lastIndexToShow = -1;
       } else {

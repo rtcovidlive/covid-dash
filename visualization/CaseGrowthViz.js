@@ -4,7 +4,7 @@ import { scaleLinear, scaleTime } from "d3-scale";
 import { axisBottom, axisLeft } from "d3-axis";
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
-import { timeWeek, timeDay } from "d3-time";
+import { timeMonth, timeWeek, timeDay } from "d3-time";
 import Constants from "lib/Constants";
 import { Util } from "lib/Util";
 import Helpers from "./Helpers";
@@ -215,7 +215,7 @@ class CaseGrowthViz {
     this.setUpAxes(
       chartContent,
       this.testsY,
-      this._width > 600 ? timeWeek : timeDay,
+      this._width > 600 ? timeMonth : timeDay, // was timeMonth
       2,
       xAxisTranslation,
       yAxisTranslation,

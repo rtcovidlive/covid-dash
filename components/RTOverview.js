@@ -5,13 +5,12 @@ import { StatesWithIssues } from "config/USStates";
 import { Col, Row } from "./Grid";
 import _ from "lodash";
 import { StateR0Display } from "./StateR0Display";
-import { ScrollToTopPill } from "./ScrollToTopPill";
 import { RTFooter } from "./RTFooter";
 import RTHeader from "./RTHeader";
 import OverviewMapSuper from "./OverviewMap";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
-import { Button } from "./Button";
+import { Radio } from "antd";
 
 const refsByState = {};
 const mapRef = React.createRef();
@@ -31,7 +30,18 @@ export function RTOverview(props) {
       enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
       yDomain: [0, 400],
       id: "infectionsPC",
-      label: "Estimated infections per 100k",
+      label: "Infections (per 100k)",
+      background:
+        "linear-gradient(90deg, rgba(0, 0, 4, 0.25) 0%, rgba(140, 41, 129, 0.25) 20%, rgba(254, 159, 109, 0.25) 40%, rgba(249, 251, 216, 0.25) 60%, rgba(236, 248, 250, 0.25) 80%, rgba(210, 248, 255, 0.25) 100%)",
+    },
+    infections: {
+      enabledModes: [Constants.MetricOptions.TrueInfections],
+      yDomain: [0, 100000],
+      yDomainCounty: [0, 5000],
+      id: "infections",
+      label: "Infections (raw)",
+      background:
+        "linear-gradient(90deg, rgba(0, 0, 4, 0.25) 0%, rgb(59, 15, 112, 0.25) 20%, rgb(140, 41, 129, 0.25) 40%, rgb(222, 73, 104, 0.25) 60%, rgb(254, 159, 109, 0.25) 80%, rgb(252, 253, 191, 0.25) 100%",
     },
     r0: {
       enabledModes: [Constants.MetricOptions.DerivedR0],
@@ -39,23 +49,20 @@ export function RTOverview(props) {
       id: "r0",
       label: (
         <span>
-          R<sub>t</sub>
+          Effective reproduction number (R<sub>t</sub>)
         </span>
       ),
+      background:
+        "linear-gradient(90deg, rgba(26, 26, 26, 0.25) 0%, rgba(134, 134, 134, 0.25) 20%, rgba(223, 223, 223, 0.25) 40%, rgba(252, 216, 197, 0.25) 60%, rgba(213, 95, 80, 0.25) 80%, rgba(103, 0, 31, 0.25) 100%)",
     },
     seroprevalence: {
       enabledModes: [Constants.MetricOptions.Seroprevalence],
-      yDomain: [0, 40],
-      yDomainCounty: [0, 80],
+      yDomain: [0, 100],
+      yDomainCounty: [0, 100],
       id: "seroprevalence",
-      label: "Estimated seroprevalence",
-    },
-    infections: {
-      enabledModes: [Constants.MetricOptions.TrueInfections],
-      yDomain: [0, 100000],
-      yDomainCounty: [0, 5000],
-      id: "infections",
-      label: "Estimated infections",
+      label: "Percent ever infected",
+      background:
+        "linear-gradient(90deg,  rgba(255, 255, 217, 0.25) 0%, rgba(213, 238, 179, 0.25) 20%, rgba(115, 201, 189, 0.25) 40%, rgba(40, 151, 191, 0.25) 60%, rgba(35, 78, 160, 0.25) 80%, rgba(8, 29, 88, 0.25) 100%)",
     },
   };
 
@@ -143,26 +150,28 @@ export function RTOverview(props) {
           }
         >
           <Row className="stacked-chart-controls">
-            {_.map(outcomeTypes, (outcome) => {
-              return (
-                <Button
-                  onClick={() => handleRadioButton(outcome.id)}
-                  key={outcome.id}
-                  active={selectedOutcome.id === outcome.id}
-                  shape="round"
-                >
-                  <input
-                    checked={selectedOutcome.id === outcome.id}
-                    type="radio"
-                    id={outcome.id}
-                    name={outcome.id}
+            <Radio.Group
+              value={selectedOutcome.id}
+              onChange={(e) => handleRadioButton(e.target.value)}
+            >
+              {_.map(outcomeTypes, (outcome) => {
+                const style = outcome.background
+                  ? {
+                      background: outcome.background,
+                    }
+                  : undefined;
+
+                return (
+                  <Radio.Button
                     value={outcome.id}
-                    readOnly
-                  />
-                  <label htmlFor={outcome.id}>{outcome.label}</label>
-                </Button>
-              );
-            })}
+                    key={outcome.id}
+                    style={style}
+                  >
+                    <strong>{outcome.label}</strong>
+                  </Radio.Button>
+                );
+              })}
+            </Radio.Group>
           </Row>
           <Row className="stacked-states-outer">
             {rtData &&
@@ -220,7 +229,6 @@ export function RTOverview(props) {
         knownIssues={config.knownIssues}
         maxWidth={1500}
       />
-      <ScrollToTopPill target={heroRef} />
     </>
   );
 }

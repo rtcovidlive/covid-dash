@@ -102,6 +102,7 @@ function dataForCounty(data, fips) {
 
 export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapData, setMapData] = useState(null);
+  const [dataLoadProgress, setDataLoadProgress] = useState(0);
   const [dataIsLoaded, setDataIsLoaded] = useState(false);
 
   const [dateMinMax, setDateMinMax] = useState([null, null]);
@@ -153,7 +154,13 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    axios.get(url, { responseType: "arraybuffer" }).then(
+    const config = {
+      onDownloadProgress: function (e) {
+        setDataLoadProgress(e.loaded / 50000000);
+      },
+      responseType: "arraybuffer",
+    };
+    axios.get(url, config).then(
       (result) => {
         let decoded = decode(result.data);
         let reformatted = reformatMapData(decoded);
@@ -207,7 +214,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   };
 
   const svgWidth = contentWidth;
-  let svgHeight = Math.floor(Math.min(500, 0.5 * contentWidth));
+  let svgHeight = Math.floor(Math.min(400, 0.33 * contentWidth));
 
   if (svgWidth < 500) svgHeight = 1.8 * svgWidth;
 
@@ -304,7 +311,12 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
                 </p>
                 <p>
                   {dataIsLoaded ? <strong>Loaded</strong> : "Loading"} model
-                  data
+                  data{" "}
+                  {dataIsLoaded
+                    ? ""
+                    : `(${
+                        parseFloat(100 * dataLoadProgress).toFixed(0) + "%"
+                      })`}
                 </p>
               </>
             }
@@ -413,21 +425,7 @@ export class TrayCharts extends PureComponent {
           <Row style={{ marginRight: 32 }}>
             <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
               <HelperTitle className="state-rt-display-name" level={2}>
-                <SelectOutlined /> Click county to add
-              </HelperTitle>
-            </Col>
-          </Row>
-        </div>
-      </Col>
-    );
-
-    let closeHelp = (
-      <Col key="placeholder" size={props.colsPerChart} align="left">
-        <div className="state-rt-display">
-          <Row style={{ marginRight: 32 }}>
-            <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
-              <HelperTitle className="state-rt-display-name" level={2}>
-                <LeftOutlined /> Click to remove
+                <SelectOutlined /> Click a county
               </HelperTitle>
             </Col>
           </Row>
@@ -456,12 +454,7 @@ export class TrayCharts extends PureComponent {
 
       refsByFIPS[fips] = refsByFIPS[fips] || React.createRef();
 
-      if (data.series.length === 0)
-        return (
-          <Col key={fips + "0"} size={props.colsPerChart} align="left">
-            No data!
-          </Col>
-        );
+      if (data.series.length === 0) return null;
 
       return (
         <Col
@@ -470,14 +463,7 @@ export class TrayCharts extends PureComponent {
           align={align}
           offset={align === "center" ? props.spacerOffset : 0}
         >
-          <div
-            className="stacked-state-wrapper"
-            onClick={
-              this.props.handleRemoveFIPS
-                ? (e) => this.props.handleRemoveFIPS(fips)
-                : null
-            }
-          >
+          <div className="stacked-state-wrapper">
             <StateR0Display
               ref={refsByFIPS[fips]}
               config={null}
@@ -493,6 +479,11 @@ export class TrayCharts extends PureComponent {
               }
               contentWidth={props.contentWidth}
               linkAvailable={false}
+              removeButton={
+                this.props.handleRemoveFIPS
+                  ? (e) => this.props.handleRemoveFIPS(fips)
+                  : null
+              }
             />
           </div>
         </Col>
@@ -504,6 +495,6 @@ export class TrayCharts extends PureComponent {
     else if (props.isHover) return [...countyCharts];
     else if (props.selectedCounties.length === 0 && !props.isHover)
       return [addHelp];
-    else return [...countyCharts, closeHelp];
+    else return [...countyCharts];
   }
 }

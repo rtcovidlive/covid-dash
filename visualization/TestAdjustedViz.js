@@ -6,7 +6,7 @@ import { axisBottom, axisLeft } from "d3-axis";
 import { format } from "d3-format";
 import { line } from "d3-shape";
 import { timeFormat } from "d3-time-format";
-import { timeWeek, timeDay } from "d3-time";
+import { timeMonth, timeWeek, timeDay } from "d3-time";
 import Constants from "lib/Constants";
 import { Util } from "lib/Util";
 import Helpers from "./Helpers";
@@ -194,6 +194,7 @@ class TestAdjustedViz {
     var timeScale;
     if (this._width > 600) {
       timeScale = timeWeek;
+      timeScale = timeMonth;
     } else {
       timeScale = timeDay;
     }

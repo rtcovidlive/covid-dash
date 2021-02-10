@@ -77,7 +77,7 @@ class OverviewMap {
       return "Estimated infections / 100k / day";
     else if (this.accessor === "onsets") return "Estimated infections / day";
     else if (this.accessor === "cumulative")
-      return "Estimated seroprevalence (%)";
+      return "Percent ever infected, pink: NA";
     else return "Invalid accessor!!";
   }
 

@@ -9,6 +9,7 @@ import { Title } from "./Typography";
 import { Row, Col } from "./Grid";
 import Constants from "lib/Constants";
 import { Util } from "lib/Util";
+import { CloseCircleOutlined } from "@ant-design/icons";
 
 const DetailsLink = styled.a`
   background-color: white;
@@ -119,6 +120,12 @@ export const StateR0Display = React.forwardRef((props, ref) => {
               </span>
             )}
           </Title>{" "}
+          {props.removeButton ? (
+            <CloseCircleOutlined
+              onClick={props.removeButton}
+              style={{ marginLeft: "5px" }}
+            />
+          ) : null}
         </Col>
         {props.linkAvailable && (
           <Col verticalAlign="middle" textAlign="right" size={8}>

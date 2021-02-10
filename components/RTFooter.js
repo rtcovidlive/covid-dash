@@ -24,6 +24,11 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
             <img src="/hsph.png" width={Math.min(450, props.maxWidth)} />
           </a>
         </div>
+        <div style={{ marginTop: "25px", marginBottom: "25px" }}>
+          <a href="https://med.stanford.edu/covid19.html">
+            <img src="/stanford.png" width={Math.min(450, props.maxWidth)} />
+          </a>
+        </div>
         <p>
           The effective reproductive number (R<sub>t</sub>) is an important
           metric of epidemic growth. R<sub>t</sub> describes the average number
@@ -89,6 +94,10 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
             Virginia E. Pitzer
           </a>
           , <a href="http://tedcohenlab.org/marcus-russi/">Marcus Russi</a>,{" "}
+          <a href="https://med.stanford.edu/profiles/joshua-salomon">
+            Joshua Salomon
+          </a>
+          ,{" "}
           <a href="https://medicine.yale.edu/profile/joshua_warren/">
             Joshua L. Warren
           </a>
