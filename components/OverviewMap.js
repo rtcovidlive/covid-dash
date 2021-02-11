@@ -490,11 +490,8 @@ export class TrayCharts extends PureComponent {
       );
     });
 
-    if (props.selectedCounties.length === 0 && props.isHover)
-      return [hoverHelp];
-    else if (props.isHover) return [...countyCharts];
-    else if (props.selectedCounties.length === 1 && !props.isHover)
-      return [addHelp];
+    if (props.selectedCounties.length === 0 && props.isHover) return null;
+    else if (props.selectedCounties.length === 0) return [addHelp];
     else return [...countyCharts];
   }
 }
