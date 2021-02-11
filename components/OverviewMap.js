@@ -493,7 +493,7 @@ export class TrayCharts extends PureComponent {
     if (props.selectedCounties.length === 0 && props.isHover)
       return [hoverHelp];
     else if (props.isHover) return [...countyCharts];
-    else if (props.selectedCounties.length === 0 && !props.isHover)
+    else if (props.selectedCounties.length === 1 && !props.isHover)
       return [addHelp];
     else return [...countyCharts];
   }

@@ -108,23 +108,29 @@ export function RTHeader(props) {
           </div>
           <p>
             We make estimates about the COVID-19 epidemic using a statistical
-            model that combines information about reported cases, reported
-            deaths, disease stage duration, and disease severity and mortality
-            risks. Our methodology can be found on{" "}
+            model that combines published evidence on COVID-19 transmission,
+            natural history and diagnosis with reported cases and deaths for
+            over 3,000 locations within the United States. Our methodology can
+            be found on{" "}
             <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v1">
               medRxiv
             </a>
-            , however, be sure to review recent changes we have made, documented
-            above. You can run our model with your own data, using the{" "}
-            <a href="https://pkg.covidestim.org">covidestim R package</a>.
+            , with regular updates to our model documented here. You can run our
+            model with your own data, using the{" "}
+            <a href="https://pkg.covidestim.org/">covidestim</a> R package.
             State-level data is sourced from the{" "}
             <a href="https://covidtracking.com/">COVID Tracking Project</a>, and
             county-level data comes from{" "}
             <a href="https://github.com/CSSEGISandData/COVID-19">
               Johns Hopkins CSSE
             </a>
-            . Our computational pipeline can be viewed at our{" "}
-            <a href="https://github.com/covidestim">GitHub organization</a>.
+            . Our computational pipeline can be viewed at our GitHub{" "}
+            <a href="https://github.com/covidestim">organization</a>. We fit
+            county-level models using an optimization algorithm. We fit
+            state-level models using a Hamiltonian Monte Carlo (HMC) algorithm
+            to provide point estimates as well as measures of uncertainty. If
+            HMC fitting does not converge for a state on a given day, the
+            optimization algorithm is used.
           </p>
         </HeaderInner>
       </div>
