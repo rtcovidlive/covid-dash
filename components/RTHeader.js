@@ -115,8 +115,9 @@ export function RTHeader(props) {
             <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v1">
               medRxiv
             </a>
-            , with regular updates to our model documented here. You can run our
-            model with your own data, using the{" "}
+            , with regular updates to our model documented{" "}
+            <a href="https://www.covidestim.org/updates.pdf">here</a>. You can
+            run our model with your own data, using the{" "}
             <a href="https://pkg.covidestim.org/">covidestim</a> R package.
             State-level data is sourced from the{" "}
             <a href="https://covidtracking.com/">COVID Tracking Project</a>, and
@@ -129,8 +130,9 @@ export function RTHeader(props) {
             county-level models using an optimization algorithm. We fit
             state-level models using a Hamiltonian Monte Carlo (HMC) algorithm
             to provide point estimates as well as measures of uncertainty. If
-            HMC fitting does not converge for a state on a given day, the
-            optimization algorithm is used.
+            HMC fitting does not converge for a state, the optimization
+            algorithm is used instead that day, and the results will lack
+            uncertainty intervals.
           </p>
         </HeaderInner>
       </div>
