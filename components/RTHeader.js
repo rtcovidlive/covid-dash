@@ -134,6 +134,15 @@ export function RTHeader(props) {
             algorithm is used instead that day, and the results will lack
             uncertainty intervals.
           </p>
+          <p>
+            <strong>3/1</strong>: Iowa case-data anomalies (documented{" "}
+            <a href="https://github.com/CSSEGISandData/COVID-19/issues/3705">
+              here
+            </a>
+            ) are preventing accurate county-level estimates. County estimates
+            have been removed pending issue resolution. State estimates are
+            unimpacted at this time.
+          </p>
         </HeaderInner>
       </div>
     </>
