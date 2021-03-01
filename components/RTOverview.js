@@ -214,7 +214,7 @@ export function RTOverview(props) {
                           enabledModes={selectedOutcome.enabledModes}
                           yDomain={selectedOutcome.yDomain}
                           contentWidth={props.width}
-                          linkAvailable={true}
+                          state={true}
                         />
                       </div>
                     </Col>

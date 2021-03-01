@@ -87,7 +87,7 @@ export const StateR0Display = React.forwardRef((props, ref) => {
       }
     >
       <Row style={{ marginRight: 32 }}>
-        <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
+        <Col verticalAlign="middle" size={props.state ? 16 : 24}>
           {props.stateInitials && (
             <span
               style={{
@@ -127,7 +127,7 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             />
           ) : null}
         </Col>
-        {props.linkAvailable && (
+        {props.state && (
           <Col verticalAlign="middle" textAlign="right" size={8}>
             <Link
               href={`/us/${props.subArea}`}

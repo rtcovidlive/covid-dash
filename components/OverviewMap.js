@@ -409,7 +409,7 @@ export class TrayCharts extends PureComponent {
       <Col key="placeholder" size={props.colsPerChart} align="left">
         <div className="state-rt-display">
           <Row style={{ marginRight: 32 }}>
-            <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
+            <Col verticalAlign="middle" size={props.state ? 16 : 24}>
               <HelperTitle className="state-rt-display-name" level={2}>
                 <ZoomInOutlined /> Hover county for detail
               </HelperTitle>
@@ -423,7 +423,7 @@ export class TrayCharts extends PureComponent {
       <Col key="placeholder" size={props.colsPerChart} align="left">
         <div className="state-rt-display">
           <Row style={{ marginRight: 32 }}>
-            <Col verticalAlign="middle" size={props.linkAvailable ? 16 : 24}>
+            <Col verticalAlign="middle" size={props.state ? 16 : 24}>
               <HelperTitle className="state-rt-display-name" level={2}>
                 <SelectOutlined /> Click a county
               </HelperTitle>
@@ -478,7 +478,7 @@ export class TrayCharts extends PureComponent {
                 props.selectedOutcome.yDomain
               }
               contentWidth={props.contentWidth}
-              linkAvailable={false}
+              state={false}
               removeButton={
                 this.props.handleRemoveFIPS
                   ? (e) => this.props.handleRemoveFIPS(fips)
