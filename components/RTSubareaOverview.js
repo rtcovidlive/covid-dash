@@ -161,7 +161,10 @@ export function RTSubareaOverview(props) {
   let isSmallScreen = props.width <= 768;
   let chartHeight = isSmallScreen ? 280 : 350;
   let maxWidth = 980;
+
   let areaName = config.subAreas[props.subarea];
+  let countyName = props.fips ? config.counties[props.fips].county : "";
+
   let subAreaData = rtData.dataSeries[props.subarea];
 
   useLayoutEffect(() => {
@@ -184,6 +187,29 @@ export function RTSubareaOverview(props) {
     }),
   ];
 
+  let countyMenuItems = [
+    {
+      key: "_overall",
+      abbr: props.subarea.toUpperCase(),
+      label: `Overall ${props.subarea}`,
+    },
+    ..._.map(
+      _.keyBy(
+        _.filter(config.counties, (d) => d.abbr == props.subarea.toUpperCase()),
+        (d) => d.fips
+      ),
+      (val, key) => {
+        return {
+          key: key,
+          abbr: val.abbr,
+          label: val.county,
+        };
+      }
+    ),
+  ];
+
+  console.log(countyMenuItems);
+
   let nameLength = areaName.length;
   let shareRowOnTop = isSmallScreen && nameLength > 9;
   let shareOptions = (
@@ -198,8 +224,6 @@ export function RTSubareaOverview(props) {
       />
     </Col>
   );
-
-  let MOVIE_CDN_URL = "https://covidestim.s3.us-east-2.amazonaws.com/movies/";
 
   return (
     <>
@@ -243,6 +267,37 @@ export function RTSubareaOverview(props) {
                       />
                     </SubareaName>
                   </Dropdown>
+                  {props.fips && (
+                    <Dropdown
+                      options={countyMenuItems}
+                      minWidth={220}
+                      onSelect={(e) => {
+                        if (e.key === "_overall") {
+                          Navigation.navigateToSubArea(
+                            props.config.code,
+                            e.abbr,
+                            document.location.search
+                          );
+                        } else {
+                          Navigation.navigateToCounty(
+                            props.config.code,
+                            e.abbr,
+                            e.key,
+                            document.location.search
+                          );
+                        }
+                      }}
+                    >
+                      <SubareaName level={1}>
+                        {countyName}
+
+                        <span
+                          style={{ fontSize: "0.6em", marginLeft: 5 }}
+                          className="icon-caret-down"
+                        />
+                      </SubareaName>
+                    </Dropdown>
+                  )}
                 </Col>
                 {!shareRowOnTop && shareOptions}
               </HeaderRow>

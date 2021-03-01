@@ -1,4 +1,5 @@
 import { USStatesByCode } from "./USStates";
+import { USCounties } from "./USCounties";
 import { CountriesByCode } from "./Countries";
 import Constants from "lib/Constants";
 
@@ -24,6 +25,7 @@ class Config {
     dataPath,
     subSets,
     subAreas,
+    counties,
     regionFilterOptions,
     highlightOptions,
     knownIssues = []
@@ -33,6 +35,7 @@ class Config {
     this.subSets = subSets;
     this.subAreaType = subAreaType;
     this.subAreas = subAreas;
+    this.counties = counties;
     this.regionFilterOptions = regionFilterOptions;
     this.dataURLBase = `${CDN_ROOT}/${dataPath}`;
     this.highlightOptions = highlightOptions;
@@ -174,6 +177,7 @@ function US() {
     "state/summary",
     ussubSets,
     USStatesByCode,
+    USCounties,
     [
       "All",
       "Reopened",
@@ -200,6 +204,7 @@ function Global() {
     "https://d14wlfuexuxgcm.cloudfront.net/covid/topcountries_for_js",
     subsets,
     CountriesByCode,
+    [],
     ["All", "N. America"],
     ["G-7", "N. America", "S. America", "Africa"],
     []
