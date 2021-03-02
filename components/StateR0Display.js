@@ -149,6 +149,31 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             </Link>
           </Col>
         )}
+        {!props.state && (
+          <Col verticalAlign="middle" textAlign="right" size={8}>
+            <Link
+              href={`/us/${props.stateInitials}/${props.fips}`}
+              as={{
+                pathname: `/us/${props.stateInitials}/${props.fips}`,
+                query: navigationQuery,
+              }}
+              passHref
+            >
+              <DetailsLink>
+                Details{" "}
+                <span
+                  style={{
+                    fontSize: 9,
+                    position: "relative",
+                    top: 0.5,
+                    color: "goldenrod",
+                  }}
+                  className="icon-chevron-right"
+                ></span>
+              </DetailsLink>
+            </Link>
+          </Col>
+        )}
       </Row>
       {contentWidth && (
         <div

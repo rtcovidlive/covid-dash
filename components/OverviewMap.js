@@ -469,6 +469,7 @@ export class TrayCharts extends PureComponent {
               config={null}
               stateInitials={stateAbbr}
               subArea={`${county.name}`}
+              fips={fips}
               highlight={false}
               hasOwnRow={props.isSmallScreen}
               data={data}
