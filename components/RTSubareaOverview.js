@@ -10,6 +10,7 @@ import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { DataFetchContext } from "lib/DataFetchContext";
 import { StateRtChart } from "./StateRtChart";
+import { CountyRtChart } from "./CountyRtChart";
 import { TestAdjustedChart } from "./TestAdjustedChart";
 import { CaseGrowthChart } from "./CaseGrowthChart";
 import { ShareButtons } from "./ShareButtons";
@@ -318,7 +319,7 @@ export function RTSubareaOverview(props) {
               COVID-19 cases will increase in the near future. If it&rsquo;s
               below 1.0, COVID-19 cases will decrease in the near future.
             </Explanation>
-            {contentWidth && (
+            {!props.fips && contentWidth && (
               <RTChartWrapper>
                 <StateRtChart
                   data={subAreaData}
@@ -328,6 +329,16 @@ export function RTSubareaOverview(props) {
                   yAxisPosition="left"
                   isHovered={true}
                   isOwnPage={true}
+                />
+              </RTChartWrapper>
+            )}
+            {props.fips && contentWidth && (
+              <RTChartWrapper>
+                <CountyRtChart
+                  measure={"Rt"}
+                  fips={props.fips}
+                  width={contentWidth - 10} // + 40}
+                  height={chartHeight - 10} //}
                 />
               </RTChartWrapper>
             )}
