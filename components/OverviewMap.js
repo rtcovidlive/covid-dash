@@ -76,14 +76,11 @@ function reformatMapData(data) {
     })
   );
 
-  // Delete Iowa!
-  const filtered = _.filter(zipped, (d) => !d.fips.startsWith("19"));
-
   const nested = nest()
     .key((d) => d.date)
     .key((d) => d.fips)
     .rollup((d) => d[0])
-    .map(filtered);
+    .map(zipped);
 
   return nested;
 }

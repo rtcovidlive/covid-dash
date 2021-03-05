@@ -135,16 +135,15 @@ export function RTHeader(props) {
             uncertainty intervals.
           </p>
           <p>
-            <strong>3/4</strong>: Iowa case-data anomalies (documented{" "}
+            <strong>3/5</strong>: Iowa case-data anomalies (documented{" "}
             <a href="https://github.com/CSSEGISandData/COVID-19/issues/3705">
               here
             </a>
             ) were{" "}
             <a href="https://github.com/CSSEGISandData/COVID-19/commit/275c928cf5369e147b4c4139dc9dd8b51b56e371">
-              resolved this morning
+              resolved yesterday
             </a>{" "}
-            by JHU's CSSE. Expect the return of county-level estimates tomorrow.
-            State estimates are unimpacted.
+            by JHU's CSSE. County-level modeling has resumed.
           </p>
         </HeaderInner>
       </div>
