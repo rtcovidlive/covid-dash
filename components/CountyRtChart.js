@@ -32,7 +32,9 @@ export function CountyRtChart(props) {
         lastDrawLocation && [lastDrawLocation.left, lastDrawLocation.right]
       }
       yDomain={
-        lastDrawLocation && [lastDrawLocation.bottom, lastDrawLocation.top]
+        lastDrawLocation
+          ? [lastDrawLocation.bottom, lastDrawLocation.top]
+          : [0, 2]
       }
       width={width}
       height={height}
@@ -41,7 +43,6 @@ export function CountyRtChart(props) {
       xType="time"
       style={{
         backgroundColor: "white",
-        overflow: "visible",
       }}
     >
       <HorizontalGridLines />
