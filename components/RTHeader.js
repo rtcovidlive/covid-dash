@@ -135,15 +135,22 @@ export function RTHeader(props) {
             uncertainty intervals.
           </p>
           <p>
-            <strong>3/5</strong>: Iowa case-data anomalies (documented{" "}
-            <a href="https://github.com/CSSEGISandData/COVID-19/issues/3705">
+            <strong>3/12</strong>: Missouri data anomalies (documented{" "}
+            <a href="https://github.com/CSSEGISandData/COVID-19/issues/3806">
               here
             </a>
-            ) were{" "}
-            <a href="https://github.com/CSSEGISandData/COVID-19/commit/275c928cf5369e147b4c4139dc9dd8b51b56e371">
-              resolved yesterday
-            </a>{" "}
-            by JHU's CSSE. County-level modeling has resumed.
+            ) are preventing accurate county-level modeling. We will restore
+            estimates when Missouri's Department of Health releases the
+            necessary time series. State estimates are unimpacted at this time.
+          </p>
+          <p>
+            <strong>3/16</strong>: Virginia's extreme death-data reporting
+            delays (documented{" "}
+            <a href="https://github.com/CSSEGISandData/COVID-19/issues/3713">
+              here
+            </a>
+            ) are impacting our estimates for the Jan-Mar 2021 period. We will
+            post an update if the underlying data changes.
           </p>
         </HeaderInner>
       </div>

@@ -76,11 +76,14 @@ function reformatMapData(data) {
     })
   );
 
+  // Delete Missouri/29!
+  const filtered = _.filter(zipped, (d) => !d.fips.startsWith("29"));
+
   const nested = nest()
     .key((d) => d.date)
     .key((d) => d.fips)
     .rollup((d) => d[0])
-    .map(zipped);
+    .map(filtered);
 
   return nested;
 }
