@@ -53,6 +53,7 @@ export const USStatesByCode = {
   WV: "West Virginia",
   WI: "Wisconsin",
   WY: "Wyoming",
+  PR: "Puerto Rico",
 };
 
 export const StatesWithIssues = {};
