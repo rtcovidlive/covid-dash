@@ -1,5 +1,7 @@
 @import "./constants.scss";
 
+@import "../node_modules/react-vis/dist/style.css";
+
 body {
   margin: 0;
   font-family: $font-stack;
