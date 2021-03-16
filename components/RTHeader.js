@@ -143,6 +143,15 @@ export function RTHeader(props) {
             estimates when Missouri's Department of Health releases the
             necessary time series. State estimates are unimpacted at this time.
           </p>
+          <p>
+            <strong>3/16</strong>: Virginia's extreme death-data reporting
+            delays (documented{" "}
+            <a href="https://github.com/CSSEGISandData/COVID-19/issues/3713">
+              here
+            </a>
+            ) are impacting our estimates for the Jan-Mar 2021 period. We will
+            post an update if the underlying data changes.
+          </p>
         </HeaderInner>
       </div>
     </>
