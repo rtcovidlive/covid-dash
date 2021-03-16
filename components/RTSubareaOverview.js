@@ -10,7 +10,8 @@ import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { DataFetchContext } from "lib/DataFetchContext";
 import { StateRtChart } from "./StateRtChart";
-import { CountyRtChart } from "./CountyRtChart";
+import { CountyMetricChart } from "./CountyMetricChart";
+import { CountyTestAdjustedChart } from "./CountyTestAdjustedChart";
 import { TestAdjustedChart } from "./TestAdjustedChart";
 import { CaseGrowthChart } from "./CaseGrowthChart";
 import { ShareButtons } from "./ShareButtons";
@@ -112,7 +113,6 @@ function StatRow(props) {
   }
   let offsetRtEntry = series.nth(-1 * (Constants.daysOffsetSinceEnd + 1));
   let lastRt = format(".2f")(offsetRtEntry.r0);
-  let testsTotal = numFormat(series.sumBy((e) => e.tests_new));
   let positiveTotal = numFormat(series.sumBy((e) => e.cases_new));
   let deathsTotal = numFormat(series.sumBy((e) => e.deaths_new));
   let colsPerStat = 8;
@@ -121,7 +121,7 @@ function StatRow(props) {
       <Col size={colsPerStat}>
         <StatContent round="left">
           <StatLabel>
-            Current R<sub>t</sub>
+            Current state R<sub>t</sub>
           </StatLabel>
           <StatNumber color={Util.colorCodeRt(props.subarea, lastRt)}>
             {lastRt}
@@ -131,23 +131,12 @@ function StatRow(props) {
       <Col size={colsPerStat}>
         <StatContent>
           <StatLabel>
-            Cases{" "}
+            Total state cases{" "}
             <span style={{ visibility: "hidden" }}>
               <sub>t</sub>
             </span>
           </StatLabel>
           <StatNumber>{positiveTotal}</StatNumber>
-        </StatContent>
-      </Col>
-      <Col size={colsPerStat}>
-        <StatContent>
-          <StatLabel>
-            Tests{" "}
-            <span style={{ visibility: "hidden" }}>
-              <sub>t</sub>
-            </span>
-          </StatLabel>
-          <StatNumber>{testsTotal}</StatNumber>
         </StatContent>
       </Col>
     </Row>
@@ -334,21 +323,38 @@ export function RTSubareaOverview(props) {
             )}
             {props.fips && contentWidth && (
               <RTChartWrapper>
-                <CountyRtChart
+                <CountyMetricChart
                   measure={"Rt"}
                   fips={props.fips}
-                  width={contentWidth - 10} // + 40}
-                  height={chartHeight - 10} //}
+                  width={contentWidth + 40} // + 40}
+                  height={chartHeight} //}
                 />
               </RTChartWrapper>
             )}
-            <ChartTitle level={2}>Positive Tests</ChartTitle>
-            {contentWidth && (
-              <CaseGrowthChart
-                data={subAreaData}
-                width={contentWidth + 40}
-                height={chartHeight + 120}
-              />
+            <ChartTitle level={2}>Infections per capita</ChartTitle>
+            <Explanation>
+              Infections per capita corresponds to an important metric
+              PLACEHOLDER PLACEHOLDER PLACEHOLDER.
+            </Explanation>
+            {props.fips && contentWidth && (
+              <RTChartWrapper>
+                <CountyMetricChart
+                  measure={"infections"}
+                  fips={props.fips}
+                  width={contentWidth + 40} // + 40}
+                  height={chartHeight} //}
+                />
+              </RTChartWrapper>
+            )}
+            {!props.fips && contentWidth && (
+              <>
+                <ChartTitle level={2}>Positive Tests</ChartTitle>
+                <CaseGrowthChart
+                  data={subAreaData}
+                  width={contentWidth + 40}
+                  height={chartHeight + 120}
+                />
+              </>
             )}
             <ChartTitle level={2}>Fitted Cases and Infections</ChartTitle>
             <Explanation>
@@ -357,7 +363,14 @@ export function RTSubareaOverview(props) {
               for the delays from infection to symptom onset, and from symptom
               onset to diagnosis. Gaps in case detection are taken into account.
             </Explanation>
-            {contentWidth && (
+            {props.fips && contentWidth && (
+              <CountyTestAdjustedChart
+                fips={props.fips}
+                width={contentWidth + 40}
+                height={chartHeight + 170}
+              />
+            )}
+            {!props.fips && contentWidth && (
               <TestAdjustedChart
                 data={subAreaData}
                 width={contentWidth + 40}

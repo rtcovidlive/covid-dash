@@ -102,8 +102,32 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             </span>
           )}
           <Title className="state-rt-display-name" level={2}>
-            {(props.config && props.config.subAreas[props.subArea]) ||
-              props.subArea}
+            {props.state &&
+              ((props.config && props.config.subAreas[props.subArea]) ||
+                props.subArea)}
+            {!props.state && (
+              <Link
+                href={`/us/${props.stateInitials}/${props.fips}`}
+                as={{
+                  pathname: `/us/${props.stateInitials}/${props.fips}`,
+                  query: navigationQuery,
+                }}
+                passHref
+              >
+                <DetailsLink>
+                  {props.subArea}{" "}
+                  <span
+                    style={{
+                      fontSize: 9,
+                      position: "relative",
+                      top: 0.5,
+                      color: "goldenrod",
+                    }}
+                    className="icon-chevron-right"
+                  ></span>
+                </DetailsLink>
+              </Link>
+            )}
             {props.hasDataIssue && (
               <span>
                 &nbsp;
@@ -132,31 +156,6 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             <Link
               href={`/us/${props.subArea}`}
               as={{ pathname: `/us/${props.subArea}`, query: navigationQuery }}
-              passHref
-            >
-              <DetailsLink>
-                Details{" "}
-                <span
-                  style={{
-                    fontSize: 9,
-                    position: "relative",
-                    top: 0.5,
-                    color: "goldenrod",
-                  }}
-                  className="icon-chevron-right"
-                ></span>
-              </DetailsLink>
-            </Link>
-          </Col>
-        )}
-        {!props.state && (
-          <Col verticalAlign="middle" textAlign="right" size={8}>
-            <Link
-              href={`/us/${props.stateInitials}/${props.fips}`}
-              as={{
-                pathname: `/us/${props.stateInitials}/${props.fips}`,
-                query: navigationQuery,
-              }}
               passHref
             >
               <DetailsLink>

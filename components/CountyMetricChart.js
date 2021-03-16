@@ -17,13 +17,38 @@ function groupByRunDate(data) {
   return _.groupBy(data, (d) => d["run.date"]);
 }
 
-export function CountyRtChart(props) {
+const getSeriesConfig = function (metric) {
+  var conf;
+
+  switch (metric) {
+    case "Rt": {
+      conf = {
+        yDomain: [0, 2],
+      };
+      break;
+    }
+    default: {
+      conf = {
+        yDomain: [0, 10000],
+        strokeColor: "rgba(0, 145, 255, 1)",
+      };
+    }
+  }
+
+  return conf;
+};
+
+export function CountyMetricChart(props) {
   const [lastDrawLocation, setLastDrawLocation] = useState(null);
 
   const { measure, fips, width, height } = props;
   const { data, error } = useAllRunResultsDev(fips);
 
   const resultsGrouped = data && groupByRunDate(data);
+
+  const conf = getSeriesConfig(measure);
+
+  console.log(conf);
 
   return (
     <XYPlot
@@ -34,7 +59,7 @@ export function CountyRtChart(props) {
       yDomain={
         lastDrawLocation
           ? [lastDrawLocation.bottom, lastDrawLocation.top]
-          : [0, 2]
+          : conf.yDomain
       }
       width={width}
       height={height}
@@ -48,15 +73,20 @@ export function CountyRtChart(props) {
       <HorizontalGridLines />
 
       <YAxis />
-      <XAxis tickFormat={(d) => format(d, "M/dd")} />
+      <XAxis tickFormat={(d) => format(d, "M/d")} />
 
       {_.map(resultsGrouped, (v, k) => (
-        <LineSeries data={v} key={k} color="black" opacity={0.1} />
+        <LineSeries
+          data={v}
+          key={k}
+          color={conf.strokeColor || "black"}
+          opacity={0.1}
+        />
       ))}
 
       <MarkSeries
         data={_.map(resultsGrouped, (d) => _.maxBy(d, (day) => day.date))}
-        color="red"
+        color={conf.strokeColor || "black"}
         size={1}
       />
 
