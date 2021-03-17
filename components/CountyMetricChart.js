@@ -24,13 +24,32 @@ const getSeriesConfig = function (metric) {
     case "Rt": {
       conf = {
         yDomain: [0, 2],
+        strokeColor: "gray",
+        strokeColorEmphasis: "rgb(234, 99, 255)",
+      };
+      break;
+    }
+    case "infectionsPC": {
+      conf = {
+        yDomain: [0, 500],
+        strokeColor: "rgb(56, 230, 252)",
+        strokeColorEmphasis: "rgba(0, 145, 255, 1)",
+      };
+      break;
+    }
+    case "PEI": {
+      conf = {
+        yDomain: [0, 1],
+        strokeColor: "rgb(56, 230, 252)",
+        strokeColorEmphasis: "rgba(0, 145, 255, 1)",
       };
       break;
     }
     default: {
       conf = {
         yDomain: [0, 10000],
-        strokeColor: "rgba(0, 145, 255, 1)",
+        strokeColor: "rgb(56, 230, 252)",
+        strokeColorEmphasis: "rgba(0, 145, 255, 1)",
       };
     }
   }
@@ -46,7 +65,11 @@ export function CountyMetricChart(props) {
 
   const resultsGrouped = data && groupByRunDate(data);
 
+  const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
+
   const conf = getSeriesConfig(measure);
+
+  const numSeries = _.keys(resultsGrouped).length;
 
   console.log(conf);
 
@@ -72,22 +95,28 @@ export function CountyMetricChart(props) {
     >
       <HorizontalGridLines />
 
-      <YAxis />
+      <YAxis tickTotal={3} style={{ line: { opacity: 0 } }} />
       <XAxis tickFormat={(d) => format(d, "M/d")} />
 
-      {_.map(resultsGrouped, (v, k) => (
+      {_.map(_.toArray(resultsGrouped), (v, k) => (
         <LineSeries
           data={v}
           key={k}
-          color={conf.strokeColor || "black"}
-          opacity={0.1}
+          color={
+            k === numSeries - 1 && conf.strokeColorEmphasis
+              ? conf.strokeColorEmphasis
+              : conf.strokeColor || "black"
+          }
+          opacity={logitScale(12, 0.7)(k / (numSeries - 1))}
+          strokeWidth={k === numSeries - 1 ? "4px" : "2px"}
         />
       ))}
 
       <MarkSeries
         data={_.map(resultsGrouped, (d) => _.maxBy(d, (day) => day.date))}
         color={conf.strokeColor || "black"}
-        size={1}
+        size={0.6}
+        opacity={0.2}
       />
 
       <Highlight

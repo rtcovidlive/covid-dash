@@ -339,7 +339,32 @@ export function RTSubareaOverview(props) {
             {props.fips && contentWidth && (
               <RTChartWrapper>
                 <CountyMetricChart
-                  measure={"infections"}
+                  measure={"infectionsPC"}
+                  fips={props.fips}
+                  width={contentWidth + 40} // + 40}
+                  height={chartHeight} //}
+                />
+              </RTChartWrapper>
+            )}
+            {!props.fips && contentWidth && (
+              <>
+                <ChartTitle level={2}>Positive Tests</ChartTitle>
+                <CaseGrowthChart
+                  data={subAreaData}
+                  width={contentWidth + 40}
+                  height={chartHeight + 120}
+                />
+              </>
+            )}
+            <ChartTitle level={2}>Percent Ever Infected</ChartTitle>
+            <Explanation>
+              Percent ever infected corresponds to an important metric
+              PLACEHOLDER PLACEHOLDER PLACEHOLDER.
+            </Explanation>
+            {props.fips && contentWidth && (
+              <RTChartWrapper>
+                <CountyMetricChart
+                  measure={"PEI"}
                   fips={props.fips}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
