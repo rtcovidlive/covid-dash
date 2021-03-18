@@ -1,4 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
+import { SWRConfig } from "swr";
 
 class MyDocument extends Document {
   static async getInitialProps(ctx) {
@@ -34,8 +35,16 @@ var t=c[p];c[p]=function(a){m({p:a.reason});t&&t.apply(c,arguments)};f||setTimeo
         <script dangerouslySetInnerHTML={scriptSrc} />
         <Head />
         <body>
-          <Main />
-          <NextScript />
+          <SWRConfig
+            value={{
+              refreshInterval: 0,
+              dedupingInterval: 1000 * 60 * 60,
+              revalidateOnFocus: false,
+            }}
+          >
+            <Main />
+            <NextScript />
+          </SWRConfig>
         </body>
       </Html>
     );

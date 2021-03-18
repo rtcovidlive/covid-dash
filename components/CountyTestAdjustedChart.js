@@ -10,7 +10,7 @@ import {
   Highlight,
 } from "react-vis";
 import _ from "lodash";
-import { useAllRunResultsDev, useInputData } from "../lib/data";
+import { useCountyResults, useInputData } from "../lib/data";
 import { format } from "date-fns";
 import { useState } from "react";
 
@@ -22,7 +22,7 @@ export function CountyTestAdjustedChart(props) {
   const [lastDrawLocation, setLastDrawLocation] = useState(null);
 
   const { fips, width, height } = props;
-  const { data, error } = useAllRunResultsDev(fips);
+  const { data, error } = useCountyResults(fips);
   const { data: inputData, error: inputError } = useInputData(fips);
 
   const resultsGrouped = data && groupByRunDate(data);

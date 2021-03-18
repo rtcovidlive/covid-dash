@@ -9,7 +9,7 @@ import {
   Highlight,
 } from "react-vis";
 import _ from "lodash";
-import { useAllRunResultsDev } from "../lib/data";
+import { useCountyResults } from "../lib/data";
 import { format } from "date-fns";
 import { useState } from "react";
 
@@ -61,7 +61,7 @@ export function CountyMetricChart(props) {
   const [lastDrawLocation, setLastDrawLocation] = useState(null);
 
   const { measure, fips, width, height } = props;
-  const { data, error } = useAllRunResultsDev(fips);
+  const { data, error } = useCountyResults(fips);
 
   const resultsGrouped = data && groupByRunDate(data);
 
