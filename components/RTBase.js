@@ -8,6 +8,7 @@ import { DataFetchContext } from "lib/DataFetchContext";
 import dynamic from "next/dynamic";
 import { Util } from "lib/Util";
 import DataFetcher from "lib/DataFetcher";
+import { SWRConfig } from "swr";
 
 const GoogleAnalyticsTag = dynamic(() => import("./GoogleAnalyticsTag"), {
   ssr: false,
@@ -77,23 +78,31 @@ export function RTBase(props) {
         countryCode={props.countrycode}
         subarea={props.subarea}
       />
-      <div className="main-content" ref={mainContentRef}>
-        <DataFetchContext.Provider value={rtData}>
-          <DataFetchContext.Consumer>
-            {(value) => {
-              if (!value || !config) {
-                return null;
-              }
-              let subProps = {
-                width: contentWidth,
-                config: config,
-              };
-              Object.assign(subProps, props);
-              return React.createElement(props.contentClass, subProps);
-            }}
-          </DataFetchContext.Consumer>
-        </DataFetchContext.Provider>
-      </div>
+      <SWRConfig
+        value={{
+          refreshInterval: 0,
+          dedupingInterval: 1000 * 60 * 60,
+          revalidateOnFocus: false,
+        }}
+      >
+        <div className="main-content" ref={mainContentRef}>
+          <DataFetchContext.Provider value={rtData}>
+            <DataFetchContext.Consumer>
+              {(value) => {
+                if (!value || !config) {
+                  return null;
+                }
+                let subProps = {
+                  width: contentWidth,
+                  config: config,
+                };
+                Object.assign(subProps, props);
+                return React.createElement(props.contentClass, subProps);
+              }}
+            </DataFetchContext.Consumer>
+          </DataFetchContext.Provider>
+        </div>
+      </SWRConfig>
       <GoogleAnalyticsTag analyticsID="UA-173420256-1" />
     </div>
   );

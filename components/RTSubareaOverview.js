@@ -10,7 +10,7 @@ import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { DataFetchContext } from "lib/DataFetchContext";
 import { StateRtChart } from "./StateRtChart";
-import { CountyMetricChart } from "./CountyMetricChart";
+import { CountyMetricChart, CountyInputChart } from "./CountyMetricChart";
 import { CountyTestAdjustedChart } from "./CountyTestAdjustedChart";
 import { TestAdjustedChart } from "./TestAdjustedChart";
 import { CaseGrowthChart } from "./CaseGrowthChart";
@@ -33,11 +33,28 @@ const HeaderRow = styled(Row)`
   }
 `;
 
+const SubHeaderRow = styled(Row)`
+  margin: 5px 0px 0px 0px;
+  @media (max-width: 768px) {
+    margin: 5px 0px 0px 0px;
+  }
+`;
+
 const SubareaName = styled(Title)`
   font-size: 42px;
   margin-left: -3px;
   @media (max-width: 768px) {
     font-size: 28px;
+    margin-top: 6px;
+  }
+`;
+
+const CountyName = styled(Title)`
+  display: block;
+  font-size: 28px;
+  margin-left: -3px;
+  @media (max-width: 768px) {
+    font-size: 18px;
     margin-top: 6px;
   }
 `;
@@ -153,7 +170,9 @@ export function RTSubareaOverview(props) {
   let maxWidth = 980;
 
   let areaName = config.subAreas[props.subarea];
-  let countyName = props.fips ? config.counties[props.fips].county : "";
+  let countyName = props.fips
+    ? config.counties[props.fips].county
+    : `Overall ${props.subarea}`;
 
   let subAreaData = rtData.dataSeries[props.subarea];
 
@@ -197,8 +216,6 @@ export function RTSubareaOverview(props) {
       }
     ),
   ];
-
-  console.log(countyMenuItems);
 
   let nameLength = areaName.length;
   let shareRowOnTop = isSmallScreen && nameLength > 9;
@@ -257,7 +274,12 @@ export function RTSubareaOverview(props) {
                       />
                     </SubareaName>
                   </Dropdown>
-                  {props.fips && (
+                </Col>
+                {!shareRowOnTop && shareOptions}
+              </HeaderRow>
+              <SubHeaderRow>
+                <Col size={24}>
+                  {true && (
                     <Dropdown
                       options={countyMenuItems}
                       minWidth={220}
@@ -278,19 +300,18 @@ export function RTSubareaOverview(props) {
                         }
                       }}
                     >
-                      <SubareaName level={1}>
+                      <CountyName level={1}>
                         {countyName}
 
                         <span
                           style={{ fontSize: "0.6em", marginLeft: 5 }}
                           className="icon-caret-down"
                         />
-                      </SubareaName>
+                      </CountyName>
                     </Dropdown>
                   )}
                 </Col>
-                {!shareRowOnTop && shareOptions}
-              </HeaderRow>
+              </SubHeaderRow>
               <StatRow
                 config={config}
                 data={subAreaData}
@@ -374,11 +395,13 @@ export function RTSubareaOverview(props) {
             {!props.fips && contentWidth && (
               <>
                 <ChartTitle level={2}>Positive Tests</ChartTitle>
-                <CaseGrowthChart
-                  data={subAreaData}
-                  width={contentWidth + 40}
-                  height={chartHeight + 120}
-                />
+                <RTChartWrapper>
+                  <CaseGrowthChart
+                    data={subAreaData}
+                    width={contentWidth + 40}
+                    height={chartHeight + 120}
+                  />
+                </RTChartWrapper>
               </>
             )}
             <ChartTitle level={2}>Fitted Cases and Infections</ChartTitle>
@@ -389,11 +412,13 @@ export function RTSubareaOverview(props) {
               onset to diagnosis. Gaps in case detection are taken into account.
             </Explanation>
             {props.fips && contentWidth && (
-              <CountyTestAdjustedChart
-                fips={props.fips}
-                width={contentWidth + 40}
-                height={chartHeight + 170}
-              />
+              <RTChartWrapper>
+                <CountyTestAdjustedChart
+                  fips={props.fips}
+                  width={contentWidth + 40}
+                  height={chartHeight + 170}
+                />
+              </RTChartWrapper>
             )}
             {!props.fips && contentWidth && (
               <TestAdjustedChart
@@ -401,6 +426,34 @@ export function RTSubareaOverview(props) {
                 width={contentWidth + 40}
                 height={chartHeight + 170}
               />
+            )}
+            {props.fips && contentWidth && (
+              <>
+                <ChartTitle level={2}>Model input data</ChartTitle>
+                <Explanation>
+                  We estimate daily new COVID-19 infections and diagnosed cases
+                  based on the daily number of reported cases and deaths. We
+                  account for the delays from infection to symptom onset, and
+                  from symptom onset to diagnosis. Gaps in case detection are
+                  taken into account.
+                </Explanation>
+                <RTChartWrapper>
+                  <CountyInputChart
+                    fips={props.fips}
+                    measure={"cases"}
+                    width={contentWidth + 40}
+                    height={(chartHeight + 120) / 2}
+                  />
+                </RTChartWrapper>
+                <RTChartWrapper>
+                  <CountyInputChart
+                    fips={props.fips}
+                    measure={"deaths"}
+                    width={contentWidth + 40}
+                    height={(chartHeight + 120) / 2}
+                  />
+                </RTChartWrapper>
+              </>
             )}
           </div>
         </div>

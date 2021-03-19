@@ -12,6 +12,7 @@ import {
 import _ from "lodash";
 import { useCountyResults, useInputData } from "../lib/data";
 import { format } from "date-fns";
+import { format as d3format } from "d3-format";
 import { useState } from "react";
 
 function groupByRunDate(data) {
@@ -41,12 +42,15 @@ export function CountyTestAdjustedChart(props) {
       xType="time"
       style={{
         backgroundColor: "white",
-        marginLeft: "-30px",
       }}
     >
       <HorizontalGridLines tickTotal={3} />
 
-      <YAxis tickTotal={3} style={{ line: { opacity: 0 } }} />
+      <YAxis
+        tickTotal={3}
+        tickFormat={d3format(".2s")}
+        style={{ line: { opacity: 0 } }}
+      />
       <XAxis
         tickSize={0}
         tickFormat={(d) => format(d, "M/d")}
