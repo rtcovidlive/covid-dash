@@ -164,6 +164,7 @@ export function RTSubareaOverview(props) {
   const rtData = useContext(DataFetchContext);
   const config = props.config;
   const [contentWidth, setContentWidth] = useState(null);
+  const [lastDrawLocation, setLastDrawLocation] = useState(null);
 
   let isSmallScreen = props.width <= 768;
   let chartHeight = isSmallScreen ? 280 : 350;
@@ -324,8 +325,8 @@ export function RTSubareaOverview(props) {
               Effective Reproduction Number &middot; R<sub>t</sub>
             </ChartTitle>
             <Explanation>
-              R<sub>t</sub> is the average number of people that will become
-              infected by a person infected today. If it&rsquo;s above 1.0,
+              R<sub>t</sub> is the average number of people who will become
+              infected by a person infected at time t. If it&rsquo;s above 1.0,
               COVID-19 cases will increase in the near future. If it&rsquo;s
               below 1.0, COVID-19 cases will decrease in the near future.
             </Explanation>
@@ -347,15 +348,19 @@ export function RTSubareaOverview(props) {
                 <CountyMetricChart
                   measure={"Rt"}
                   fips={props.fips}
-                  width={contentWidth + 40} // + 40}
-                  height={chartHeight} //}
+                  width={contentWidth + 40}
+                  height={chartHeight}
+                  lastDrawLocation={lastDrawLocation}
+                  setLastDrawLocation={setLastDrawLocation}
                 />
               </RTChartWrapper>
             )}
             <ChartTitle level={2}>Infections per capita</ChartTitle>
             <Explanation>
-              Infections per capita corresponds to an important metric
-              PLACEHOLDER PLACEHOLDER PLACEHOLDER.
+              Infections per capita is our best estimate of the per-capita rate
+              of infection - including infections which are never diagnosed
+              through testing and never manifest in testing data. This estimate
+              is presented as infections, per 100,000 individuals, per day.
             </Explanation>
             {props.fips && contentWidth && (
               <RTChartWrapper>
@@ -364,6 +369,8 @@ export function RTSubareaOverview(props) {
                   fips={props.fips}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
+                  lastDrawLocation={lastDrawLocation}
+                  setLastDrawLocation={setLastDrawLocation}
                 />
               </RTChartWrapper>
             )}
@@ -379,8 +386,9 @@ export function RTSubareaOverview(props) {
             )}
             <ChartTitle level={2}>Percent Ever Infected</ChartTitle>
             <Explanation>
-              Percent ever infected corresponds to an important metric
-              PLACEHOLDER PLACEHOLDER PLACEHOLDER.
+              Percent ever infected is our estimate of the number of individuals
+              in the county or state popululation who have been infected at
+              least once with COVID-19.
             </Explanation>
             {props.fips && contentWidth && (
               <RTChartWrapper>
@@ -389,6 +397,8 @@ export function RTSubareaOverview(props) {
                   fips={props.fips}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
+                  lastDrawLocation={lastDrawLocation}
+                  setLastDrawLocation={setLastDrawLocation}
                 />
               </RTChartWrapper>
             )}
@@ -404,12 +414,47 @@ export function RTSubareaOverview(props) {
                 </RTChartWrapper>
               </>
             )}
-            <ChartTitle level={2}>Fitted Cases and Infections</ChartTitle>
+            {props.fips && contentWidth && (
+              <>
+                <ChartTitle level={2}>Model input data</ChartTitle>
+                <Explanation>
+                  Here is the case (top) and death (bottom) data used in the
+                  latest model run. Note: revisions to this data are common to
+                  correct previous errors, fix reporting delays, and sometimes
+                  include other types of testing data.
+                </Explanation>
+                <RTChartWrapper>
+                  <CountyInputChart
+                    fips={props.fips}
+                    measure={"cases"}
+                    width={contentWidth + 40}
+                    height={(chartHeight + 120) / 2}
+                    lastDrawLocation={lastDrawLocation}
+                    setLastDrawLocation={setLastDrawLocation}
+                  />
+                </RTChartWrapper>
+                <RTChartWrapper>
+                  <CountyInputChart
+                    fips={props.fips}
+                    measure={"deaths"}
+                    width={contentWidth + 40}
+                    height={(chartHeight + 120) / 2}
+                    lastDrawLocation={lastDrawLocation}
+                    setLastDrawLocation={setLastDrawLocation}
+                  />
+                </RTChartWrapper>
+              </>
+            )}
+            <ChartTitle level={2}>
+              Infections, fitted cases, and case data
+            </ChartTitle>
             <Explanation>
-              We estimate daily new COVID-19 infections and diagnosed cases
-              based on the daily number of reported cases and deaths. We account
-              for the delays from infection to symptom onset, and from symptom
-              onset to diagnosis. Gaps in case detection are taken into account.
+              This chart shows how our estimated number of infections (blue)
+              compares to raw case data, and to a fit of the case data produced
+              during model execution. Here, you can see the effects of reporting
+              delays as the "shift" between infections and fitted cases, and you
+              can see the degree of case underascertainment as the gap between
+              the testing data and the infections curve.
             </Explanation>
             {props.fips && contentWidth && (
               <RTChartWrapper>
@@ -426,34 +471,6 @@ export function RTSubareaOverview(props) {
                 width={contentWidth + 40}
                 height={chartHeight + 170}
               />
-            )}
-            {props.fips && contentWidth && (
-              <>
-                <ChartTitle level={2}>Model input data</ChartTitle>
-                <Explanation>
-                  We estimate daily new COVID-19 infections and diagnosed cases
-                  based on the daily number of reported cases and deaths. We
-                  account for the delays from infection to symptom onset, and
-                  from symptom onset to diagnosis. Gaps in case detection are
-                  taken into account.
-                </Explanation>
-                <RTChartWrapper>
-                  <CountyInputChart
-                    fips={props.fips}
-                    measure={"cases"}
-                    width={contentWidth + 40}
-                    height={(chartHeight + 120) / 2}
-                  />
-                </RTChartWrapper>
-                <RTChartWrapper>
-                  <CountyInputChart
-                    fips={props.fips}
-                    measure={"deaths"}
-                    width={contentWidth + 40}
-                    height={(chartHeight + 120) / 2}
-                  />
-                </RTChartWrapper>
-              </>
             )}
           </div>
         </div>

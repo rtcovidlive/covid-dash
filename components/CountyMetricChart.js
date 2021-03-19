@@ -82,9 +82,14 @@ const getSeriesConfig = function (metric) {
 };
 
 export function CountyMetricChart(props) {
-  const [lastDrawLocation, setLastDrawLocation] = useState(null);
-
-  const { measure, fips, width, height } = props;
+  const {
+    measure,
+    fips,
+    width,
+    height,
+    lastDrawLocation,
+    setLastDrawLocation,
+  } = props;
   const { data, error } = useCountyResults(fips);
 
   const resultsGrouped = data && groupByRunDate(data);
@@ -104,11 +109,7 @@ export function CountyMetricChart(props) {
       xDomain={
         lastDrawLocation && [lastDrawLocation.left, lastDrawLocation.right]
       }
-      yDomain={
-        lastDrawLocation
-          ? [lastDrawLocation.bottom, lastDrawLocation.top]
-          : conf.yDomain
-      }
+      yDomain={conf.yDomain}
       width={width}
       height={height}
       getX={(d) => new Date(d.date)}
@@ -164,24 +165,22 @@ export function CountyMetricChart(props) {
       />
 
       <Highlight
+        enableY={false}
         onBrushEnd={(area) => setLastDrawLocation(area)}
-        onDrag={(area) => {
-          setLastDrawLocation({
-            bottom: lastDrawLocation.bottom + (area.top - area.bottom),
-            left: lastDrawLocation.left - (area.right - area.left),
-            right: lastDrawLocation.right - (area.right - area.left),
-            top: lastDrawLocation.top + (area.top - area.bottom),
-          });
-        }}
       />
     </XYPlot>
   );
 }
 
 export function CountyInputChart(props) {
-  const [lastDrawLocation, setLastDrawLocation] = useState(null);
-
-  const { measure, fips, width, height } = props;
+  const {
+    measure,
+    fips,
+    width,
+    height,
+    lastDrawLocation,
+    setLastDrawLocation,
+  } = props;
   const { data, error } = useInputData(fips);
 
   const conf = getSeriesConfig(measure);
@@ -193,13 +192,12 @@ export function CountyInputChart(props) {
     <XYPlot
       className="svg-container"
       xDomain={
-        lastDrawLocation && [lastDrawLocation.left, lastDrawLocation.right]
+        lastDrawLocation && [
+          lastDrawLocation.left.getTime(),
+          lastDrawLocation.right.getTime(),
+        ]
       }
-      yDomain={
-        lastDrawLocation
-          ? [lastDrawLocation.bottom, lastDrawLocation.top]
-          : conf.yDomain
-      }
+      yDomain={conf.yDomain}
       width={width}
       height={height}
       getX={(d) => new Date(d.date).getTime()}
@@ -229,15 +227,8 @@ export function CountyInputChart(props) {
       />
 
       <Highlight
+        enableY={false}
         onBrushEnd={(area) => setLastDrawLocation(area)}
-        onDrag={(area) => {
-          setLastDrawLocation({
-            bottom: lastDrawLocation.bottom + (area.top - area.bottom),
-            left: lastDrawLocation.left - (area.right - area.left),
-            right: lastDrawLocation.right - (area.right - area.left),
-            top: lastDrawLocation.top + (area.top - area.bottom),
-          });
-        }}
       />
     </XYPlot>
   );
