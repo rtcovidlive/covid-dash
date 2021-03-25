@@ -347,6 +347,7 @@ export function RTSubareaOverview(props) {
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"Rt"}
+                  showNeighbors={true}
                   fips={props.fips}
                   width={contentWidth + 40}
                   height={chartHeight}
@@ -366,6 +367,7 @@ export function RTSubareaOverview(props) {
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"infectionsPC"}
+                  showNeighbors={true}
                   fips={props.fips}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
@@ -394,6 +396,7 @@ export function RTSubareaOverview(props) {
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"PEI"}
+                  showNeighbors={true}
                   fips={props.fips}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
@@ -459,6 +462,7 @@ export function RTSubareaOverview(props) {
             {props.fips && contentWidth && (
               <RTChartWrapper>
                 <CountyTestAdjustedChart
+                  type={"cases"}
                   fips={props.fips}
                   width={contentWidth + 40}
                   height={chartHeight + 170}
@@ -471,6 +475,22 @@ export function RTSubareaOverview(props) {
                 width={contentWidth + 40}
                 height={chartHeight + 170}
               />
+            )}
+            {props.fips && contentWidth && (
+              <>
+                <ChartTitle level={2}>
+                  Deaths, fitted deaths, and reported death data
+                </ChartTitle>
+                <Explanation>Explanation for the grphs.</Explanation>
+                <RTChartWrapper>
+                  <CountyTestAdjustedChart
+                    type={"deaths"}
+                    fips={props.fips}
+                    width={contentWidth + 40}
+                    height={chartHeight + 170}
+                  />
+                </RTChartWrapper>
+              </>
             )}
           </div>
         </div>

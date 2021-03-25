@@ -59,7 +59,10 @@ export function CountyTestAdjustedChart(props) {
 
       {_.map(resultsGrouped, (v, k) => (
         <LineSeries
-          data={selectMeasure(v, "infections")}
+          data={selectMeasure(
+            v,
+            props.type == "cases" ? "infections" : "deaths"
+          )}
           key={k}
           color={"rgba(0, 145, 255, 1)"}
           opacity={0.1}
@@ -68,7 +71,10 @@ export function CountyTestAdjustedChart(props) {
 
       {_.map(resultsGrouped, (v, k) => (
         <LineSeries
-          data={selectMeasure(v, "cases.fitted")}
+          data={selectMeasure(
+            v,
+            props.type == "cases" ? "cases.fitted" : "deaths.fitted"
+          )}
           key={k}
           color={"rgba(50, 50, 0, 1"}
           opacity={0.1}
@@ -77,7 +83,10 @@ export function CountyTestAdjustedChart(props) {
 
       {inputData && (
         <VerticalBarSeries
-          data={selectMeasure(inputData, "cases")}
+          data={selectMeasure(
+            inputData,
+            props.type === "cases" ? "cases" : "deaths"
+          )}
           key={"casebars"}
           color={"rgba(50, 50, 0, 0)"}
           fill={"rgba(50, 50, 0, 0.1)"}

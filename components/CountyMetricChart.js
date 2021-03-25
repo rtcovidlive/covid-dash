@@ -11,13 +11,17 @@ import {
   Highlight,
 } from "react-vis";
 import _ from "lodash";
-import { useCountyResults, useInputData } from "../lib/data";
+import {
+  useCountyResults,
+  useNeighboringCountyResults,
+  useInputData,
+} from "../lib/data";
 import { format } from "date-fns";
 import { format as d3format } from "d3-format";
 import { useState } from "react";
 
-function groupByRunDate(data) {
-  return _.groupBy(data, (d) => d["run.date"]);
+function groupBy(data, metric) {
+  return _.groupBy(data, (d) => d[metric]);
 }
 
 const getSeriesConfig = function (metric) {
@@ -29,6 +33,7 @@ const getSeriesConfig = function (metric) {
         yDomain: [0, 2],
         yAxisTicks: [0.5, 1, 1.5],
         strokeColor: "gray",
+        neighborStrokeColor: "rgb(56, 21, 105)",
         strokeColorEmphasis: "rgb(234, 99, 255)",
       };
       break;
@@ -87,13 +92,21 @@ export function CountyMetricChart(props) {
     fips,
     width,
     height,
+    showNeighbors,
     lastDrawLocation,
     setLastDrawLocation,
   } = props;
   const { data, error } = useCountyResults(fips);
+  const {
+    data: dataNeighbor,
+    error: errorNeighbor,
+  } = useNeighboringCountyResults(fips, "2021-03-24");
 
-  const resultsGrouped = data && groupByRunDate(data);
+  const resultsGrouped = data && groupBy(data, "run.date");
+  const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, "fips");
   const resultsArray = data && _.toArray(resultsGrouped);
+  const neighborResultsArray =
+    dataNeighbor && _.toArray(neighborResultsGrouped);
 
   const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
 
@@ -133,15 +146,17 @@ export function CountyMetricChart(props) {
         <AreaSeries data={_.last(resultsArray)} color={"rgb(235,235,240)"} />
       )}
 
-      {props.measure === "Rt" && (
-        <LineSeries
-          data={[
-            { date: -Infinity, Rt: 1 },
-            { date: +Infinity, Rt: 1 },
-          ]}
-          color="green"
-        />
-      )}
+      {showNeighbors &&
+        _.map(neighborResultsArray, (v, k) => (
+          <LineSeries
+            data={v}
+            key={k}
+            color={conf.neighborStrokeColor || "black"}
+            opacity={0.4}
+            strokeWidth={"1.5px"}
+            strokeStyle={"dashed"}
+          />
+        ))}
 
       {_.map(resultsArray, (v, k) => (
         <LineSeries
@@ -156,13 +171,6 @@ export function CountyMetricChart(props) {
           strokeWidth={k === numSeries - 1 ? "4px" : "2px"}
         />
       ))}
-
-      <MarkSeries
-        data={_.map(resultsGrouped, (d) => _.maxBy(d, (day) => day.date))}
-        color={conf.strokeColor || "black"}
-        size={0.6}
-        opacity={0.2}
-      />
 
       <Highlight
         enableY={false}
