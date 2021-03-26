@@ -9,6 +9,7 @@ import {
   MarkSeries,
   AreaSeries,
   Highlight,
+  Hint,
 } from "react-vis";
 import _ from "lodash";
 import {
@@ -19,6 +20,8 @@ import {
 import { format } from "date-fns";
 import { format as d3format } from "d3-format";
 import { useState } from "react";
+import sma from "sma";
+import { USCounties } from "../config/USCounties.js";
 
 function groupBy(data, metric) {
   return _.groupBy(data, (d) => d[metric]);
@@ -40,6 +43,7 @@ const getSeriesConfig = function (metric) {
     }
     case "infectionsPC": {
       conf = {
+        shortName: "IPC",
         yDomain: [0, 500],
         yAxisTicks: [0, 100, 200, 300, 400],
         strokeColor: "rgb(56, 230, 252)",
@@ -60,7 +64,7 @@ const getSeriesConfig = function (metric) {
     }
     case "cases": {
       conf = {
-        yTickFormat: d3format(".1s"),
+        yTickFormat: d3format(".2s"),
         color: "rgba(50, 50, 0, 0)",
         fill: "rgba(50, 50, 0, 0.5)",
       };
@@ -93,14 +97,18 @@ export function CountyMetricChart(props) {
     width,
     height,
     showNeighbors,
+    showHistory,
     lastDrawLocation,
     setLastDrawLocation,
   } = props;
+
   const { data, error } = useCountyResults(fips);
   const {
     data: dataNeighbor,
     error: errorNeighbor,
   } = useNeighboringCountyResults(fips, "2021-03-24");
+
+  const [value, setValue] = useState(false);
 
   const resultsGrouped = data && groupBy(data, "run.date");
   const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, "fips");
@@ -110,9 +118,23 @@ export function CountyMetricChart(props) {
 
   const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
 
+  const formatHint = (d) => {
+    if (!showNeighbors)
+      return [
+        { title: "Date", value: format(new Date(d.date), "M/d") },
+        {
+          title: conf.shortName || measure,
+          value: conf.yTickFormat
+            ? conf.yTickFormat(d[measure])
+            : d3format(",.2f")(d[measure]),
+        },
+      ];
+    else return [{ title: USCounties[d.fips].county, value: "Hmm" }];
+  };
+
   const conf = getSeriesConfig(measure);
 
-  const numSeries = _.keys(resultsGrouped).length;
+  const numSeries = showHistory ? _.keys(resultsGrouped).length : 1;
 
   console.log(conf);
 
@@ -128,6 +150,7 @@ export function CountyMetricChart(props) {
       getX={(d) => new Date(d.date)}
       getY={(d) => d[measure]}
       xType="time"
+      onMouseLeave={() => setValue(false)}
       style={{
         backgroundColor: "white",
       }}
@@ -158,7 +181,7 @@ export function CountyMetricChart(props) {
           />
         ))}
 
-      {_.map(resultsArray, (v, k) => (
+      {_.map(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) => (
         <LineSeries
           data={v}
           key={k}
@@ -169,6 +192,12 @@ export function CountyMetricChart(props) {
           }
           opacity={logitScale(12, 0.7)(k / (numSeries - 1))}
           strokeWidth={k === numSeries - 1 ? "4px" : "2px"}
+          onNearestXY={(value) =>
+            k === numSeries - 1 &&
+            !showNeighbors &&
+            !showHistory &&
+            setValue(value)
+          }
         />
       ))}
 
@@ -176,6 +205,8 @@ export function CountyMetricChart(props) {
         enableY={false}
         onBrushEnd={(area) => setLastDrawLocation(area)}
       />
+
+      {value ? <Hint value={value} format={formatHint} /> : null}
     </XYPlot>
   );
 }
@@ -193,8 +224,23 @@ export function CountyInputChart(props) {
 
   const conf = getSeriesConfig(measure);
 
-  console.log("cdafdsa");
-  console.log(conf);
+  var sma_7d = sma(
+    _.map(data, (s) => s[measure]),
+    7,
+    (n) => n
+  );
+
+  sma_7d = [0, 0, 0, 0, 0, 0].concat(sma_7d); // First 6 elements aren't part of sma
+
+  const sma_zipped = _.zipWith(
+    _.map(data, (d) => d.date),
+    sma_7d,
+    (date, avg) => {
+      var d = { date: date };
+      d[measure] = avg;
+      return d;
+    }
+  );
 
   return (
     <XYPlot
@@ -233,6 +279,8 @@ export function CountyInputChart(props) {
         opacity={1}
         barWidth={0.92}
       />
+
+      <LineSeries data={sma_zipped} color="rgb(179, 109, 25)" />
 
       <Highlight
         enableY={false}

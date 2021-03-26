@@ -18,6 +18,8 @@ import { ShareButtons } from "./ShareButtons";
 import "../styles/subarea.scss";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
+import { Switch } from "antd";
+import "../styles/antd.scss";
 
 const rtRef = React.createRef();
 
@@ -111,6 +113,13 @@ function addCumulativeSum(series, key) {
 }
 
 function StatRow(props) {
+  const {
+    showHistory,
+    setShowHistory,
+    showNeighbors,
+    setShowNeighbors,
+  } = props;
+
   let series = _(props.data.series);
   addCumulativeSum(props.data.series, "tests_new");
   addCumulativeSum(props.data.series, "cases_new");
@@ -132,9 +141,9 @@ function StatRow(props) {
   let lastRt = format(".2f")(offsetRtEntry.r0);
   let positiveTotal = numFormat(series.sumBy((e) => e.cases_new));
   let deathsTotal = numFormat(series.sumBy((e) => e.deaths_new));
-  let colsPerStat = 8;
+  let colsPerStat = 6;
   return (
-    <Row style={{ maxWidth: 500 }}>
+    <Row style={{ maxWidth: 625 }}>
       <Col size={colsPerStat}>
         <StatContent round="left">
           <StatLabel>
@@ -156,6 +165,28 @@ function StatRow(props) {
           <StatNumber>{positiveTotal}</StatNumber>
         </StatContent>
       </Col>
+      <Col size={colsPerStat}>
+        <StatContent>
+          <StatLabel>Show history? </StatLabel>
+          <StatNumber>
+            <Switch
+              checked={showHistory}
+              onClick={(e) => setShowHistory(!showHistory)}
+            />
+          </StatNumber>
+        </StatContent>
+      </Col>
+      <Col size={colsPerStat}>
+        <StatContent>
+          <StatLabel>Show neighbors? </StatLabel>
+          <StatNumber>
+            <Switch
+              checked={showNeighbors}
+              onClick={(e) => setShowNeighbors(!showNeighbors)}
+            />
+          </StatNumber>
+        </StatContent>
+      </Col>
     </Row>
   );
 }
@@ -165,6 +196,10 @@ export function RTSubareaOverview(props) {
   const config = props.config;
   const [contentWidth, setContentWidth] = useState(null);
   const [lastDrawLocation, setLastDrawLocation] = useState(null);
+
+  // Show estimate history, and show latest result from all neighboring counties?
+  const [showHistory, setShowHistory] = useState(false);
+  const [showNeighbors, setShowNeighbors] = useState(false);
 
   let isSmallScreen = props.width <= 768;
   let chartHeight = isSmallScreen ? 280 : 350;
@@ -319,6 +354,10 @@ export function RTSubareaOverview(props) {
                 width={contentWidth}
                 subarea={props.subarea}
                 isSmallScreen={isSmallScreen}
+                showHistory={showHistory}
+                setShowHistory={setShowHistory}
+                showNeighbors={showNeighbors}
+                setShowNeighbors={setShowNeighbors}
               />
             </Header>
             <ChartTitle level={2}>
@@ -347,7 +386,8 @@ export function RTSubareaOverview(props) {
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"Rt"}
-                  showNeighbors={true}
+                  showNeighbors={showNeighbors}
+                  showHistory={showHistory}
                   fips={props.fips}
                   width={contentWidth + 40}
                   height={chartHeight}
@@ -367,7 +407,8 @@ export function RTSubareaOverview(props) {
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"infectionsPC"}
-                  showNeighbors={true}
+                  showNeighbors={showNeighbors}
+                  showHistory={showHistory}
                   fips={props.fips}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
@@ -396,7 +437,8 @@ export function RTSubareaOverview(props) {
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"PEI"}
-                  showNeighbors={true}
+                  showNeighbors={showNeighbors}
+                  showHistory={showHistory}
                   fips={props.fips}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
