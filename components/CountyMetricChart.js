@@ -100,7 +100,7 @@ export function CountyMetricChart(props) {
   const {
     data: dataNeighbor,
     error: errorNeighbor,
-  } = useNeighboringCountyResults(fips, "2021-03-24");
+  } = useNeighboringCountyResults(fips, "2021-03-31");
 
   const resultsGrouped = data && groupBy(data, "run.date");
   const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, "fips");
