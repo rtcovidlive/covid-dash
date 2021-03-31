@@ -106,7 +106,7 @@ export function CountyMetricChart(props) {
   const {
     data: dataNeighbor,
     error: errorNeighbor,
-  } = useNeighboringCountyResults(fips, "2021-03-24");
+  } = useNeighboringCountyResults(fips, "2021-03-31");
 
   const [value, setValue] = useState(false);
 
