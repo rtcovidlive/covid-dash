@@ -136,8 +136,6 @@ export function CountyMetricChart(props) {
 
   const numSeries = showHistory ? _.keys(resultsGrouped).length : 1;
 
-  console.log(conf);
-
   return (
     <XYPlot
       className="svg-container"
