@@ -19,6 +19,7 @@ import {
 } from "../lib/data";
 import { format } from "date-fns";
 import { format as d3format } from "d3-format";
+import { utcFormat } from "d3-time-format";
 import { useState } from "react";
 import sma from "sma";
 import { USCounties } from "../config/USCounties.js";
@@ -106,7 +107,12 @@ export function CountyMetricChart(props) {
   const {
     data: dataNeighbor,
     error: errorNeighbor,
-  } = useNeighboringCountyResults(fips, "2021-03-31");
+  } = useNeighboringCountyResults(
+    fips,
+    data
+      ? _.maxBy(data, (d) => d["run.date"])["run.date"]
+      : utcFormat("%Y-%m-%d")(new Date())
+  );
 
   const [value, setValue] = useState(false);
 
