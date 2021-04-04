@@ -268,6 +268,15 @@ export function RTSubareaOverview(props) {
     </Col>
   );
 
+  const routeToFIPS = (abbr, fips) => {
+    Navigation.navigateToCounty(
+      props.config.code,
+      abbr,
+      fips,
+      document.location.search
+    );
+  };
+
   return (
     <>
       <div className="rt-container-wrapper">
@@ -393,6 +402,7 @@ export function RTSubareaOverview(props) {
                   height={chartHeight}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
+                  routeToFIPS={routeToFIPS}
                 />
               </RTChartWrapper>
             )}
@@ -414,6 +424,7 @@ export function RTSubareaOverview(props) {
                   height={chartHeight} //}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
+                  routeToFIPS={routeToFIPS}
                 />
               </RTChartWrapper>
             )}
@@ -444,6 +455,7 @@ export function RTSubareaOverview(props) {
                   height={chartHeight} //}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
+                  routeToFIPS={routeToFIPS}
                 />
               </RTChartWrapper>
             )}

@@ -10,6 +10,7 @@ import {
   AreaSeries,
   Highlight,
   Hint,
+  DiscreteColorLegend,
 } from "react-vis";
 import _ from "lodash";
 import {
@@ -17,7 +18,6 @@ import {
   useNeighboringCountyResults,
   useInputData,
 } from "../lib/data";
-import { format } from "date-fns";
 import { format as d3format } from "d3-format";
 import { utcFormat } from "d3-time-format";
 import { useState } from "react";
@@ -101,6 +101,7 @@ export function CountyMetricChart(props) {
     showHistory,
     lastDrawLocation,
     setLastDrawLocation,
+    routeToFIPS,
   } = props;
 
   const { data, error } = useCountyResults(fips);
@@ -115,6 +116,8 @@ export function CountyMetricChart(props) {
   );
 
   const [value, setValue] = useState(false);
+  const [modelRunDate, setModelRunDate] = useState(false);
+  const [neighborFIPS, setNeighborFIPS] = useState(null);
 
   const resultsGrouped = data && groupBy(data, "run.date");
   const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, "fips");
@@ -127,7 +130,7 @@ export function CountyMetricChart(props) {
   const formatHint = (d) => {
     if (!showNeighbors)
       return [
-        { title: "Date", value: format(new Date(d.date), "M/d") },
+        { title: "Date", value: utcFormat("%b %e")(new Date(d.date)) },
         {
           title: conf.shortName || measure,
           value: conf.yTickFormat
@@ -137,6 +140,10 @@ export function CountyMetricChart(props) {
       ];
     else return [{ title: USCounties[d.fips].county, value: "Hmm" }];
   };
+
+  const rundateFormatHint = (d) => [
+    { title: "Age", value: utcFormat("%b %e")(new Date(d["run.date"])) },
+  ];
 
   const conf = getSeriesConfig(measure);
 
@@ -154,7 +161,10 @@ export function CountyMetricChart(props) {
       getX={(d) => new Date(d.date)}
       getY={(d) => d[measure]}
       xType="time"
-      onMouseLeave={() => setValue(false)}
+      onMouseLeave={() => {
+        setValue(false);
+        setNeighborFIPS(null);
+      }}
       style={{
         backgroundColor: "white",
       }}
@@ -167,7 +177,7 @@ export function CountyMetricChart(props) {
         style={{ line: { opacity: 0 } }}
         tickFormat={conf.yTickFormat}
       />
-      <XAxis tickFormat={(d) => format(d, "M/d")} />
+      <XAxis tickFormat={(d) => utcFormat("%b %e")(d)} />
 
       {props.measure === "PEI" && (
         <AreaSeries data={_.last(resultsArray)} color={"rgb(235,235,240)"} />
@@ -194,7 +204,7 @@ export function CountyMetricChart(props) {
               ? conf.strokeColorEmphasis
               : conf.strokeColor || "black"
           }
-          opacity={logitScale(12, 0.7)(k / (numSeries - 1))}
+          opacity={0.2 + logitScale(12, 0.7)(k / (numSeries - 1)) / 0.7}
           strokeWidth={k === numSeries - 1 ? "4px" : "2px"}
           onNearestXY={(value) =>
             k === numSeries - 1 &&
@@ -205,12 +215,57 @@ export function CountyMetricChart(props) {
         />
       ))}
 
+      {showHistory && (
+        <MarkSeries
+          data={_.map(resultsArray, _.last)}
+          key={1000}
+          color={"red"}
+          onNearestXY={(value) =>
+            !showNeighbors && showHistory && setModelRunDate(value)
+          }
+        />
+      )}
+
       <Highlight
         enableY={false}
         onBrushEnd={(area) => setLastDrawLocation(area)}
       />
 
+      {showNeighbors && neighborFIPS && (
+        <DiscreteColorLegend
+          items={[
+            {
+              title: USCounties[neighborFIPS].county,
+              color: "rgba(0,0,0,0.7)",
+            },
+          ]}
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+          }}
+        />
+      )}
+
       {value ? <Hint value={value} format={formatHint} /> : null}
+      {modelRunDate && <Hint value={modelRunDate} format={rundateFormatHint} />}
+
+      {showNeighbors &&
+        _.map(neighborResultsArray, (v, k) => (
+          <LineSeries
+            data={v}
+            key={1000 + k}
+            color={neighborFIPS === v[0].fips ? "black" : "transparent"}
+            opacity={0.7}
+            size={6}
+            onSeriesMouseOver={(e) => setNeighborFIPS(v[0].fips)}
+            onSeriesMouseOut={(e) => setNeighborFIPS(null)}
+            onSeriesClick={(e) =>
+              routeToFIPS(USCounties[v[0].fips].abbr, v[0].fips)
+            }
+            style={{ cursor: "pointer" }}
+          />
+        ))}
     </XYPlot>
   );
 }
@@ -273,7 +328,7 @@ export function CountyInputChart(props) {
         style={{ line: { opacity: 0 } }}
         tickFormat={conf.yTickFormat}
       />
-      <XAxis tickFormat={(d) => format(d, "M/d")} />
+      <XAxis tickFormat={(d) => utcFormat("%b %e")(d)} />
 
       <VerticalBarSeries
         data={data}
