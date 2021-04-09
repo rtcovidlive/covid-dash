@@ -20,6 +20,7 @@ import {
 } from "../lib/data";
 import { format as d3format } from "d3-format";
 import { utcFormat } from "d3-time-format";
+import { timeDay } from "d3-time";
 import { useState } from "react";
 import sma from "sma";
 import { USCounties } from "../config/USCounties.js";
@@ -142,7 +143,10 @@ export function CountyMetricChart(props) {
   };
 
   const rundateFormatHint = (d) => [
-    { title: "Age", value: utcFormat("%b %e")(new Date(d["run.date"])) },
+    {
+      title: "Age",
+      value: `${timeDay.count(new Date(d["run.date"]), new Date())}d`,
+    },
   ];
 
   const conf = getSeriesConfig(measure);
@@ -163,6 +167,7 @@ export function CountyMetricChart(props) {
       xType="time"
       onMouseLeave={() => {
         setValue(false);
+        setModelRunDate(false);
         setNeighborFIPS(null);
       }}
       style={{
@@ -219,7 +224,8 @@ export function CountyMetricChart(props) {
         <MarkSeries
           data={_.map(resultsArray, _.last)}
           key={1000}
-          color={"red"}
+          color={conf.strokeColor}
+          size={1}
           onNearestXY={(value) =>
             !showNeighbors && showHistory && setModelRunDate(value)
           }

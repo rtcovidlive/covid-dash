@@ -32,6 +32,12 @@ export function CountyTestAdjustedChart(props) {
     return _.map(results, (r) => ({ date: r.date, y: r[measure] }));
   };
 
+  const yDomain =
+    data &&
+    (props.type == "cases"
+      ? [0, _.maxBy(data, (d) => Number(d.infections)).infections]
+      : [0, _.maxBy(data, (d) => Number(d.deaths)).deaths]);
+
   return (
     <XYPlot
       className="svg-container"
@@ -39,6 +45,7 @@ export function CountyTestAdjustedChart(props) {
       height={height}
       getX={(d) => new Date(d.date).getTime()}
       getY={(d) => d.y}
+      yDomain={yDomain}
       xType="time"
       style={{
         backgroundColor: "white",

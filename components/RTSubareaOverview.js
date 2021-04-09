@@ -20,6 +20,7 @@ import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 import { Switch } from "antd";
 import "../styles/antd.scss";
+import { useCountyResults, useInputData } from "../lib/data";
 
 const rtRef = React.createRef();
 
@@ -72,7 +73,7 @@ const ChartTitle = styled(Title)`
   font-size: 18px;
 `;
 
-const StatLabel = styled.p`
+const StatLabel = styled.div`
   margin: 0px;
   font-size: 14px;
   @media (max-width: 768px) {
@@ -80,9 +81,16 @@ const StatLabel = styled.p`
   }
 `;
 
+const StatUnit = styled(StatLabel)`
+  font-weight: normal;
+  color: rgb(180, 180, 180);
+  font-size: 12px;
+`;
+
 const StatNumber = styled.p`
   font-weight: 800;
   font-size: 22px;
+  display: inline-block;
   margin: 0px 0px 2px 0px;
   color: ${(props) => props.color || "rgba(0,0,0,1.0)"};
   @media (max-width: 768px) {
@@ -112,19 +120,28 @@ function addCumulativeSum(series, key) {
   }
 }
 
-function StatRow(props) {
-  const {
-    showHistory,
-    setShowHistory,
-    showNeighbors,
-    setShowNeighbors,
-  } = props;
+function CountyLatestResults(countyData) {
+  if (!countyData || countyData.length === 0) return null;
 
+  const maxDate = _.maxBy(countyData, "run.date")["run.date"];
+
+  return _.filter(countyData, (d) => d["run.date"] === maxDate);
+}
+
+function CountyStatRowNumbers(countyData) {
+  if (!countyData || countyData.length === 0) return null;
+
+  const mostRecentCountyData = CountyLatestResults(countyData);
+
+  return _.maxBy(mostRecentCountyData, "date");
+}
+
+function StateStatRow(props) {
   let series = _(props.data.series);
   addCumulativeSum(props.data.series, "tests_new");
   addCumulativeSum(props.data.series, "cases_new");
   var numFormat = format(",.0f");
-  if (props.width < 768) {
+  if (true || props.width < 768) {
     numFormat = (num) => {
       if (num > 1000000) {
         return format(".1f")(num / 1000000) + "M";
@@ -139,18 +156,38 @@ function StatRow(props) {
   }
   let offsetRtEntry = series.nth(-1 * (Constants.daysOffsetSinceEnd + 1));
   let lastRt = format(".2f")(offsetRtEntry.r0);
-  let positiveTotal = numFormat(series.sumBy((e) => e.cases_new));
-  let deathsTotal = numFormat(series.sumBy((e) => e.deaths_new));
+
+  let positiveTotalRaw = series.sumBy((e) => e.cases_new);
+  let positiveTotal = numFormat(positiveTotalRaw);
+
+  let infectionsTotalRaw = series.sumBy((e) => e.onsets);
+  let infectionsTotal = numFormat(infectionsTotalRaw);
+
+  let infectionRate = format(".1f")(offsetRtEntry.onsetsPC);
   let colsPerStat = 6;
   return (
-    <Row style={{ maxWidth: 625 }}>
+    <Row style={{ maxWidth: 700 }}>
       <Col size={colsPerStat}>
         <StatContent round="left">
           <StatLabel>
-            Current state R<sub>t</sub>
+            State R<sub>t</sub>
           </StatLabel>
           <StatNumber color={Util.colorCodeRt(props.subarea, lastRt)}>
             {lastRt}
+          </StatNumber>
+        </StatContent>
+      </Col>
+      <Col size={colsPerStat}>
+        <StatContent>
+          <StatLabel>
+            State infection rate{" "}
+            <span style={{ visibility: "hidden" }}>
+              <sub>t</sub>
+            </span>
+          </StatLabel>
+          <StatNumber>
+            {infectionRate}
+            <StatUnit>inf/100k/day</StatUnit>
           </StatNumber>
         </StatContent>
       </Col>
@@ -167,27 +204,141 @@ function StatRow(props) {
       </Col>
       <Col size={colsPerStat}>
         <StatContent>
-          <StatLabel>Show history? </StatLabel>
+          <StatLabel>
+            Total state infections{" "}
+            <span style={{ visibility: "hidden" }}>
+              <sub>t</sub>
+            </span>
+          </StatLabel>
           <StatNumber>
-            <Switch
-              checked={showHistory}
-              onClick={(e) => setShowHistory(!showHistory)}
-            />
-          </StatNumber>
-        </StatContent>
-      </Col>
-      <Col size={colsPerStat}>
-        <StatContent>
-          <StatLabel>Show neighbors? </StatLabel>
-          <StatNumber>
-            <Switch
-              checked={showNeighbors}
-              onClick={(e) => setShowNeighbors(!showNeighbors)}
-            />
+            {infectionsTotal}{" "}
+            <StatUnit>
+              ({format(".2f")(infectionsTotalRaw / positiveTotalRaw)}x
+              diagnoses)
+            </StatUnit>
           </StatNumber>
         </StatContent>
       </Col>
     </Row>
+  );
+}
+
+function CountyStatRow(props) {
+  const {
+    showHistory,
+    setShowHistory,
+    showNeighbors,
+    setShowNeighbors,
+  } = props;
+
+  var numFormat = format(",.0f");
+  if (true || props.width < 768) {
+    numFormat = (num) => {
+      if (num > 1000000) {
+        return format(".1f")(num / 1000000) + "M";
+      } else if (num > 10000) {
+        return Math.floor(num / 1000) + "K";
+      } else if (num > 1000) {
+        return format(".1f")(num / 1000) + "K";
+      } else {
+        return num;
+      }
+    };
+  }
+
+  const countyStats = CountyStatRowNumbers(props.countyData);
+  const latestResults = CountyLatestResults(props.countyData);
+
+  if (!countyStats || !props.countyInputData)
+    return <Row style={{ maxWidth: 700 }}></Row>;
+
+  let series = _(latestResults);
+  let inputSeries = _(props.countyInputData);
+
+  console.log(latestResults);
+  let lastCountyRt = countyStats && format(".2f")(countyStats.Rt);
+
+  let positiveTotalRaw = inputSeries.sumBy((e) => Number(e.cases));
+  let positiveTotal = numFormat(inputSeries.sumBy((e) => Number(e.cases)));
+  let infectionsTotalRaw = series.sumBy((e) => Number(e.infections));
+  let infectionsTotal = numFormat(series.sumBy((e) => Number(e.infections)));
+  let infectionRate = format(".1f")(countyStats.infectionsPC);
+  let colsPerStat = 6;
+  return (
+    <>
+      <Row style={{ maxWidth: 700 }}>
+        {countyStats && (
+          <Col size={colsPerStat}>
+            <StatContent round="left">
+              <StatLabel>
+                County R<sub>t</sub>
+              </StatLabel>
+              <StatNumber color={Util.colorCodeRt(props.subarea, lastCountyRt)}>
+                {lastCountyRt}
+              </StatNumber>
+            </StatContent>
+          </Col>
+        )}
+        <Col size={colsPerStat}>
+          <StatContent>
+            <StatLabel>
+              County infection rate{" "}
+              <span style={{ visibility: "hidden" }}>
+                <sub>t</sub>
+              </span>
+            </StatLabel>
+            <StatNumber>{infectionRate}</StatNumber>
+          </StatContent>
+        </Col>
+        <Col size={colsPerStat}>
+          <StatContent>
+            <StatLabel>Total county cases</StatLabel>
+            <StatNumber>{positiveTotal}</StatNumber>
+          </StatContent>
+        </Col>
+        <Col size={colsPerStat}>
+          <StatContent>
+            <StatLabel>
+              Total county infections{" "}
+              <span style={{ visibility: "hidden" }}>
+                <sub>t</sub>
+              </span>
+            </StatLabel>
+            <StatNumber>
+              {infectionsTotal}{" "}
+              <StatUnit>
+                ({format(".2f")(infectionsTotalRaw / positiveTotalRaw)}x
+                diagnoses)
+              </StatUnit>
+            </StatNumber>
+          </StatContent>
+        </Col>
+      </Row>
+      <Row style={{ maxWidth: 625 }}>
+        <Col size={colsPerStat}>
+          <StatContent>
+            <StatLabel>Show history? </StatLabel>
+            <StatNumber>
+              <Switch
+                checked={showHistory}
+                onClick={(e) => setShowHistory(!showHistory)}
+              />
+            </StatNumber>
+          </StatContent>
+        </Col>
+        <Col size={colsPerStat}>
+          <StatContent>
+            <StatLabel>Show neighbors? </StatLabel>
+            <StatNumber>
+              <Switch
+                checked={showNeighbors}
+                onClick={(e) => setShowNeighbors(!showNeighbors)}
+              />
+            </StatNumber>
+          </StatContent>
+        </Col>
+      </Row>
+    </>
   );
 }
 
@@ -200,6 +351,13 @@ export function RTSubareaOverview(props) {
   // Show estimate history, and show latest result from all neighboring counties?
   const [showHistory, setShowHistory] = useState(false);
   const [showNeighbors, setShowNeighbors] = useState(false);
+
+  const { data: countyData, error: countyDataError } = useCountyResults(
+    props.fips
+  );
+  const { data: countyInputs, error: countyInputsError } = useInputData(
+    props.fips
+  );
 
   let isSmallScreen = props.width <= 768;
   let chartHeight = isSmallScreen ? 280 : 350;
@@ -357,7 +515,7 @@ export function RTSubareaOverview(props) {
                   )}
                 </Col>
               </SubHeaderRow>
-              <StatRow
+              <StateStatRow
                 config={config}
                 data={subAreaData}
                 width={contentWidth}
@@ -368,6 +526,21 @@ export function RTSubareaOverview(props) {
                 showNeighbors={showNeighbors}
                 setShowNeighbors={setShowNeighbors}
               />
+              {props.fips && (
+                <CountyStatRow
+                  config={config}
+                  data={subAreaData}
+                  countyData={countyData}
+                  countyInputData={countyInputs}
+                  width={contentWidth}
+                  subarea={props.subarea}
+                  isSmallScreen={isSmallScreen}
+                  showHistory={showHistory}
+                  setShowHistory={setShowHistory}
+                  showNeighbors={showNeighbors}
+                  setShowNeighbors={setShowNeighbors}
+                />
+              )}
             </Header>
             <ChartTitle level={2}>
               Effective Reproduction Number &middot; R<sub>t</sub>
@@ -408,10 +581,11 @@ export function RTSubareaOverview(props) {
             )}
             <ChartTitle level={2}>Infections per capita</ChartTitle>
             <Explanation>
-              Infections per capita is our best estimate of the per-capita rate
-              of infection - including infections which are never diagnosed
-              through testing and never manifest in testing data. This estimate
-              is presented as infections, per 100,000 individuals, per day.
+              Infections per capita is our best estimate of how many individuals
+              get infected every day - including infections which are never
+              diagnosed through testing and never manifest in testing data. This
+              estimate is presented as infections, per 100,000 individuals, per
+              day.
             </Explanation>
             {props.fips && contentWidth && (
               <RTChartWrapper>
@@ -475,10 +649,10 @@ export function RTSubareaOverview(props) {
               <>
                 <ChartTitle level={2}>Model input data</ChartTitle>
                 <Explanation>
-                  Here is the case (top) and death (bottom) data used in the
-                  latest model run. Note: revisions to this data are common to
-                  correct previous errors, fix reporting delays, and sometimes
-                  include other types of testing data.
+                  The case (top) and death (bottom) data used in the latest
+                  model run. Retrospective to this data are common to correct
+                  previous errors, fix reporting delays, and sometimes include
+                  other types of testing data.
                 </Explanation>
                 <RTChartWrapper>
                   <CountyInputChart
@@ -519,7 +693,7 @@ export function RTSubareaOverview(props) {
                   type={"cases"}
                   fips={props.fips}
                   width={contentWidth + 40}
-                  height={chartHeight + 170}
+                  height={chartHeight}
                 />
               </RTChartWrapper>
             )}
@@ -535,13 +709,18 @@ export function RTSubareaOverview(props) {
                 <ChartTitle level={2}>
                   Deaths, fitted deaths, and reported death data
                 </ChartTitle>
-                <Explanation>Explanation for the grphs.</Explanation>
+                <Explanation>
+                  Death ascertainment is much higher than case ascertainment for
+                  COVID-19 in the United States. However, incomplete
+                  ascertainment, as well as reporting delays, are usually
+                  evident in the following graph.
+                </Explanation>
                 <RTChartWrapper>
                   <CountyTestAdjustedChart
                     type={"deaths"}
                     fips={props.fips}
                     width={contentWidth + 40}
-                    height={chartHeight + 170}
+                    height={chartHeight}
                   />
                 </RTChartWrapper>
               </>
