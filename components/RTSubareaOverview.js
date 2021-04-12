@@ -694,6 +694,7 @@ export function RTSubareaOverview(props) {
                   fips={props.fips}
                   width={contentWidth + 40}
                   height={chartHeight}
+                  showHistory={showHistory}
                 />
               </RTChartWrapper>
             )}
@@ -721,6 +722,7 @@ export function RTSubareaOverview(props) {
                     fips={props.fips}
                     width={contentWidth + 40}
                     height={chartHeight}
+                    showHistory={showHistory}
                   />
                 </RTChartWrapper>
               </>
