@@ -36,8 +36,20 @@ export function CountyTestAdjustedChart(props) {
   const yDomain =
     data &&
     (props.type == "cases"
-      ? [0, _.maxBy(data, (d) => Number(d.infections)).infections]
-      : [0, _.maxBy(data, (d) => Number(d.deaths)).deaths]);
+      ? [
+          0,
+          _.max([
+            _.maxBy(data, (d) => Number(d.infections)).infections,
+            1.1 * _.maxBy(inputData, (d) => Number(d.cases)).cases,
+          ]),
+        ]
+      : [
+          0,
+          _.max([
+            _.maxBy(data, (d) => Number(d.deaths)).deaths,
+            1.1 * _.maxBy(inputData, (d) => Number(d.deaths)).deaths,
+          ]),
+        ]);
 
   return (
     <XYPlot
@@ -56,7 +68,7 @@ export function CountyTestAdjustedChart(props) {
 
       <YAxis
         tickTotal={3}
-        tickFormat={d3format(".2s")}
+        tickFormat={props.type == "cases" ? d3format(".2s") : d3format(".1f")}
         style={{ line: { opacity: 0 } }}
       />
       <XAxis

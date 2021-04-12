@@ -62,7 +62,7 @@ export function RTHeader(props) {
                 href={"/updates.pdf"}
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
-                <DiffOutlined /> <strong>(2/10) New model changes</strong>
+                <DiffOutlined /> <strong>(4/13) New model changes</strong>
               </a>
             </div>
             <div
@@ -107,50 +107,33 @@ export function RTHeader(props) {
             */}
           </div>
           <p>
-            We make estimates about the COVID-19 epidemic using a statistical
-            model that combines published evidence on COVID-19 transmission,
-            natural history and diagnosis with reported cases and deaths for
-            over 3,000 locations within the United States. Our methodology can
-            be found on{" "}
-            <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v1">
-              medRxiv
+            <strong>
+              The <i>covidestim</i> project tries to paint the most complete,
+              current, and granular picture possible of the U.S. COVID-19
+              epidemic
+            </strong>
+            . We use an in-house statistical model that combines evidence on
+            COVID-19 transmission, natural history and diagnosis with reported
+            cases and deaths for nearly every state and county in the US. Our
+            methodology can be found on{" "}
+            <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v2">
+              medRxiv{" "}
             </a>
             , with regular updates to our model documented{" "}
-            <a href="https://www.covidestim.org/updates.pdf">here</a>. You can
-            run our model with your own data, using the{" "}
-            <a href="https://pkg.covidestim.org/">covidestim</a> R package.
-            State-level data is sourced from the{" "}
-            <a href="https://covidtracking.com/">COVID Tracking Project</a>, and
-            county-level data comes from{" "}
+            <a href="/updates.pdf">here</a>. You can run our model with your own
+            data, using the <a href="https://pkg.covidestim.org/">covidestim</a>{" "}
+            R package, possibly in concert with our{" "}
+            <a href="https://github.com/covidestim">data pipeline</a>. State-
+            and county-level data are sourced from{" "}
             <a href="https://github.com/CSSEGISandData/COVID-19">
               Johns Hopkins CSSE
             </a>
-            . Our computational pipeline can be viewed at our GitHub{" "}
-            <a href="https://github.com/covidestim">organization</a>. We fit
-            county-level models using an optimization algorithm. We fit
-            state-level models using a Hamiltonian Monte Carlo (HMC) algorithm
-            to provide point estimates as well as measures of uncertainty. If
-            HMC fitting does not converge for a state, the optimization
-            algorithm is used instead that day, and the results will lack
-            uncertainty intervals.
-          </p>
-          <p>
-            <strong>3/12</strong>: Missouri data anomalies (documented{" "}
-            <a href="https://github.com/CSSEGISandData/COVID-19/issues/3806">
-              here
-            </a>
-            ) are preventing accurate county-level modeling. We will restore
-            estimates when Missouri's Department of Health releases the
-            necessary time series. State estimates are unimpacted at this time.
-          </p>
-          <p>
-            <strong>3/16</strong>: Virginia's extreme death-data reporting
-            delays (documented{" "}
-            <a href="https://github.com/CSSEGISandData/COVID-19/issues/3713">
-              here
-            </a>
-            ) are impacting our estimates for the Jan-Mar 2021 period. We will
-            post an update if the underlying data changes.
+            . We fit county-level models using an optimization algorithm. The
+            state-level models are fit using a Hamiltonian Monte Carlo (HMC)
+            algorithm to provide point estimates as well as measures of
+            uncertainty. If HMC fitting does not converge for a state, the
+            optimization algorithm is used instead that day, and the results
+            will lack uncertainty intervals.
           </p>
         </HeaderInner>
       </div>

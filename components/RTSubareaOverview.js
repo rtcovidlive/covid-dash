@@ -18,29 +18,31 @@ import { ShareButtons } from "./ShareButtons";
 import "../styles/subarea.scss";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
-import { Switch } from "antd";
+import { Switch, DatePicker, Tooltip, BackTop } from "antd";
 import "../styles/antd.scss";
 import { useCountyResults, useInputData } from "../lib/data";
+import { USStatesByCode } from "../config/USStates";
 
 const rtRef = React.createRef();
 
 const Header = styled.div`
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 const HeaderRow = styled(Row)`
-  margin: 30px 0px 0px 0px;
+  margin: 30px 0px 10px 0px;
   @media (max-width: 768px) {
-    margin: 20px 0px 0px 0px;
+    margin: 20px 0px 10px 0px;
   }
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 const SubHeaderRow = styled(Row)`
-  margin: 5px 0px 0px 0px;
+  margin: 20px 0px 10px 0px;
   @media (max-width: 768px) {
-    margin: 5px 0px 0px 0px;
+    margin: 20px 0px 10px 0px;
   }
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 const SubareaName = styled(Title)`
@@ -64,6 +66,23 @@ const CountyName = styled(Title)`
 
 const Explanation = styled.p`
   margin: 0px 0px 10px 0px;
+`;
+
+const ColorLabel = styled.span`
+  display: inline-block;
+  border-radius: 3.5px;
+  color: white;
+  font-weight: 400;
+  padding: 0px 5px;
+  background-color: black;
+`;
+
+const ColorLabelGrey = styled(ColorLabel)`
+  background-color: grey;
+`;
+
+const ColorLabelBlue = styled(ColorLabel)`
+  background-color: rgb(0, 145, 255);
 `;
 
 const ChartTitle = styled(Title)`
@@ -98,7 +117,7 @@ const StatNumber = styled.p`
   }
 `;
 const StatContent = styled.div`
-  padding: 20px 0px 0px 0px;
+  padding: 5px 0px 0px 0px;
   line-height: 1.35;
   background-color: ${(props) => props.backgroundColor || "#FFF"};
   @media (max-width: 768px) {
@@ -166,7 +185,7 @@ function StateStatRow(props) {
   let infectionRate = format(".1f")(offsetRtEntry.onsetsPC);
   let colsPerStat = 6;
   return (
-    <Row style={{ maxWidth: 700 }}>
+    <Row style={{ maxWidth: 700, ...props.style }}>
       <Col size={colsPerStat}>
         <StatContent round="left">
           <StatLabel>
@@ -231,20 +250,17 @@ function CountyStatRow(props) {
     setShowNeighbors,
   } = props;
 
-  var numFormat = format(",.0f");
-  if (true || props.width < 768) {
-    numFormat = (num) => {
-      if (num > 1000000) {
-        return format(".1f")(num / 1000000) + "M";
-      } else if (num > 10000) {
-        return Math.floor(num / 1000) + "K";
-      } else if (num > 1000) {
-        return format(".1f")(num / 1000) + "K";
-      } else {
-        return num;
-      }
-    };
-  }
+  const numFormat = (num) => {
+    if (num > 1000000) {
+      return format(".1f")(num / 1000000) + "M";
+    } else if (num > 10000) {
+      return Math.floor(num / 1000) + "K";
+    } else if (num > 1000) {
+      return format(".1f")(num / 1000) + "K";
+    } else {
+      return format(".1f")(num);
+    }
+  };
 
   const countyStats = CountyStatRowNumbers(props.countyData);
   const latestResults = CountyLatestResults(props.countyData);
@@ -255,7 +271,6 @@ function CountyStatRow(props) {
   let series = _(latestResults);
   let inputSeries = _(props.countyInputData);
 
-  console.log(latestResults);
   let lastCountyRt = countyStats && format(".2f")(countyStats.Rt);
 
   let positiveTotalRaw = inputSeries.sumBy((e) => Number(e.cases));
@@ -287,7 +302,10 @@ function CountyStatRow(props) {
                 <sub>t</sub>
               </span>
             </StatLabel>
-            <StatNumber>{infectionRate}</StatNumber>
+            <StatNumber>
+              {infectionRate}
+              <StatUnit>inf/100k/day</StatUnit>
+            </StatNumber>
           </StatContent>
         </Col>
         <Col size={colsPerStat}>
@@ -316,31 +334,80 @@ function CountyStatRow(props) {
       </Row>
       <Row style={{ maxWidth: 625 }}>
         <Col size={colsPerStat}>
-          <StatContent>
-            <StatLabel>Show history? </StatLabel>
-            <StatNumber>
-              <Switch
-                checked={showHistory}
-                onClick={(e) => setShowHistory(!showHistory)}
-              />
-            </StatNumber>
-          </StatContent>
+          <Tooltip
+            placement="left"
+            title="Display a selection of historical model runs"
+          >
+            <StatContent style={{ paddingTop: 20 }}>
+              <StatLabel>Show history?</StatLabel>
+              <StatNumber>
+                <Switch
+                  checked={showHistory}
+                  onClick={(e) => setShowHistory(!showHistory)}
+                />
+              </StatNumber>
+            </StatContent>
+          </Tooltip>
         </Col>
         <Col size={colsPerStat}>
-          <StatContent>
-            <StatLabel>Show neighbors? </StatLabel>
-            <StatNumber>
-              <Switch
-                checked={showNeighbors}
-                onClick={(e) => setShowNeighbors(!showNeighbors)}
-              />
-            </StatNumber>
-          </StatContent>
+          <Tooltip
+            placement="left"
+            title="Display latest estimates from all neighboring counties"
+          >
+            <StatContent style={{ paddingTop: 20 }}>
+              <StatLabel>Show neighbors?</StatLabel>
+              <StatNumber>
+                <Switch
+                  checked={showNeighbors}
+                  onClick={(e) => setShowNeighbors(!showNeighbors)}
+                />
+              </StatNumber>
+            </StatContent>
+          </Tooltip>
         </Col>
       </Row>
     </>
   );
 }
+
+const CountyInputView = function (props) {
+  const { fips, width, height, lastDrawLocation, setLastDrawLocation } = props;
+
+  const [inputDataDate, setInputDataDate] = useState(null);
+
+  const onDateChange = (date, dateString) => {
+    if (dateString.length > 0) setInputDataDate(dateString);
+    else setInputDataDate(null);
+  };
+
+  return (
+    <>
+      <DatePicker onChange={onDateChange} placeholder="Choose a date" />
+      <RTChartWrapper>
+        <CountyInputChart
+          date={inputDataDate}
+          fips={fips}
+          measure={"cases"}
+          width={width}
+          height={height}
+          lastDrawLocation={lastDrawLocation}
+          setLastDrawLocation={setLastDrawLocation}
+        />
+      </RTChartWrapper>
+      <RTChartWrapper>
+        <CountyInputChart
+          date={inputDataDate}
+          fips={fips}
+          measure={"deaths"}
+          width={width}
+          height={height}
+          lastDrawLocation={lastDrawLocation}
+          setLastDrawLocation={setLastDrawLocation}
+        />
+      </RTChartWrapper>
+    </>
+  );
+};
 
 export function RTSubareaOverview(props) {
   const rtData = useContext(DataFetchContext);
@@ -366,7 +433,7 @@ export function RTSubareaOverview(props) {
   let areaName = config.subAreas[props.subarea];
   let countyName = props.fips
     ? config.counties[props.fips].county
-    : `Overall ${props.subarea}`;
+    : `${props.subarea}`;
 
   let subAreaData = rtData.dataSeries[props.subarea];
 
@@ -381,7 +448,7 @@ export function RTSubareaOverview(props) {
   });
   let navigationQuery = Util.getNavigationQuery(document.location.search);
   let subareaMenuItems = [
-    { key: "_overall", label: "Overall U.S." },
+    { key: "_overall", label: "←🏠 Home" },
     ..._.map(config.subAreas, (val, key) => {
       return {
         key: key,
@@ -394,7 +461,7 @@ export function RTSubareaOverview(props) {
     {
       key: "_overall",
       abbr: props.subarea.toUpperCase(),
-      label: `Overall ${props.subarea}`,
+      label: `↑ ${USStatesByCode[props.subarea]}`,
     },
     ..._.map(
       _.keyBy(
@@ -435,8 +502,24 @@ export function RTSubareaOverview(props) {
     );
   };
 
+  const backtopStyle = {
+    height: 40,
+    width: 40,
+    lineHeight: "40px",
+    borderRadius: 4,
+    backgroundColor: "#1088e9",
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 14,
+  };
+
   return (
     <>
+      {props.fips && (
+        <BackTop>
+          <div style={backtopStyle}>↑ top</div>
+        </BackTop>
+      )}
       <div className="rt-container-wrapper">
         <div
           style={{ maxWidth: maxWidth }}
@@ -448,8 +531,7 @@ export function RTSubareaOverview(props) {
           <div ref={rtRef} className="rt-subarea-page-inner">
             <Header>
               <HeaderRow>
-                {shareRowOnTop && shareOptions}
-                <Col size={shareRowOnTop ? 24 : 12}>
+                <Col size={24}>
                   <Dropdown
                     options={subareaMenuItems}
                     minWidth={220}
@@ -468,7 +550,10 @@ export function RTSubareaOverview(props) {
                       }
                     }}
                   >
-                    <SubareaName level={1}>
+                    <SubareaName
+                      level={1}
+                      style={{ opacity: props.fips ? 0.38 : 1 }}
+                    >
                       {areaName}
 
                       <span
@@ -478,10 +563,22 @@ export function RTSubareaOverview(props) {
                     </SubareaName>
                   </Dropdown>
                 </Col>
-                {!shareRowOnTop && shareOptions}
               </HeaderRow>
+              <StateStatRow
+                config={config}
+                data={subAreaData}
+                width={contentWidth}
+                subarea={props.subarea}
+                isSmallScreen={isSmallScreen}
+                showHistory={showHistory}
+                setShowHistory={setShowHistory}
+                showNeighbors={showNeighbors}
+                setShowNeighbors={setShowNeighbors}
+                style={{ opacity: props.fips ? 0.38 : 1 }}
+              />
               <SubHeaderRow>
                 <Col size={24}>
+                  {!props.fips && <div>See county-level results: </div>}
                   {true && (
                     <Dropdown
                       options={countyMenuItems}
@@ -515,17 +612,6 @@ export function RTSubareaOverview(props) {
                   )}
                 </Col>
               </SubHeaderRow>
-              <StateStatRow
-                config={config}
-                data={subAreaData}
-                width={contentWidth}
-                subarea={props.subarea}
-                isSmallScreen={isSmallScreen}
-                showHistory={showHistory}
-                setShowHistory={setShowHistory}
-                showNeighbors={showNeighbors}
-                setShowNeighbors={setShowNeighbors}
-              />
               {props.fips && (
                 <CountyStatRow
                   config={config}
@@ -612,35 +698,25 @@ export function RTSubareaOverview(props) {
                 />
               </>
             )}
-            <ChartTitle level={2}>Percent Ever Infected</ChartTitle>
-            <Explanation>
-              Percent ever infected is our estimate of the number of individuals
-              in the county or state popululation who have been infected at
-              least once with COVID-19.
-            </Explanation>
             {props.fips && contentWidth && (
-              <RTChartWrapper>
-                <CountyMetricChart
-                  measure={"PEI"}
-                  showNeighbors={showNeighbors}
-                  showHistory={showHistory}
-                  fips={props.fips}
-                  width={contentWidth + 40} // + 40}
-                  height={chartHeight} //}
-                  lastDrawLocation={lastDrawLocation}
-                  setLastDrawLocation={setLastDrawLocation}
-                  routeToFIPS={routeToFIPS}
-                />
-              </RTChartWrapper>
-            )}
-            {!props.fips && contentWidth && (
               <>
-                <ChartTitle level={2}>Positive Tests</ChartTitle>
+                <ChartTitle level={2}>Percent Ever Infected</ChartTitle>
+                <Explanation>
+                  Percent ever infected is our estimate of the number of
+                  individuals in the county or state popululation who have been
+                  infected at least once with COVID-19.
+                </Explanation>
                 <RTChartWrapper>
-                  <CaseGrowthChart
-                    data={subAreaData}
-                    width={contentWidth + 40}
-                    height={chartHeight + 120}
+                  <CountyMetricChart
+                    measure={"PEI"}
+                    showNeighbors={showNeighbors}
+                    showHistory={showHistory}
+                    fips={props.fips}
+                    width={contentWidth + 40} // + 40}
+                    height={chartHeight} //}
+                    lastDrawLocation={lastDrawLocation}
+                    setLastDrawLocation={setLastDrawLocation}
+                    routeToFIPS={routeToFIPS}
                   />
                 </RTChartWrapper>
               </>
@@ -649,43 +725,35 @@ export function RTSubareaOverview(props) {
               <>
                 <ChartTitle level={2}>Model input data</ChartTitle>
                 <Explanation>
-                  The case (top) and death (bottom) data used in the latest
-                  model run. Retrospective to this data are common to correct
-                  previous errors, fix reporting delays, and sometimes include
-                  other types of testing data.
+                  The <ColorLabelGrey>case</ColorLabelGrey> and{" "}
+                  <ColorLabel>death</ColorLabel> data used in the latest model
+                  run. Retrospective edits to this data are common to correct
+                  previous errors. These edits (and the errors that precede
+                  them) can influence our estimates a lot. You can use the
+                  dropdown to inspect archived model input data to see if this
+                  may be the case.
                 </Explanation>
-                <RTChartWrapper>
-                  <CountyInputChart
-                    fips={props.fips}
-                    measure={"cases"}
-                    width={contentWidth + 40}
-                    height={(chartHeight + 120) / 2}
-                    lastDrawLocation={lastDrawLocation}
-                    setLastDrawLocation={setLastDrawLocation}
-                  />
-                </RTChartWrapper>
-                <RTChartWrapper>
-                  <CountyInputChart
-                    fips={props.fips}
-                    measure={"deaths"}
-                    width={contentWidth + 40}
-                    height={(chartHeight + 120) / 2}
-                    lastDrawLocation={lastDrawLocation}
-                    setLastDrawLocation={setLastDrawLocation}
-                  />
-                </RTChartWrapper>
+                <CountyInputView
+                  fips={props.fips}
+                  width={contentWidth + 40}
+                  height={(chartHeight + 120) / 2}
+                  lastDrawLocation={lastDrawLocation}
+                  setLastDrawLocation={setLastDrawLocation}
+                />
               </>
             )}
             <ChartTitle level={2}>
               Infections, fitted cases, and case data
             </ChartTitle>
             <Explanation>
-              This chart shows how our estimated number of infections (blue)
-              compares to raw case data, and to a fit of the case data produced
-              during model execution. Here, you can see the effects of reporting
-              delays as the "shift" between infections and fitted cases, and you
-              can see the degree of case underascertainment as the gap between
-              the testing data and the infections curve.
+              This chart shows how our estimated number of{" "}
+              <ColorLabelBlue>infections</ColorLabelBlue> compares to{" "}
+              <ColorLabelGrey>case data</ColorLabelGrey>, and to a{" "}
+              <ColorLabel>fitted cases</ColorLabel> timeseries produced during
+              model execution. Here, you can see the effects of reporting delays
+              as the "shift" between infections and fitted cases, and you can
+              see the degree of case underascertainment as the gap between the
+              testing data and the infections curve.
             </Explanation>
             {props.fips && contentWidth && (
               <RTChartWrapper>
@@ -714,7 +782,10 @@ export function RTSubareaOverview(props) {
                   Death ascertainment is much higher than case ascertainment for
                   COVID-19 in the United States. However, incomplete
                   ascertainment, as well as reporting delays, are usually
-                  evident in the following graph.
+                  evident in the following graph, which shows{" "}
+                  <ColorLabelBlue>deaths</ColorLabelBlue>,{" "}
+                  <ColorLabel>fitted deaths</ColorLabel>, and{" "}
+                  <ColorLabelGrey>death data</ColorLabelGrey>.
                 </Explanation>
                 <RTChartWrapper>
                   <CountyTestAdjustedChart

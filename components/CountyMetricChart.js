@@ -17,6 +17,7 @@ import {
   useCountyResults,
   useNeighboringCountyResults,
   useInputData,
+  useInputDataFromDate,
 } from "../lib/data";
 import { format as d3format } from "d3-format";
 import { utcFormat } from "d3-time-format";
@@ -24,10 +25,16 @@ import { timeDay } from "d3-time";
 import { useState } from "react";
 import sma from "sma";
 import { USCounties } from "../config/USCounties.js";
+import { Alert } from "antd";
+import styled from "styled-components";
 
 function groupBy(data, metric) {
   return _.groupBy(data, (d) => d[metric]);
 }
+
+const Explanation = styled.p`
+  margin: 10px 0px 10px 30px;
+`;
 
 const getSeriesConfig = function (metric) {
   var conf;
@@ -74,7 +81,7 @@ const getSeriesConfig = function (metric) {
     }
     case "deaths": {
       conf = {
-        yTickFormat: d3format(".1s"),
+        yTickFormat: d3format(".1f"),
         color: "rgba(50, 50, 0, 1.0)",
         fill: "rgba(50, 50, 0, 1.0)",
       };
@@ -146,6 +153,10 @@ export function CountyMetricChart(props) {
     {
       title: "Age",
       value: `${timeDay.count(new Date(d["run.date"]), new Date())}d`,
+    },
+    {
+      title: "Date",
+      value: utcFormat("%b %e")(new Date(d["run.date"])),
     },
   ];
 
@@ -254,7 +265,13 @@ export function CountyMetricChart(props) {
       )}
 
       {value ? <Hint value={value} format={formatHint} /> : null}
-      {modelRunDate && <Hint value={modelRunDate} format={rundateFormatHint} />}
+      {modelRunDate && (
+        <Hint
+          value={modelRunDate}
+          style={{ margin: "10px" }}
+          format={rundateFormatHint}
+        />
+      )}
 
       {showNeighbors &&
         _.map(neighborResultsArray, (v, k) => (
@@ -284,8 +301,43 @@ export function CountyInputChart(props) {
     height,
     lastDrawLocation,
     setLastDrawLocation,
+    date,
   } = props;
-  const { data, error } = useInputData(fips);
+
+  const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
+  const [minDateSeen, setMinDateSeen] = useState("2100-01-01");
+
+  const { data: latestData, error: latestError } = useInputData(fips);
+  const { data, error } = date
+    ? useInputDataFromDate(fips, date)
+    : useInputData(fips);
+
+  if (data && data.length > 0) {
+    const maxDateForRunDate = _.maxBy(data, (d) => d.date).date;
+    const minDateForRunDate = _.minBy(data, (d) => d.date).date;
+
+    if (new Date(maxDateForRunDate) > new Date(maxDateSeen)) {
+      setMaxDateSeen(maxDateForRunDate);
+    }
+
+    if (new Date(minDateForRunDate) < new Date(minDateSeen)) {
+      setMinDateSeen(minDateForRunDate);
+    }
+  }
+
+  if (data && data.length === 0)
+    return (
+      <Explanation>
+        <Alert
+          message="No data"
+          description={`We don't have archived ${
+            measure === "cases" ? "case" : "death"
+          } data this far back for this county`}
+          type="error"
+          showIcon
+        />
+      </Explanation>
+    );
 
   const conf = getSeriesConfig(measure);
 
@@ -307,14 +359,37 @@ export function CountyInputChart(props) {
     }
   );
 
+  var sma_7d_latest = sma(
+    _.map(latestData, (s) => s[measure]),
+    7,
+    (n) => n
+  );
+
+  sma_7d_latest = [0, 0, 0, 0, 0, 0].concat(sma_7d_latest); // First 6 elements aren't part of sma
+
+  const sma_zipped_latest = _.zipWith(
+    _.map(latestData, (d) => d.date),
+    sma_7d_latest,
+    (date, avg) => {
+      var d = { date: date };
+      d[measure] = avg;
+      return d;
+    }
+  );
+
   return (
     <XYPlot
       className="svg-container"
       xDomain={
-        lastDrawLocation && [
+        (lastDrawLocation && [
           lastDrawLocation.left.getTime(),
           lastDrawLocation.right.getTime(),
-        ]
+        ]) ||
+        (maxDateSeen &&
+          minDateSeen && [
+            new Date(minDateSeen).getTime(),
+            new Date(maxDateSeen).getTime(),
+          ])
       }
       yDomain={conf.yDomain}
       width={width}
@@ -345,7 +420,9 @@ export function CountyInputChart(props) {
         barWidth={0.92}
       />
 
-      <LineSeries data={sma_zipped} color="rgb(179, 109, 25)" />
+      <LineSeries data={sma_zipped_latest} color="rgb(179, 109, 25)" />
+      {date && <LineSeries data={sma_zipped} color="magenta" />}
+      {date && <MarkSeries data={[_.last(sma_zipped)]} color="magenta" />}
 
       <Highlight
         enableY={false}

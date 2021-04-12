@@ -21,7 +21,7 @@ import {
 } from "date-fns";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
-import { Slider, Spin } from "antd";
+import { Slider, Spin, Tooltip } from "antd";
 import {
   SelectOutlined,
   LeftOutlined,
@@ -76,14 +76,14 @@ function reformatMapData(data) {
     })
   );
 
-  // Delete Missouri/29!
-  const filtered = _.filter(zipped, (d) => !d.fips.startsWith("29"));
+  // Delete states
+  // const filtered = _.filter(zipped, (d) => !d.fips.startsWith("29"));
 
   const nested = nest()
     .key((d) => d.date)
     .key((d) => d.fips)
     .rollup((d) => d[0])
-    .map(filtered);
+    .map(zipped);
 
   return nested;
 }
@@ -466,30 +466,37 @@ export class TrayCharts extends PureComponent {
           align={align}
           offset={align === "center" ? props.spacerOffset : 0}
         >
-          <div className="stacked-state-wrapper">
-            <StateR0Display
-              ref={refsByFIPS[fips]}
-              config={null}
-              stateInitials={stateAbbr}
-              subArea={`${county.name}`}
-              fips={fips}
-              highlight={false}
-              hasOwnRow={props.isSmallScreen}
-              data={data}
-              enabledModes={modes}
-              yDomain={
-                props.selectedOutcome.yDomainCounty ||
-                props.selectedOutcome.yDomain
-              }
-              contentWidth={props.contentWidth}
-              state={false}
-              removeButton={
-                this.props.handleRemoveFIPS
-                  ? (e) => this.props.handleRemoveFIPS(fips)
-                  : null
-              }
-            />
-          </div>
+          <Tooltip
+            visible={i === 0 && props.isHover}
+            color="blue"
+            placement="top"
+            title="🌟 New! Click county name for details"
+          >
+            <div className="stacked-state-wrapper">
+              <StateR0Display
+                ref={refsByFIPS[fips]}
+                config={null}
+                stateInitials={stateAbbr}
+                subArea={`${county.name}`}
+                fips={fips}
+                highlight={false}
+                hasOwnRow={props.isSmallScreen}
+                data={data}
+                enabledModes={modes}
+                yDomain={
+                  props.selectedOutcome.yDomainCounty ||
+                  props.selectedOutcome.yDomain
+                }
+                contentWidth={props.contentWidth}
+                state={false}
+                removeButton={
+                  this.props.handleRemoveFIPS
+                    ? (e) => this.props.handleRemoveFIPS(fips)
+                    : null
+                }
+              />
+            </div>
+          </Tooltip>
         </Col>
       );
     });
