@@ -241,7 +241,7 @@ export function CountyMetricChart(props) {
         <DiscreteColorLegend
           items={[
             {
-              title: USCounties[neighborFIPS].county,
+              title: `${USCounties[neighborFIPS].county}, ${USCounties[neighborFIPS].abbr}`,
               color: "rgba(0,0,0,0.7)",
             },
           ]}
