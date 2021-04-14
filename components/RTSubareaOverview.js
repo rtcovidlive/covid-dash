@@ -85,6 +85,10 @@ const ColorLabelBlue = styled(ColorLabel)`
   background-color: rgb(0, 145, 255);
 `;
 
+const ColorLabelBrown = styled(ColorLabel)`
+  background-color: rgb(179, 109, 25);
+`;
+
 const ChartTitle = styled(Title)`
   margin-top: 28px;
   margin-bottom: 6px;
@@ -335,7 +339,7 @@ function CountyStatRow(props) {
       <Row style={{ maxWidth: 625 }}>
         <Col size={colsPerStat}>
           <Tooltip
-            placement="left"
+            placement="top"
             title="Display a selection of historical model runs"
           >
             <StatContent style={{ paddingTop: 20 }}>
@@ -351,7 +355,7 @@ function CountyStatRow(props) {
         </Col>
         <Col size={colsPerStat}>
           <Tooltip
-            placement="left"
+            placement="top"
             title="Display latest estimates from all neighboring counties"
           >
             <StatContent style={{ paddingTop: 20 }}>
@@ -727,7 +731,9 @@ export function RTSubareaOverview(props) {
                 <Explanation>
                   The <ColorLabelGrey>case</ColorLabelGrey> and{" "}
                   <ColorLabel>death</ColorLabel> data used in the latest model
-                  run. Retrospective edits to this data are common to correct
+                  run, and the 7-day{" "}
+                  <ColorLabelBrown>moving average</ColorLabelBrown>.
+                  Retrospective edits to this data are common to correct
                   previous errors. These edits (and the errors that precede
                   them) can influence our estimates a lot. You can use the
                   dropdown to inspect archived model input data to see if this
