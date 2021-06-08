@@ -30,6 +30,11 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           </a>
         </div>
         <p>
+          This project was supported by Cooperative Agreement number
+          NU38OT000297 from The Centers for Disease Control and Prevention (CDC)
+          and CSTE and does not necessarily represent the views of CDC and CSTE.
+        </p>
+        <p>
           The effective reproductive number (R<sub>t</sub>) is an important
           metric of epidemic growth. R<sub>t</sub> describes the average number
           of people that one individual is expected to infect, at any given
@@ -112,6 +117,7 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           <a href="https://research.computing.yale.edu/">
             Yale Center for Research Computing
           </a>
+          .
         </p>
         <p>
           Original site built by{" "}
