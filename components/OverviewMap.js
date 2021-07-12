@@ -21,7 +21,7 @@ import {
 } from "date-fns";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
-import { Slider, Spin, Tooltip } from "antd";
+import { Slider, Spin } from "antd";
 import {
   SelectOutlined,
   LeftOutlined,
@@ -466,37 +466,30 @@ export class TrayCharts extends PureComponent {
           align={align}
           offset={align === "center" ? props.spacerOffset : 0}
         >
-          <Tooltip
-            visible={i === 0 && props.isHover}
-            color="blue"
-            placement="top"
-            title="🌟 New! Click county name for details"
-          >
-            <div className="stacked-state-wrapper">
-              <StateR0Display
-                ref={refsByFIPS[fips]}
-                config={null}
-                stateInitials={stateAbbr}
-                subArea={`${county.name}`}
-                fips={fips}
-                highlight={false}
-                hasOwnRow={props.isSmallScreen}
-                data={data}
-                enabledModes={modes}
-                yDomain={
-                  props.selectedOutcome.yDomainCounty ||
-                  props.selectedOutcome.yDomain
-                }
-                contentWidth={props.contentWidth}
-                state={false}
-                removeButton={
-                  this.props.handleRemoveFIPS
-                    ? (e) => this.props.handleRemoveFIPS(fips)
-                    : null
-                }
-              />
-            </div>
-          </Tooltip>
+          <div className="stacked-state-wrapper">
+            <StateR0Display
+              ref={refsByFIPS[fips]}
+              config={null}
+              stateInitials={stateAbbr}
+              subArea={`${county.name}`}
+              fips={fips}
+              highlight={false}
+              hasOwnRow={props.isSmallScreen}
+              data={data}
+              enabledModes={modes}
+              yDomain={
+                props.selectedOutcome.yDomainCounty ||
+                props.selectedOutcome.yDomain
+              }
+              contentWidth={props.contentWidth}
+              state={false}
+              removeButton={
+                this.props.handleRemoveFIPS
+                  ? (e) => this.props.handleRemoveFIPS(fips)
+                  : null
+              }
+            />
+          </div>
         </Col>
       );
     });
