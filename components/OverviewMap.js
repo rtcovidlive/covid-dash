@@ -17,8 +17,10 @@ import { utcFormat } from "d3-time-format";
 import {
   differenceInDays,
   eachMonthOfInterval,
+  eachWeekOfInterval,
   format as dateFormat,
 } from "date-fns";
+import { useCountyResults } from "../lib/data";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
 import { Slider, Spin } from "antd";
@@ -88,19 +90,41 @@ function reformatMapData(data) {
   return nested;
 }
 
-function dataForCounty(data, fips) {
-  let series = [];
+//function dataForCounty(data, fips) {
+//  let series = [];
+//
+//  data.each((vals, date) => {
+//    let dataForDate = vals.get(fips);
+//
+//    if (dataForDate) series.push(dataForDate);
+//  });
+//
+//  return {
+//    identifier: fips,
+//    series: _.sortBy(series, (d) => d.date),
+//  };
+//}
+function identifyAndTransformLatestRun(data) {
+  console.log(data);
+  const maxDate = _.maxBy(data, (d) => d["run.date"])["run.date"];
 
-  data.each((vals, date) => {
-    let dataForDate = vals.get(fips);
+  console.log(maxDate);
+  const filtered = data.filter((d) => d["run.date"] == maxDate);
+  console.log(filtered);
 
-    if (dataForDate) series.push(dataForDate);
-  });
-
-  return {
-    identifier: fips,
-    series: _.sortBy(series, (d) => d.date),
-  };
+  const result = filtered.map(
+    ({ PEI, date, fips, infections, infectionsPC, Rt }) => ({
+      cumulative: +PEI,
+      date: date,
+      fips: fips,
+      identifier: fips,
+      onsets: +infections,
+      onsetsPC: +infectionsPC,
+      r0: +Rt,
+    })
+  );
+  console.log(result);
+  return result;
 }
 
 export const OverviewMapSuper = React.forwardRef((props, ref) => {
@@ -124,7 +148,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [fips, setFips] = useState(cookieFips);
 
   const url =
-    "https://covidestim.s3.us-east-2.amazonaws.com/latest/summary.pack.gz";
+    "https://covidestim.s3.us-east-2.amazonaws.com/latest/summary-test.pack.gz";
   const albersURL =
     "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
 
@@ -222,14 +246,14 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   if (svgWidth < 500) svgHeight = 1.8 * svgWidth;
 
   let sliderMarks = ([min, max]) => {
-    const months = eachMonthOfInterval({
+    const months = eachWeekOfInterval({
       start: new Date(min),
       end: new Date(max),
     });
 
     let monthsFormatted = _.zipObject(
       _.map(months, toEpoch),
-      _.map(months, (d) => utcFormat("%b")(d))
+      _.map(months, (d) => (d.getUTCDate() < 8 ? utcFormat("%b")(d) : ""))
     );
 
     // Add on day-name of latest date of model data
@@ -257,6 +281,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
         <Col size={24}>
           <Slider
             marks={sliderMarks(dateMinMax)}
+            step={null}
             defaultValue={toEpoch(dateMinMax[1])}
             tooltipVisible={true}
             min={toEpoch(dateMinMax[0])}
@@ -398,104 +423,143 @@ export class OverviewMapChart extends RTSubareaChart {
   }
 }
 
-export class TrayCharts extends PureComponent {
-  modes(selectedOutcome) {
+export function TrayCharts(props) {
+  function mapModes(selectedOutcome) {
     return modeMap(selectedOutcome.enabledModes);
   }
 
-  render() {
-    let props = this.props;
-    let modes = this.modes(props.selectedOutcome);
-    let refsByFIPS = {};
+  let modes = mapModes(props.selectedOutcome);
+  let refsByFIPS = {};
 
-    let hoverHelp = (
-      <Col key="placeholder" size={props.colsPerChart} align="left">
-        <div className="state-rt-display">
-          <Row style={{ marginRight: 32 }}>
-            <Col verticalAlign="middle" size={props.state ? 16 : 24}>
-              <HelperTitle className="state-rt-display-name" level={2}>
-                <ZoomInOutlined /> Hover county for detail
-              </HelperTitle>
-            </Col>
-          </Row>
-        </div>
+  let hoverHelp = (
+    <Col key="placeholder" size={props.colsPerChart} align="left">
+      <div className="state-rt-display">
+        <Row style={{ marginRight: 32 }}>
+          <Col verticalAlign="middle" size={props.state ? 16 : 24}>
+            <HelperTitle className="state-rt-display-name" level={2}>
+              <ZoomInOutlined /> Hover county for detail
+            </HelperTitle>
+          </Col>
+        </Row>
+      </div>
+    </Col>
+  );
+
+  let addHelp = (
+    <Col key="placeholder" size={props.colsPerChart} align="left">
+      <div className="state-rt-display">
+        <Row style={{ marginRight: 32 }}>
+          <Col verticalAlign="middle" size={props.state ? 16 : 24}>
+            <HelperTitle className="state-rt-display-name" level={2}>
+              <SelectOutlined /> Click a county
+            </HelperTitle>
+          </Col>
+        </Row>
+      </div>
+    </Col>
+  );
+
+  const countyCharts = _.map(props.selectedCounties, (county, i) => (
+    <TrayChartsItem
+      county={county}
+      i={i}
+      colsPerChart={props.colsPerChart}
+      align={props.align}
+      spacerOffset={props.spacerOffset}
+      rowCount={props.rowCount}
+      isSmallScreen={props.isSmallScreen}
+      modes={modes}
+      contentWidth={props.contentWidth}
+      selectedOutcome={props.selectedOutcome}
+      isHover={props.isHover}
+      handleRemoveFIPS={props.handleRemoveFIPS}
+      eef={refsByFIPS[county.fips] || React.createRef()}
+    />
+  ));
+
+  if (props.selectedCounties.length === 0 && props.isHover) return null;
+  else if (props.selectedCounties.length === 0) return [addHelp];
+  else return [...countyCharts];
+}
+///////////////
+///////////////
+///////////////
+///////////////
+function TrayChartsItem({
+  county,
+  i,
+  colsPerChart,
+  align,
+  spacerOffset,
+  rowCount,
+  ref,
+  isSmallScreen,
+  modes,
+  contentWidth,
+  isHover,
+  selectedOutcome,
+  handleRemoveFIPS,
+}) {
+  const fips = county.fips;
+
+  const { data, error } = useCountyResults(fips);
+
+  if (!data)
+    return (
+      <Col
+        key={`${fips},loading`}
+        size={colsPerChart}
+        align={align}
+        offset={align === "center" ? spacerOffset : 0}
+      >
+        <div className="stacked-state-wrapper">Loading...</div>
       </Col>
     );
 
-    let addHelp = (
-      <Col key="placeholder" size={props.colsPerChart} align="left">
-        <div className="state-rt-display">
-          <Row style={{ marginRight: 32 }}>
-            <Col verticalAlign="middle" size={props.state ? 16 : 24}>
-              <HelperTitle className="state-rt-display-name" level={2}>
-                <SelectOutlined /> Click a county
-              </HelperTitle>
-            </Col>
-          </Row>
-        </div>
-      </Col>
-    );
+  const reformattedData = {
+    identifier: fips,
+    series: identifyAndTransformLatestRun(data),
+  };
 
-    let countyCharts = _.map(props.selectedCounties, (county, i) => {
-      const fips = county.fips;
-      const data = dataForCounty(props.mapData, fips);
+  const stateAbbr = Util.abbrState(county.state, "abbr");
 
-      const stateAbbr = Util.abbrState(county.state, "abbr");
-
-      var align;
-      switch (i % props.rowCount) {
-        case 0:
-          align = "left";
-          break;
-        case props.rowCount - 1:
-          align = "right";
-          break;
-        default:
-          align = "center";
-          break;
-      }
-
-      refsByFIPS[fips] = refsByFIPS[fips] || React.createRef();
-
-      if (data.series.length === 0) return null;
-
-      return (
-        <Col
-          key={`${fips},${this.props.isHover ? "-1" : "-0"}`}
-          size={props.colsPerChart}
-          align={align}
-          offset={align === "center" ? props.spacerOffset : 0}
-        >
-          <div className="stacked-state-wrapper">
-            <StateR0Display
-              ref={refsByFIPS[fips]}
-              config={null}
-              stateInitials={stateAbbr}
-              subArea={`${county.name}`}
-              fips={fips}
-              highlight={false}
-              hasOwnRow={props.isSmallScreen}
-              data={data}
-              enabledModes={modes}
-              yDomain={
-                props.selectedOutcome.yDomainCounty ||
-                props.selectedOutcome.yDomain
-              }
-              contentWidth={props.contentWidth}
-              state={false}
-              removeButton={
-                this.props.handleRemoveFIPS
-                  ? (e) => this.props.handleRemoveFIPS(fips)
-                  : null
-              }
-            />
-          </div>
-        </Col>
-      );
-    });
-
-    if (props.selectedCounties.length === 0 && props.isHover) return null;
-    else if (props.selectedCounties.length === 0) return [addHelp];
-    else return [...countyCharts];
+  var align;
+  switch (i % rowCount) {
+    case 0:
+      align = "left";
+      break;
+    case rowCount - 1:
+      align = "right";
+      break;
+    default:
+      align = "center";
+      break;
   }
+
+  return (
+    <Col
+      key={`${fips},${isHover ? "-1" : "-0"}`}
+      size={colsPerChart}
+      align={align}
+      offset={align === "center" ? spacerOffset : 0}
+    >
+      <div className="stacked-state-wrapper">
+        <StateR0Display
+          ref={ref || React.createRef()}
+          config={null}
+          stateInitials={stateAbbr}
+          subArea={`${county.name}`}
+          fips={fips}
+          highlight={false}
+          hasOwnRow={isSmallScreen}
+          data={reformattedData}
+          enabledModes={modes}
+          yDomain={selectedOutcome.yDomainCounty || selectedOutcome.yDomain}
+          contentWidth={contentWidth}
+          state={false}
+          removeButton={handleRemoveFIPS ? (e) => handleRemoveFIPS(fips) : null}
+        />
+      </div>
+    </Col>
+  );
 }
