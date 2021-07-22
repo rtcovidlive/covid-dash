@@ -135,28 +135,6 @@ export function RTHeader(props) {
             optimization algorithm is used instead that day, and the results
             will lack uncertainty intervals.
           </p>
-          <p>
-            <strong>News 4/14:</strong>
-            <ul>
-              <li>
-                New manuscript on
-                <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v2">
-                  {" "}
-                  medRxiv
-                </a>
-                , where we explain the model in detail, discuss the course of
-                the first year of the U.S. epidemic, and compare our estimates
-                to excess death and seroprevalence data.
-              </li>
-              <li>
-                County-level detail pages (tap county on map, then click on
-                county name)
-              </li>
-              <li>
-                Changes to early-epidemic IFR, see "New model changes" above
-              </li>
-            </ul>
-          </p>
         </HeaderInner>
       </div>
     </>
