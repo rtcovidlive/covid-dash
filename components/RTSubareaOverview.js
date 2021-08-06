@@ -707,7 +707,7 @@ export function RTSubareaOverview(props) {
                 <ChartTitle level={2}>Percent Ever Infected</ChartTitle>
                 <Explanation>
                   Percent ever infected is our estimate of the number of
-                  individuals in the county or state popululation who have been
+                  individuals in the county or state population who have been
                   infected at least once with COVID-19.
                 </Explanation>
                 <RTChartWrapper>
