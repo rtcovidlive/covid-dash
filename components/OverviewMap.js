@@ -114,7 +114,7 @@ function identifyAndTransformLatestRun(data) {
 
   const result = filtered.map(
     ({ PEI, date, fips, infections, infectionsPC, Rt }) => ({
-      cumulative: +PEI,
+      cumulative: +PEI * 100,
       date: date,
       fips: fips,
       identifier: fips,
