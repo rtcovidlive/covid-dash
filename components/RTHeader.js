@@ -135,6 +135,13 @@ export function RTHeader(props) {
             optimization algorithm is used instead that day, and the results
             will lack uncertainty intervals.
           </p>
+          <p>
+            Delaware: recent results are{" "}
+            <a href="https://github.com/CSSEGISandData/COVID-19/issues/4461">
+              currently unreliable
+            </a>
+            .
+          </p>
         </HeaderInner>
       </div>
     </>
