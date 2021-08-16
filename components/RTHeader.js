@@ -6,6 +6,7 @@ import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { ShareButtons } from "./ShareButtons";
 import { DiffOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
+import { Collapse } from "antd";
 
 export const MainTitle = styled(Title)`
   font-weight: 600;
@@ -35,6 +36,8 @@ export const HeaderInner = styled.div`
 `;
 
 export function RTHeader(props) {
+  const { Panel } = Collapse;
+
   useLayoutEffect(() => {
     window.twttr && window.twttr.widgets.load();
     window.FB && window.FB.XFBML.parse();
@@ -142,6 +145,17 @@ export function RTHeader(props) {
             </a>
             .
           </p>
+          <Collapse defaultActiveKey={["1"]} ghost>
+            <Panel header="This is panel header 1" key="1">
+              <p>Answer 1</p>
+            </Panel>
+            <Panel header="This is panel header 2" key="2">
+              <p>Answer 2</p>
+            </Panel>
+            <Panel header="This is panel header 3" key="3">
+              <p>Answer 3</p>
+            </Panel>
+          </Collapse>
         </HeaderInner>
       </div>
     </>
