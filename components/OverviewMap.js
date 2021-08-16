@@ -241,7 +241,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   };
 
   const svgWidth = contentWidth;
-  let svgHeight = Math.floor(Math.min(400, 0.33 * contentWidth));
+  let svgHeight = Math.floor(Math.min(400, 0.43 * contentWidth));
 
   if (svgWidth < 500) svgHeight = 1.8 * svgWidth;
 

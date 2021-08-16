@@ -91,6 +91,10 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
             Joshua Havumaki
           </a>
           ,{" "}
+          <a href="https://www.hsph.harvard.edu/menzies-lab/people/fayette-klaassen/">
+            Fayette Klaassen
+          </a>
+          ,{" "}
           <a href="https://www.hsph.harvard.edu/nicolas-menzies/">
             Nicolas A. Menzies
           </a>
@@ -101,6 +105,10 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           , <a href="http://tedcohenlab.org/marcus-russi/">Marcus Russi</a>,{" "}
           <a href="https://med.stanford.edu/profiles/joshua-salomon">
             Joshua Salomon
+          </a>
+          ,{" "}
+          <a href="https://www.hsph.harvard.edu/menzies-lab/people/nicole-swartwood/">
+            Nicole Smartwood
           </a>
           ,{" "}
           <a href="https://medicine.yale.edu/profile/joshua_warren/">
