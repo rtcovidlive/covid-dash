@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import "styles/App.scss";
 import { Title } from "components/Typography";
 import dynamic from "next/dynamic";
 

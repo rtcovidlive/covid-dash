@@ -1,4 +1,3 @@
-import "styles/App.scss";
 import _ from "lodash";
 import React, {
   useState,
@@ -31,8 +30,6 @@ import {
 } from "@ant-design/icons";
 import { Util } from "lib/Util";
 import { Title, HelperTitle } from "./Typography";
-
-import "../styles/antd.scss";
 
 import {
   TooltipWrapper,

@@ -15,11 +15,9 @@ import { CountyTestAdjustedChart } from "./CountyTestAdjustedChart";
 import { TestAdjustedChart } from "./TestAdjustedChart";
 import { CaseGrowthChart } from "./CaseGrowthChart";
 import { ShareButtons } from "./ShareButtons";
-import "../styles/subarea.scss";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 import { Switch, DatePicker, Tooltip, BackTop } from "antd";
-import "../styles/antd.scss";
 import { useCountyResults, useInputData } from "../lib/data";
 import { USStatesByCode } from "../config/USStates";
 
@@ -247,12 +245,8 @@ function StateStatRow(props) {
 }
 
 function CountyStatRow(props) {
-  const {
-    showHistory,
-    setShowHistory,
-    showNeighbors,
-    setShowNeighbors,
-  } = props;
+  const { showHistory, setShowHistory, showNeighbors, setShowNeighbors } =
+    props;
 
   const numFormat = (num) => {
     if (num > 1000000) {

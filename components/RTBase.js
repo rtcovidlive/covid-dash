@@ -1,4 +1,3 @@
-import "styles/App.scss";
 import _ from "lodash";
 import React, { useState, useEffect, useRef } from "react";
 import HeadTag from "./HeadTag";
