@@ -167,7 +167,7 @@ export function RTHeader(props) {
                 account county- and state-level vaccination data
               </strong>
             </p>
-            <Collapse defaultActiveKey={["1"]} bordered={false}>
+            <Collapse defaultActiveKey={[]} bordered={false}>
               <Panel
                 header="Vaccinations started 8 months ago. Why are vaccines only now included in the model?"
                 key="1"

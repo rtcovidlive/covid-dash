@@ -239,7 +239,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const svgWidth = contentWidth;
   let svgHeight = Math.floor(Math.min(550, 0.33 * contentWidth));
 
-  if (svgWidth < 500) svgHeight = 1.8 * svgWidth;
+  if (svgWidth < 500) svgHeight = svgWidth;
 
   let sliderMarks = ([min, max]) => {
     let months = eachWeekOfInterval({
@@ -273,69 +273,77 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
-        <Col size={24} align="center" ref={ref}>
-          <OverviewMapChart
-            data={data}
-            width={svgWidth}
-            height={svgHeight}
-            addFips={addFips}
-            addHoverFips={addHoverFips}
-            dateToDisplay={dateToDisplay}
-            selectedOutcome={props.selectedOutcome}
-            marginLeft={0}
-          />
-        </Col>
-        <Col size={24}>
-          <Slider
-            marks={sliderMarks(dateMinMax)}
-            step={null}
-            defaultValue={toEpoch(dateMinMax[1])}
-            tooltipVisible={true}
-            min={toEpoch(dateMinMax[0])}
-            max={toEpoch(dateMinMax[1])}
-            tipFormatter={(epoch) => {
-              const d = new Date(epoch * 24 * 3600 * 1000);
-              const md = utcFormat("%b %d")(d);
-              const diff = differenceInDays(new Date(), d);
+        <div className="rt-container-wrapper-map">
+          <Col size={24} align="center" ref={ref}>
+            <OverviewMapChart
+              data={data}
+              width={svgWidth}
+              height={svgHeight}
+              addFips={addFips}
+              addHoverFips={addHoverFips}
+              dateToDisplay={dateToDisplay}
+              selectedOutcome={props.selectedOutcome}
+              marginLeft={0}
+            />
+          </Col>
+        </div>
+        <div className="rt-container-wrapper">
+          <div className="rt-container rt-container-wide">
+            <Row className="stacked-states-outer">
+              <Col size={24}>
+                <Slider
+                  marks={sliderMarks(dateMinMax)}
+                  step={null}
+                  defaultValue={toEpoch(dateMinMax[1])}
+                  tooltipVisible={true}
+                  min={toEpoch(dateMinMax[0])}
+                  max={toEpoch(dateMinMax[1])}
+                  tipFormatter={(epoch) => {
+                    const d = new Date(epoch * 24 * 3600 * 1000);
+                    const md = utcFormat("%b %d")(d);
+                    const diff = differenceInDays(new Date(), d);
 
-              if (diff <= 40) return `${md}, ${diff}d ago`;
+                    if (diff <= 40) return `${md}, ${diff}d ago`;
 
-              return md;
-            }}
-            onChange={handleSliderChange}
-          />
-        </Col>
-        {!props.isSmallScreen && (
-          <TrayCharts
-            key="traychart-1"
-            selectedCounties={hoverFips}
-            mapData={mapData}
-            rowCount={props.rowCount}
-            colsPerChart={props.colsPerChart}
-            isSmallScreen={props.isSmallScreen}
-            selectedOutcome={props.selectedOutcome}
-            contentWidth={contentWidth}
-            isHover={true}
-          />
-        )}
-        <TrayCharts
-          key="traychart-2"
-          selectedCounties={fips}
-          mapData={mapData}
-          rowCount={props.rowCount}
-          colsPerChart={props.colsPerChart}
-          isSmallScreen={props.isSmallScreen}
-          selectedOutcome={props.selectedOutcome}
-          contentWidth={contentWidth}
-          handleRemoveFIPS={removeFips}
-          isHover={false}
-        />
+                    return md;
+                  }}
+                  onChange={handleSliderChange}
+                />
+              </Col>
+              {!props.isSmallScreen && (
+                <TrayCharts
+                  key="traychart-1"
+                  selectedCounties={hoverFips}
+                  mapData={mapData}
+                  rowCount={props.rowCount}
+                  colsPerChart={props.colsPerChart}
+                  isSmallScreen={props.isSmallScreen}
+                  selectedOutcome={props.selectedOutcome}
+                  contentWidth={contentWidth}
+                  isHover={true}
+                />
+              )}
+              <TrayCharts
+                key="traychart-2"
+                selectedCounties={fips}
+                mapData={mapData}
+                rowCount={props.rowCount}
+                colsPerChart={props.colsPerChart}
+                isSmallScreen={props.isSmallScreen}
+                selectedOutcome={props.selectedOutcome}
+                contentWidth={contentWidth}
+                handleRemoveFIPS={removeFips}
+                isHover={false}
+              />
+            </Row>
+          </div>
+        </div>
       </Fragment>
     );
   } else {
     return (
       <Col size={24} ref={ref}>
-        <div style={{ margin: "20px" }}>
+        <div style={{ margin: "50px" }}>
           <Spin
             size="large"
             tip={

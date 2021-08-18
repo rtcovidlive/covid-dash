@@ -127,20 +127,14 @@ export function RTOverview(props) {
         width={props.width}
         useNewHeader={props.newHeader}
       />
-      <div className="rt-container-wrapper">
-        <div className="rt-container rt-container-wide">
-          <Row className="stacked-states-outer">
-            <OverviewMapSuper
-              ref={mapRef}
-              selectedOutcome={selectedOutcome}
-              colsPerChart={smallColsPerChart}
-              isSmallScreen={isSmallScreen}
-              rowCount={rowCount}
-              spacerOffset={spacerOffset}
-            />
-          </Row>
-        </div>
-      </div>
+      <OverviewMapSuper
+        ref={mapRef}
+        selectedOutcome={selectedOutcome}
+        colsPerChart={smallColsPerChart}
+        isSmallScreen={isSmallScreen}
+        rowCount={rowCount}
+        spacerOffset={spacerOffset}
+      />
       <div className="rt-container-wrapper">
         <div
           ref={rtRef}
