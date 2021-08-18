@@ -114,8 +114,7 @@ export function CountyMetricChart(props) {
     height,
     showNeighbors,
     showHistory,
-    lastDrawLocation,
-    setLastDrawLocation,
+    showExtent,
     routeToFIPS,
     routeToState,
   } = props;
@@ -198,12 +197,17 @@ export function CountyMetricChart(props) {
 
   const numSeries = showHistory ? _.keys(resultsGrouped).length : 1;
 
+  const clipper = (d) =>
+    showExtent === "all"
+      ? d
+      : _.filter(
+          d,
+          (v) => new Date(v.date) > timeDay.offset(new Date(), -8 * 30)
+        );
+
   return (
     <XYPlot
       className="svg-container"
-      xDomain={
-        lastDrawLocation && [lastDrawLocation.left, lastDrawLocation.right]
-      }
       yDomain={conf.yDomain}
       width={width}
       height={height}
@@ -220,6 +224,10 @@ export function CountyMetricChart(props) {
       }}
     >
       <HorizontalGridLines tickValues={conf.yGridTicks} />
+      <VerticalGridLines
+        style={{ opacity: 0.25 }}
+        tickTotal={showExtent === "all" ? 18 : 5}
+      />
 
       <YAxis
         tickTotal={3}
@@ -227,15 +235,21 @@ export function CountyMetricChart(props) {
         style={{ line: { opacity: 0 } }}
         tickFormat={conf.yTickFormat}
       />
-      <XAxis tickFormat={(d) => utcFormat("%b %e")(d)} />
+      <XAxis
+        tickTotal={showExtent === "all" ? 18 : 5}
+        tickFormat={(d) => utcFormat("%b %e")(d)}
+      />
 
       {props.measure === "PEI" && (
-        <AreaSeries data={_.last(resultsArray)} color={"rgb(235,235,240)"} />
+        <AreaSeries
+          data={clipper(_.last(resultsArray))}
+          color={"rgb(235,235,240)"}
+        />
       )}
 
       {key === "state" && hasConf && (
         <AreaSeries
-          data={_.last(resultsArray)}
+          data={clipper(_.last(resultsArray))}
           key={"conf"}
           getY={(d) => d[measure + ".hi"]}
           getY0={(d) => d[measure + ".lo"]}
@@ -247,7 +261,7 @@ export function CountyMetricChart(props) {
       {showNeighbors &&
         _.map(neighborResultsArray, (v, k) => (
           <LineSeries
-            data={v}
+            data={clipper(v)}
             key={k + "neighbors"}
             color={conf.neighborStrokeColor || "black"}
             opacity={0.4}
@@ -258,7 +272,7 @@ export function CountyMetricChart(props) {
 
       {_.map(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) => (
         <LineSeries
-          data={v}
+          data={clipper(v)}
           key={k}
           color={
             k === numSeries - 1 && conf.strokeColorEmphasis
@@ -287,11 +301,6 @@ export function CountyMetricChart(props) {
           }
         />
       )}
-
-      <Highlight
-        enableY={false}
-        onBrushEnd={(area) => setLastDrawLocation(area)}
-      />
 
       {showNeighbors && neighborKeys && (
         <DiscreteColorLegend
@@ -324,7 +333,7 @@ export function CountyMetricChart(props) {
       {showNeighbors &&
         _.map(neighborResultsArray, (v, k) => (
           <LineSeries
-            data={v}
+            data={clipper(v)}
             key={1000 + k}
             color={neighborKeys === v[0][key] ? "black" : "transparent"}
             opacity={0.7}
@@ -344,15 +353,7 @@ export function CountyMetricChart(props) {
 }
 
 export function CountyInputChart(props) {
-  const {
-    measure,
-    fips,
-    width,
-    height,
-    lastDrawLocation,
-    setLastDrawLocation,
-    date,
-  } = props;
+  const { measure, fips, width, height, date } = props;
 
   const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
   const [minDateSeen, setMinDateSeen] = useState("2100-01-01");
@@ -431,15 +432,11 @@ export function CountyInputChart(props) {
     <XYPlot
       className="svg-container"
       xDomain={
-        (lastDrawLocation && [
-          lastDrawLocation.left.getTime(),
-          lastDrawLocation.right.getTime(),
-        ]) ||
-        (maxDateSeen &&
-          minDateSeen && [
-            new Date(minDateSeen).getTime(),
-            new Date(maxDateSeen).getTime(),
-          ])
+        maxDateSeen &&
+        minDateSeen && [
+          new Date(minDateSeen).getTime(),
+          new Date(maxDateSeen).getTime(),
+        ]
       }
       yDomain={conf.yDomain}
       width={width}
@@ -473,11 +470,6 @@ export function CountyInputChart(props) {
       <LineSeries data={sma_zipped_latest} color="rgb(179, 109, 25)" />
       {date && <LineSeries data={sma_zipped} color="magenta" />}
       {date && <MarkSeries data={[_.last(sma_zipped)]} color="magenta" />}
-
-      <Highlight
-        enableY={false}
-        onBrushEnd={(area) => setLastDrawLocation(area)}
-      />
     </XYPlot>
   );
 }

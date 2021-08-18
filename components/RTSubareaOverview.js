@@ -17,7 +17,7 @@ import { CaseGrowthChart } from "./CaseGrowthChart";
 import { ShareButtons } from "./ShareButtons";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
-import { Switch, DatePicker, Tooltip, BackTop } from "antd";
+import { Switch, DatePicker, Tooltip, BackTop, Radio } from "antd";
 import { useStateResults, useCountyResults, useInputData } from "../lib/data";
 import { USStatesByCode } from "../config/USStates";
 
@@ -330,8 +330,14 @@ function CountyStatRow(props) {
 }
 
 function ControlRow(props) {
-  const { showHistory, setShowHistory, showNeighbors, setShowNeighbors } =
-    props;
+  const {
+    showHistory,
+    setShowHistory,
+    showNeighbors,
+    setShowNeighbors,
+    showExtent,
+    setShowExtent,
+  } = props;
 
   let colsPerStat = 6;
   return (
@@ -367,6 +373,22 @@ function ControlRow(props) {
             </StatNumber>
           </StatContent>
         </Tooltip>
+      </Col>
+      <Col size={colsPerStat}>
+        <StatContent style={{ paddingTop: 20 }}>
+          <StatLabel>Data display</StatLabel>
+          <StatNumber>
+            <Radio.Group
+              onChange={(e) => setShowExtent(e.target.value)}
+              defaultValue="all"
+              size={"small"}
+              value={showExtent}
+            >
+              <Radio.Button value="all">All</Radio.Button>
+              <Radio.Button value="6mo">Last 8mo</Radio.Button>
+            </Radio.Group>
+          </StatNumber>
+        </StatContent>
       </Col>
     </Row>
   );
@@ -420,6 +442,7 @@ export function RTSubareaOverview(props) {
   // Show estimate history, and show latest result from all neighboring counties?
   const [showHistory, setShowHistory] = useState(false);
   const [showNeighbors, setShowNeighbors] = useState(false);
+  const [showExtent, setShowExtent] = useState("all");
 
   let isSmallScreen = props.width <= 768;
   let chartHeight = isSmallScreen ? 280 : 350;
@@ -640,6 +663,8 @@ export function RTSubareaOverview(props) {
                 setShowHistory={setShowHistory}
                 showNeighbors={showNeighbors}
                 setShowNeighbors={setShowNeighbors}
+                showExtent={showExtent}
+                setShowExtent={setShowExtent}
               />
             </Header>
             <ChartTitle level={2}>
@@ -657,6 +682,7 @@ export function RTSubareaOverview(props) {
                   measure={"Rt"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
+                  showExtent={showExtent}
                   fips={props.fips}
                   state={areaName}
                   stateAbbr={props.subarea}
