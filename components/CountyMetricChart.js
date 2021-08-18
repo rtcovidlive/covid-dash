@@ -14,7 +14,9 @@ import {
 } from "react-vis";
 import _ from "lodash";
 import {
+  useStateResults,
   useCountyResults,
+  useNeighboringStateResults,
   useNeighboringCountyResults,
   useInputData,
   useInputDataFromDate,
@@ -103,6 +105,8 @@ export function CountyMetricChart(props) {
   const {
     measure,
     fips,
+    state,
+    stateAbbr,
     width,
     height,
     showNeighbors,
@@ -110,25 +114,41 @@ export function CountyMetricChart(props) {
     lastDrawLocation,
     setLastDrawLocation,
     routeToFIPS,
+    routeToState,
   } = props;
 
-  const { data, error } = useCountyResults(fips);
-  const {
-    data: dataNeighbor,
-    error: errorNeighbor,
-  } = useNeighboringCountyResults(
-    fips,
-    data
-      ? _.maxBy(data, (d) => d["run.date"])["run.date"]
-      : utcFormat("%Y-%m-%d")(new Date())
-  );
+  const { data: dataCounty, error: errorCounty } = useCountyResults(fips);
+  const { data: dataState, error: errorState } = useStateResults(state);
+  const { data: dataNeighborCounty, error: errorNeighborCounty } =
+    useNeighboringCountyResults(
+      fips,
+      dataCounty
+        ? _.maxBy(dataCounty, (d) => d["run.date"])["run.date"]
+        : utcFormat("%Y-%m-%d")(new Date())
+    );
+  const { data: dataNeighborState, error: errorNeighborState } =
+    useNeighboringStateResults(
+      state,
+      dataState
+        ? _.maxBy(dataState, (d) => d["run.date"])["run.date"]
+        : utcFormat("%Y-%m-%d")(new Date())
+    );
+
+  const data = dataCounty || dataState;
+  const dataNeighbor = dataNeighborCounty || dataNeighborState;
+  const key = state ? "state" : "fips";
+
+  console.log("dataNeighborState");
+  console.log(dataNeighborState);
+  console.log("data");
+  console.log(data);
 
   const [value, setValue] = useState(false);
   const [modelRunDate, setModelRunDate] = useState(false);
-  const [neighborFIPS, setNeighborFIPS] = useState(null);
+  const [neighborKeys, setNeighborKeys] = useState(null);
 
   const resultsGrouped = data && groupBy(data, "run.date");
-  const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, "fips");
+  const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, key);
   const resultsArray = data && _.toArray(resultsGrouped);
   const neighborResultsArray =
     dataNeighbor && _.toArray(neighborResultsGrouped);
@@ -179,7 +199,7 @@ export function CountyMetricChart(props) {
       onMouseLeave={() => {
         setValue(false);
         setModelRunDate(false);
-        setNeighborFIPS(null);
+        setNeighborKeys(null);
       }}
       style={{
         backgroundColor: "white",
@@ -248,11 +268,14 @@ export function CountyMetricChart(props) {
         onBrushEnd={(area) => setLastDrawLocation(area)}
       />
 
-      {showNeighbors && neighborFIPS && (
+      {showNeighbors && neighborKeys && (
         <DiscreteColorLegend
           items={[
             {
-              title: `${USCounties[neighborFIPS].county}, ${USCounties[neighborFIPS].abbr}`,
+              title:
+                key === "fips"
+                  ? `${USCounties[neighborKeys].county}, ${USCounties[neighborKeys].abbr}`
+                  : `${neighborKeys}`,
               color: "rgba(0,0,0,0.7)",
             },
           ]}
@@ -278,13 +301,15 @@ export function CountyMetricChart(props) {
           <LineSeries
             data={v}
             key={1000 + k}
-            color={neighborFIPS === v[0].fips ? "black" : "transparent"}
+            color={neighborKeys === v[0][key] ? "black" : "transparent"}
             opacity={0.7}
             size={6}
-            onSeriesMouseOver={(e) => setNeighborFIPS(v[0].fips)}
-            onSeriesMouseOut={(e) => setNeighborFIPS(null)}
+            onSeriesMouseOver={(e) => setNeighborKeys(v[0][key])}
+            onSeriesMouseOut={(e) => setNeighborKeys(null)}
             onSeriesClick={(e) =>
-              routeToFIPS(USCounties[v[0].fips].abbr, v[0].fips)
+              key === "fips"
+                ? routeToFIPS(USCounties[v[0].fips].abbr, v[0].fips)
+                : routeToState(stateAbbr)
             }
             style={{ cursor: "pointer" }}
           />

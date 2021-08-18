@@ -18,7 +18,7 @@ import { ShareButtons } from "./ShareButtons";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 import { Switch, DatePicker, Tooltip, BackTop } from "antd";
-import { useCountyResults, useInputData } from "../lib/data";
+import { useStateResults, useCountyResults, useInputData } from "../lib/data";
 import { USStatesByCode } from "../config/USStates";
 
 const rtRef = React.createRef();
@@ -245,9 +245,6 @@ function StateStatRow(props) {
 }
 
 function CountyStatRow(props) {
-  const { showHistory, setShowHistory, showNeighbors, setShowNeighbors } =
-    props;
-
   const numFormat = (num) => {
     if (num > 1000000) {
       return format(".1f")(num / 1000000) + "M";
@@ -278,93 +275,100 @@ function CountyStatRow(props) {
   let infectionRate = format(".1f")(countyStats.infectionsPC);
   let colsPerStat = 6;
   return (
-    <>
-      <Row style={{ maxWidth: 700 }}>
-        {countyStats && (
-          <Col size={colsPerStat}>
-            <StatContent round="left">
-              <StatLabel>
-                County R<sub>t</sub>
-              </StatLabel>
-              <StatNumber color={Util.colorCodeRt(props.subarea, lastCountyRt)}>
-                {lastCountyRt}
-              </StatNumber>
-            </StatContent>
-          </Col>
-        )}
+    <Row style={{ maxWidth: 700 }}>
+      {countyStats && (
         <Col size={colsPerStat}>
-          <StatContent>
+          <StatContent round="left">
             <StatLabel>
-              County infection rate{" "}
-              <span style={{ visibility: "hidden" }}>
-                <sub>t</sub>
-              </span>
+              County R<sub>t</sub>
             </StatLabel>
-            <StatNumber>
-              {infectionRate}
-              <StatUnit>inf/100k/day</StatUnit>
+            <StatNumber color={Util.colorCodeRt(props.subarea, lastCountyRt)}>
+              {lastCountyRt}
             </StatNumber>
           </StatContent>
         </Col>
-        <Col size={colsPerStat}>
-          <StatContent>
-            <StatLabel>Total county cases</StatLabel>
-            <StatNumber>{positiveTotal}</StatNumber>
-          </StatContent>
-        </Col>
-        <Col size={colsPerStat}>
-          <StatContent>
-            <StatLabel>
-              Total county infections{" "}
-              <span style={{ visibility: "hidden" }}>
-                <sub>t</sub>
-              </span>
-            </StatLabel>
+      )}
+      <Col size={colsPerStat}>
+        <StatContent>
+          <StatLabel>
+            County infection rate{" "}
+            <span style={{ visibility: "hidden" }}>
+              <sub>t</sub>
+            </span>
+          </StatLabel>
+          <StatNumber>
+            {infectionRate}
+            <StatUnit>inf/100k/day</StatUnit>
+          </StatNumber>
+        </StatContent>
+      </Col>
+      <Col size={colsPerStat}>
+        <StatContent>
+          <StatLabel>Total county cases</StatLabel>
+          <StatNumber>{positiveTotal}</StatNumber>
+        </StatContent>
+      </Col>
+      <Col size={colsPerStat}>
+        <StatContent>
+          <StatLabel>
+            Total county infections{" "}
+            <span style={{ visibility: "hidden" }}>
+              <sub>t</sub>
+            </span>
+          </StatLabel>
+          <StatNumber>
+            {infectionsTotal}{" "}
+            <StatUnit>
+              ({format(".2f")(infectionsTotalRaw / positiveTotalRaw)}x
+              diagnoses)
+            </StatUnit>
+          </StatNumber>
+        </StatContent>
+      </Col>
+    </Row>
+  );
+}
+
+function ControlRow(props) {
+  const { showHistory, setShowHistory, showNeighbors, setShowNeighbors } =
+    props;
+
+  let colsPerStat = 6;
+  return (
+    <Row style={{ maxWidth: 625 }}>
+      <Col size={colsPerStat}>
+        <Tooltip
+          placement="top"
+          title="Display a selection of historical model runs"
+        >
+          <StatContent style={{ paddingTop: 20 }}>
+            <StatLabel>Show history?</StatLabel>
             <StatNumber>
-              {infectionsTotal}{" "}
-              <StatUnit>
-                ({format(".2f")(infectionsTotalRaw / positiveTotalRaw)}x
-                diagnoses)
-              </StatUnit>
+              <Switch
+                checked={showHistory}
+                onClick={(e) => setShowHistory(!showHistory)}
+              />
             </StatNumber>
           </StatContent>
-        </Col>
-      </Row>
-      <Row style={{ maxWidth: 625 }}>
-        <Col size={colsPerStat}>
-          <Tooltip
-            placement="top"
-            title="Display a selection of historical model runs"
-          >
-            <StatContent style={{ paddingTop: 20 }}>
-              <StatLabel>Show history?</StatLabel>
-              <StatNumber>
-                <Switch
-                  checked={showHistory}
-                  onClick={(e) => setShowHistory(!showHistory)}
-                />
-              </StatNumber>
-            </StatContent>
-          </Tooltip>
-        </Col>
-        <Col size={colsPerStat}>
-          <Tooltip
-            placement="top"
-            title="Display latest estimates from all neighboring counties"
-          >
-            <StatContent style={{ paddingTop: 20 }}>
-              <StatLabel>Show neighbors?</StatLabel>
-              <StatNumber>
-                <Switch
-                  checked={showNeighbors}
-                  onClick={(e) => setShowNeighbors(!showNeighbors)}
-                />
-              </StatNumber>
-            </StatContent>
-          </Tooltip>
-        </Col>
-      </Row>
-    </>
+        </Tooltip>
+      </Col>
+      <Col size={colsPerStat}>
+        <Tooltip
+          placement="top"
+          title="Display latest estimates from all neighboring areas"
+        >
+          <StatContent style={{ paddingTop: 20 }}>
+            <StatLabel>Show neighbors?</StatLabel>
+            <StatNumber>
+              <Switch
+                checked={showNeighbors}
+                onClick={(e) => setShowNeighbors(!showNeighbors)}
+              />
+            </StatNumber>
+          </StatContent>
+        </Tooltip>
+      </Col>
+    </Row>
   );
 }
 
@@ -417,13 +421,6 @@ export function RTSubareaOverview(props) {
   const [showHistory, setShowHistory] = useState(false);
   const [showNeighbors, setShowNeighbors] = useState(false);
 
-  const { data: countyData, error: countyDataError } = useCountyResults(
-    props.fips
-  );
-  const { data: countyInputs, error: countyInputsError } = useInputData(
-    props.fips
-  );
-
   let isSmallScreen = props.width <= 768;
   let chartHeight = isSmallScreen ? 280 : 350;
   let maxWidth = 980;
@@ -432,6 +429,15 @@ export function RTSubareaOverview(props) {
   let countyName = props.fips
     ? config.counties[props.fips].county
     : `${props.subarea}`;
+
+  const { data: stateData, error: stateDataError } = useStateResults(areaName);
+
+  const { data: countyData, error: countyDataError } = useCountyResults(
+    props.fips
+  );
+  const { data: countyInputs, error: countyInputsError } = useInputData(
+    props.fips
+  );
 
   let subAreaData = rtData.dataSeries[props.subarea];
 
@@ -496,6 +502,14 @@ export function RTSubareaOverview(props) {
       props.config.code,
       abbr,
       fips,
+      document.location.search
+    );
+  };
+
+  const routeToState = (abbr) => {
+    Navigation.navigateToSubArea(
+      props.config.code,
+      abbr,
       document.location.search
     );
   };
@@ -619,12 +633,14 @@ export function RTSubareaOverview(props) {
                   width={contentWidth}
                   subarea={props.subarea}
                   isSmallScreen={isSmallScreen}
-                  showHistory={showHistory}
-                  setShowHistory={setShowHistory}
-                  showNeighbors={showNeighbors}
-                  setShowNeighbors={setShowNeighbors}
                 />
               )}
+              <ControlRow
+                showHistory={showHistory}
+                setShowHistory={setShowHistory}
+                showNeighbors={showNeighbors}
+                setShowNeighbors={setShowNeighbors}
+              />
             </Header>
             <ChartTitle level={2}>
               Effective Reproduction Number &middot; R<sub>t</sub>
@@ -635,31 +651,21 @@ export function RTSubareaOverview(props) {
               COVID-19 cases will increase in the near future. If it&rsquo;s
               below 1.0, COVID-19 cases will decrease in the near future.
             </Explanation>
-            {!props.fips && contentWidth && (
-              <RTChartWrapper>
-                <StateRtChart
-                  data={subAreaData}
-                  width={contentWidth + 40}
-                  height={chartHeight}
-                  drawOuterBorder={false}
-                  yAxisPosition="left"
-                  isHovered={true}
-                  isOwnPage={true}
-                />
-              </RTChartWrapper>
-            )}
-            {props.fips && contentWidth && (
+            {contentWidth && (
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"Rt"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
                   fips={props.fips}
+                  state={areaName}
+                  stateAbbr={props.subarea}
                   width={contentWidth + 40}
                   height={chartHeight}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
                   routeToFIPS={routeToFIPS}
+                  routeToState={routeToState}
                 />
               </RTChartWrapper>
             )}
@@ -671,32 +677,25 @@ export function RTSubareaOverview(props) {
               estimate is presented as infections, per 100,000 individuals, per
               day.
             </Explanation>
-            {props.fips && contentWidth && (
+            {contentWidth && (
               <RTChartWrapper>
                 <CountyMetricChart
                   measure={"infectionsPC"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
                   fips={props.fips}
+                  state={areaName}
+                  stateAbbr={props.subarea}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
                   routeToFIPS={routeToFIPS}
+                  routeToState={routeToState}
                 />
               </RTChartWrapper>
             )}
-            {!props.fips && contentWidth && (
-              <>
-                <ChartTitle level={2}>Positive Tests</ChartTitle>
-                <CaseGrowthChart
-                  data={subAreaData}
-                  width={contentWidth + 40}
-                  height={chartHeight + 120}
-                />
-              </>
-            )}
-            {props.fips && contentWidth && (
+            {contentWidth && (
               <>
                 <ChartTitle level={2}>Percent Ever Infected</ChartTitle>
                 <Explanation>
@@ -710,11 +709,13 @@ export function RTSubareaOverview(props) {
                     showNeighbors={showNeighbors}
                     showHistory={showHistory}
                     fips={props.fips}
+                    state={areaName}
+                    stateAbbr={props.subarea}
                     width={contentWidth + 40} // + 40}
                     height={chartHeight} //}
                     lastDrawLocation={lastDrawLocation}
                     setLastDrawLocation={setLastDrawLocation}
-                    routeToFIPS={routeToFIPS}
+                    routeToState={routeToState}
                   />
                 </RTChartWrapper>
               </>
