@@ -108,7 +108,7 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           </a>
           ,{" "}
           <a href="https://www.hsph.harvard.edu/menzies-lab/people/nicole-swartwood/">
-            Nicole Smartwood
+            Nicole Swartwood
           </a>
           ,{" "}
           <a href="https://medicine.yale.edu/profile/joshua_warren/">
