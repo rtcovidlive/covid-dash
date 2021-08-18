@@ -48,6 +48,7 @@ const getSeriesConfig = function (metric) {
         yAxisTicks: [0.5, 1, 1.5],
         strokeColor: "gray",
         neighborStrokeColor: "rgb(56, 21, 105)",
+        fillColorConf: "rgb(245, 179, 255)",
         strokeColorEmphasis: "rgb(234, 99, 255)",
       };
       break;
@@ -58,6 +59,7 @@ const getSeriesConfig = function (metric) {
         yDomain: [0, 500],
         yAxisTicks: [0, 100, 200, 300, 400],
         strokeColor: "rgb(56, 230, 252)",
+        fillColorConf: "rgb(125, 200, 255)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
       };
       break;
@@ -70,6 +72,7 @@ const getSeriesConfig = function (metric) {
         yTickFormat: d3format(".0%"),
         strokeColor: "rgb(56, 230, 252)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
+        fillColorConf: "rgb(122, 192, 245)",
       };
       break;
     }
@@ -119,20 +122,24 @@ export function CountyMetricChart(props) {
 
   const { data: dataCounty, error: errorCounty } = useCountyResults(fips);
   const { data: dataState, error: errorState } = useStateResults(state);
-  const { data: dataNeighborCounty, error: errorNeighborCounty } =
-    useNeighboringCountyResults(
-      fips,
-      dataCounty
-        ? _.maxBy(dataCounty, (d) => d["run.date"])["run.date"]
-        : utcFormat("%Y-%m-%d")(new Date())
-    );
-  const { data: dataNeighborState, error: errorNeighborState } =
-    useNeighboringStateResults(
-      state,
-      dataState
-        ? _.maxBy(dataState, (d) => d["run.date"])["run.date"]
-        : utcFormat("%Y-%m-%d")(new Date())
-    );
+  const {
+    data: dataNeighborCounty,
+    error: errorNeighborCounty,
+  } = useNeighboringCountyResults(
+    fips,
+    dataCounty
+      ? _.maxBy(dataCounty, (d) => d["run.date"])["run.date"]
+      : utcFormat("%Y-%m-%d")(new Date())
+  );
+  const {
+    data: dataNeighborState,
+    error: errorNeighborState,
+  } = useNeighboringStateResults(
+    state,
+    dataState
+      ? _.maxBy(dataState, (d) => d["run.date"])["run.date"]
+      : utcFormat("%Y-%m-%d")(new Date())
+  );
 
   const data = dataCounty || dataState;
   const dataNeighbor = dataNeighborCounty || dataNeighborState;
@@ -152,6 +159,13 @@ export function CountyMetricChart(props) {
   const resultsArray = data && _.toArray(resultsGrouped);
   const neighborResultsArray =
     dataNeighbor && _.toArray(neighborResultsGrouped);
+
+  const hasConf =
+    key === "state" &&
+    resultsArray &&
+    resultsArray.length &&
+    _.last(resultsArray)[0]["Rt.lo"] !== null &&
+    _.last(resultsArray)[0]["Rt.lo"] !== "";
 
   const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
 
@@ -219,11 +233,22 @@ export function CountyMetricChart(props) {
         <AreaSeries data={_.last(resultsArray)} color={"rgb(235,235,240)"} />
       )}
 
+      {key === "state" && hasConf && (
+        <AreaSeries
+          data={_.last(resultsArray)}
+          key={"conf"}
+          getY={(d) => d[measure + ".hi"]}
+          getY0={(d) => d[measure + ".lo"]}
+          color={conf.fillColorConf}
+          opacity={0.7}
+        />
+      )}
+
       {showNeighbors &&
         _.map(neighborResultsArray, (v, k) => (
           <LineSeries
             data={v}
-            key={k}
+            key={k + "neighbors"}
             color={conf.neighborStrokeColor || "black"}
             opacity={0.4}
             strokeWidth={"1.5px"}
