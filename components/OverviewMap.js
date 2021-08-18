@@ -22,7 +22,7 @@ import {
 import { useCountyResults } from "../lib/data";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
-import { Slider, Spin } from "antd";
+import { Slider, Spin, Alert } from "antd";
 import {
   SelectOutlined,
   LeftOutlined,
@@ -102,12 +102,11 @@ function reformatMapData(data) {
 //  };
 //}
 function identifyAndTransformLatestRun(data) {
-  console.log(data);
+  if (!data || !data.length) return data;
+
   const maxDate = _.maxBy(data, (d) => d["run.date"])["run.date"];
 
-  console.log(maxDate);
   const filtered = data.filter((d) => d["run.date"] == maxDate);
-  console.log(filtered);
 
   const result = filtered.map(
     ({ PEI, date, fips, infections, infectionsPC, Rt }) => ({
@@ -238,24 +237,35 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   };
 
   const svgWidth = contentWidth;
-  let svgHeight = Math.floor(Math.min(400, 0.33 * contentWidth));
+  let svgHeight = Math.floor(Math.min(550, 0.33 * contentWidth));
 
   if (svgWidth < 500) svgHeight = 1.8 * svgWidth;
 
   let sliderMarks = ([min, max]) => {
-    const months = eachWeekOfInterval({
+    let months = eachWeekOfInterval({
       start: new Date(min),
       end: new Date(max),
     });
 
+    if (svgWidth < 500) months = _.filter(months, (d) => d.getUTCDate() < 8);
+
+    // Allow tick marks on the slider for months if on a mobile device, and
+    // weeks if on a wider-screen device
     let monthsFormatted = _.zipObject(
       _.map(months, toEpoch),
-      _.map(months, (d) => (d.getUTCDate() < 8 ? utcFormat("%b")(d) : ""))
+      _.map(months, (d, i) => {
+        if (d.getUTCDate() < 8 && svgWidth >= 500) return utcFormat("%b")(d);
+        else if (d.getUTCDate() < 8 && svgWidth < 500 && i % 2 === 0)
+          return utcFormat("%b")(d);
+        else return "";
+      })
     );
 
     // Add on day-name of latest date of model data
     // monthsFormatted[toEpoch(max)] = dateFormat(new Date(max), "eee");
-    monthsFormatted[toEpoch(max)] = utcFormat("%a")(new Date(max));
+    if (svgWidth >= 500)
+      monthsFormatted[toEpoch(max)] = utcFormat("%a")(new Date(max));
+    else monthsFormatted[toEpoch(max)] = "";
 
     return monthsFormatted;
   };
@@ -510,6 +520,25 @@ function TrayChartsItem({
         offset={align === "center" ? spacerOffset : 0}
       >
         <div className="stacked-state-wrapper">Loading...</div>
+      </Col>
+    );
+
+  if (!data.length)
+    return (
+      <Col
+        key={`${fips},nope`}
+        size={colsPerChart}
+        align={align}
+        offset={align === "center" ? spacerOffset : 0}
+      >
+        <div className="stacked-state-wrapper">
+          <Alert
+            message="Error"
+            type="error"
+            message={`We have no results for ${county.name}`}
+            showIcon
+          />
+        </div>
       </Col>
     );
 
