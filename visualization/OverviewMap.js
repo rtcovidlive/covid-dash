@@ -246,6 +246,7 @@ class OverviewMap {
       .datum(mesh(us, us.objects.states))
       .attr("fill", "none")
       .attr("stroke", "rgb(14, 112, 150)")
+      .attr("stroke-width", "1.7px")
       .attr("stroke-linejoin", "round")
       .attr("d", path);
 
@@ -254,7 +255,7 @@ class OverviewMap {
     function reset() {
       self._svg
         .transition()
-        .duration(750)
+        .duration(0)
         .call(
           zoomer.transform,
           zoomIdentity,

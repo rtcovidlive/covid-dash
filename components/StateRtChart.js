@@ -42,6 +42,7 @@ class StateRtChart extends PureComponent {
       <VisualizationChart
         data={[props.data]}
         enabledModes={props.enabledModes || [Constants.MetricOptions.DerivedR0]}
+        dateBounds={props.dateBounds}
         logScale={false}
         indexing={Constants.IndexingOptions.ByDate}
         singleStateView={true}

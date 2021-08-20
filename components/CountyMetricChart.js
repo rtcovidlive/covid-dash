@@ -58,7 +58,7 @@ const getSeriesConfig = function (metric) {
         shortName: "IPC",
         yDomain: [0, 500],
         yAxisTicks: [0, 100, 200, 300, 400],
-        strokeColor: "rgb(56, 230, 252)",
+        strokeColor: "rgb(100, 125, 160)",
         fillColorConf: "rgb(125, 200, 255)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
       };
@@ -70,7 +70,7 @@ const getSeriesConfig = function (metric) {
         yAxisTicks: [0, 0.33, 0.5, 0.67, 1.0],
         yGridTicks: [0, 0.33, 0.5, 0.67, 1.0],
         yTickFormat: d3format(".0%"),
-        strokeColor: "rgb(56, 230, 252)",
+        strokeColor: "rgb(100, 125, 160)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
         fillColorConf: "rgb(122, 192, 245)",
       };
@@ -121,33 +121,24 @@ export function CountyMetricChart(props) {
 
   const { data: dataCounty, error: errorCounty } = useCountyResults(fips);
   const { data: dataState, error: errorState } = useStateResults(state);
-  const {
-    data: dataNeighborCounty,
-    error: errorNeighborCounty,
-  } = useNeighboringCountyResults(
-    fips,
-    dataCounty
-      ? _.maxBy(dataCounty, (d) => d["run.date"])["run.date"]
-      : utcFormat("%Y-%m-%d")(new Date())
-  );
-  const {
-    data: dataNeighborState,
-    error: errorNeighborState,
-  } = useNeighboringStateResults(
-    state,
-    dataState
-      ? _.maxBy(dataState, (d) => d["run.date"])["run.date"]
-      : utcFormat("%Y-%m-%d")(new Date())
-  );
+  const { data: dataNeighborCounty, error: errorNeighborCounty } =
+    useNeighboringCountyResults(
+      fips,
+      dataCounty
+        ? _.maxBy(dataCounty, (d) => d["run.date"])["run.date"]
+        : utcFormat("%Y-%m-%d")(new Date())
+    );
+  const { data: dataNeighborState, error: errorNeighborState } =
+    useNeighboringStateResults(
+      state,
+      dataState
+        ? _.maxBy(dataState, (d) => d["run.date"])["run.date"]
+        : utcFormat("%Y-%m-%d")(new Date())
+    );
 
   const data = dataCounty || dataState;
   const dataNeighbor = dataNeighborCounty || dataNeighborState;
   const key = state ? "state" : "fips";
-
-  console.log("dataNeighborState");
-  console.log(dataNeighborState);
-  console.log("data");
-  console.log(data);
 
   const [value, setValue] = useState(false);
   const [modelRunDate, setModelRunDate] = useState(false);

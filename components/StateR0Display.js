@@ -193,6 +193,7 @@ export const StateR0Display = React.forwardRef((props, ref) => {
             isHovered={hovered}
             isUnderlayed={showCases}
             enabledModes={props.enabledModes}
+            dateBounds={props.dateBounds}
           />
         </div>
       )}

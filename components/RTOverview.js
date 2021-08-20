@@ -11,6 +11,7 @@ import OverviewMapSuper from "./OverviewMap";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 import { Radio } from "antd";
+import { timeDay } from "d3-time";
 
 const refsByState = {};
 const mapRef = React.createRef();
@@ -86,10 +87,16 @@ export function RTOverview(props) {
   const rtData = useContext(DataFetchContext);
   let lastUpdated = rtData.modelLastRunDate;
   const [clickedOnState, setClickedOnState] = useState(null);
+  const [showExtent, setShowExtent] = useState("all");
 
   if (!rtData || !props.width) {
     return null;
   }
+
+  const dateBounds =
+    showExtent === "8mo"
+      ? [timeDay.offset(new Date(), -8 * 30), new Date()]
+      : [null, null];
 
   let isLgSize = props.width >= 991 && props.width < 1200;
   var colsPerChart;
@@ -129,11 +136,13 @@ export function RTOverview(props) {
       />
       <OverviewMapSuper
         ref={mapRef}
+        width={props.width}
         selectedOutcome={selectedOutcome}
         colsPerChart={smallColsPerChart}
         isSmallScreen={isSmallScreen}
         rowCount={rowCount}
         spacerOffset={spacerOffset}
+        dateBounds={dateBounds}
       />
       <div className="rt-container-wrapper">
         <div
@@ -165,6 +174,15 @@ export function RTOverview(props) {
                   </Radio.Button>
                 );
               })}
+            </Radio.Group>
+            <span style={{ padding: "5px" }}>Show:</span>
+            <Radio.Group
+              onChange={(e) => setShowExtent(e.target.value)}
+              defaultValue="all"
+              value={showExtent}
+            >
+              <Radio.Button value="all">All</Radio.Button>
+              <Radio.Button value="8mo">Last 8mo</Radio.Button>
             </Radio.Group>
           </Row>
           <Row className="stacked-states-outer">
@@ -209,6 +227,7 @@ export function RTOverview(props) {
                           yDomain={selectedOutcome.yDomain}
                           contentWidth={props.width}
                           state={true}
+                          dateBounds={dateBounds}
                         />
                       </div>
                     </Col>

@@ -385,7 +385,7 @@ function ControlRow(props) {
               value={showExtent}
             >
               <Radio.Button value="all">All</Radio.Button>
-              <Radio.Button value="6mo">Last 8mo</Radio.Button>
+              <Radio.Button value="8mo">Last 8mo</Radio.Button>
             </Radio.Group>
           </StatNumber>
         </StatContent>
@@ -709,6 +709,7 @@ export function RTSubareaOverview(props) {
                   measure={"infectionsPC"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
+                  showExtent={showExtent}
                   fips={props.fips}
                   state={areaName}
                   stateAbbr={props.subarea}
@@ -734,6 +735,7 @@ export function RTSubareaOverview(props) {
                     measure={"PEI"}
                     showNeighbors={showNeighbors}
                     showHistory={showHistory}
+                    showExtent={showExtent}
                     fips={props.fips}
                     state={areaName}
                     stateAbbr={props.subarea}
@@ -790,6 +792,7 @@ export function RTSubareaOverview(props) {
                   width={contentWidth + 40}
                   height={chartHeight}
                   showHistory={showHistory}
+                  showExtent={showExtent}
                 />
               </RTChartWrapper>
             )}
@@ -821,6 +824,7 @@ export function RTSubareaOverview(props) {
                     width={contentWidth + 40}
                     height={chartHeight}
                     showHistory={showHistory}
+                    showExtent={showExtent}
                   />
                 </RTChartWrapper>
               </>

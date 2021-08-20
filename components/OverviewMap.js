@@ -23,11 +23,7 @@ import { useCountyResults } from "../lib/data";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
 import { Slider, Spin, Alert } from "antd";
-import {
-  SelectOutlined,
-  LeftOutlined,
-  ZoomInOutlined,
-} from "@ant-design/icons";
+import { SelectOutlined, ZoomInOutlined } from "@ant-design/icons";
 import { Util } from "lib/Util";
 import { Title, HelperTitle } from "./Typography";
 
@@ -119,7 +115,6 @@ function identifyAndTransformLatestRun(data) {
       r0: +Rt,
     })
   );
-  console.log(result);
   return result;
 }
 
@@ -254,7 +249,17 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     let monthsFormatted = _.zipObject(
       _.map(months, toEpoch),
       _.map(months, (d, i) => {
-        if (d.getUTCDate() < 8 && svgWidth >= 500) return utcFormat("%b")(d);
+        if (d.getUTCDate() < 8 && i < 2 && props.width > 768)
+          return <strong>{utcFormat("%b")(d) + " '20"}</strong>;
+        else if (
+          d.getUTCDate() < 8 &&
+          d.getMonth() === 0 &&
+          d.getFullYear() === 2021 &&
+          props.width > 768
+        )
+          return <strong>Jan '21</strong>;
+        else if (d.getUTCDate() < 8 && svgWidth >= 500)
+          return utcFormat("%b")(d);
         else if (d.getUTCDate() < 8 && svgWidth < 500 && i % 2 === 0)
           return utcFormat("%b")(d);
         else return "";
@@ -301,6 +306,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
                   tipFormatter={(epoch) => {
                     const d = new Date(epoch * 24 * 3600 * 1000);
                     const md = utcFormat("%b %d")(d);
+
                     const diff = differenceInDays(new Date(), d);
 
                     if (diff <= 40) return `${md}, ${diff}d ago`;
@@ -321,6 +327,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
                   selectedOutcome={props.selectedOutcome}
                   contentWidth={contentWidth}
                   isHover={true}
+                  dateBounds={props.dateBounds}
                 />
               )}
               <TrayCharts
@@ -334,6 +341,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
                 contentWidth={contentWidth}
                 handleRemoveFIPS={removeFips}
                 isHover={false}
+                dateBounds={props.dateBounds}
               />
             </Row>
           </div>
@@ -488,7 +496,8 @@ export function TrayCharts(props) {
       selectedOutcome={props.selectedOutcome}
       isHover={props.isHover}
       handleRemoveFIPS={props.handleRemoveFIPS}
-      eef={refsByFIPS[county.fips] || React.createRef()}
+      ref={refsByFIPS[county.fips] || React.createRef()}
+      dateBounds={props.dateBounds}
     />
   ));
 
@@ -514,6 +523,7 @@ function TrayChartsItem({
   isHover,
   selectedOutcome,
   handleRemoveFIPS,
+  dateBounds,
 }) {
   const fips = county.fips;
 
@@ -592,6 +602,7 @@ function TrayChartsItem({
           contentWidth={contentWidth}
           state={false}
           removeButton={handleRemoveFIPS ? (e) => handleRemoveFIPS(fips) : null}
+          dateBounds={dateBounds}
         />
       </div>
     </Col>
