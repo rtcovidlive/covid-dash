@@ -1,5 +1,6 @@
 import _ from "lodash";
 import React, {
+  useMemo,
   useState,
   useEffect,
   useRef,
@@ -22,7 +23,7 @@ import {
 import { useCountyResults } from "../lib/data";
 import { StateRtChart } from "./StateRtChart";
 import { Row, Col } from "./Grid";
-import { Slider, Spin, Alert } from "antd";
+import { Slider, Spin, Space, Alert } from "antd";
 import { SelectOutlined, ZoomInOutlined } from "@ant-design/icons";
 import { Util } from "lib/Util";
 import { Title, HelperTitle } from "./Typography";
@@ -160,6 +161,11 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     setHoverFips([info]);
   };
 
+  let addHoverFipsThrottled = useMemo(
+    (info) => _.throttle(addHoverFips, 500),
+    []
+  );
+
   let removeFips = (fipsToRemove) => {
     const newFips = _.filter(fips, (f) => f.fips !== fipsToRemove);
     setFips(newFips);
@@ -285,7 +291,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
               width={svgWidth}
               height={svgHeight}
               addFips={addFips}
-              addHoverFips={addHoverFips}
+              addHoverFips={addHoverFipsThrottled}
               dateToDisplay={dateToDisplay}
               selectedOutcome={props.selectedOutcome}
               marginLeft={0}
@@ -537,7 +543,11 @@ function TrayChartsItem({
         align={align}
         offset={align === "center" ? spacerOffset : 0}
       >
-        <div className="stacked-state-wrapper">Loading...</div>
+        <div className="stacked-state-wrapper">
+          <div style={{ margin: 50 }}>
+            <Spin size="large" />
+          </div>
+        </div>
       </Col>
     );
 
@@ -555,6 +565,8 @@ function TrayChartsItem({
             type="error"
             message={`We have no results for ${county.name}`}
             showIcon
+            style={{ margin: 5, cursor: "pointer" }}
+            onClick={(e) => handleRemoveFIPS && handleRemoveFIPS(fips)}
           />
         </div>
       </Col>

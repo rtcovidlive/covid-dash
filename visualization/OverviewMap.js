@@ -242,7 +242,8 @@ class OverviewMap {
       Constants.MetricOptions.TrueInfectionsPCNoUI
     );
 
-    g.append("path")
+    const _states = g
+      .append("path")
       .datum(mesh(us, us.objects.states))
       .attr("fill", "none")
       .attr("stroke", "rgb(14, 112, 150)")
@@ -280,6 +281,7 @@ class OverviewMap {
       const { transform } = event;
       g.attr("transform", transform);
       g.attr("stroke-width", 1 / transform.k);
+      _states.attr("stroke-width", 2 / transform.k);
     }
 
     // let chartContent = this._svg
