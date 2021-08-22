@@ -136,17 +136,19 @@ export function CountyMetricChart(props) {
         : utcFormat("%Y-%m-%d")(new Date())
     );
 
-  const data = dataCounty || dataState;
-  const dataNeighbor = dataNeighborCounty || dataNeighborState;
   const key = state ? "state" : "fips";
+
+  const data = key === "fips" ? dataCounty : dataState;
+  const dataNeighbor = key === "fips" ? dataNeighborCounty : dataNeighborState;
 
   const [value, setValue] = useState(false);
   const [modelRunDate, setModelRunDate] = useState(false);
   const [neighborKeys, setNeighborKeys] = useState(null);
 
   const resultsGrouped = data && groupBy(data, "run.date");
-  const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, key);
   const resultsArray = data && _.toArray(resultsGrouped);
+
+  const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, key);
   const neighborResultsArray =
     dataNeighbor && _.toArray(neighborResultsGrouped);
 

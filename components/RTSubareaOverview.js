@@ -684,7 +684,7 @@ export function RTSubareaOverview(props) {
                   showHistory={showHistory}
                   showExtent={showExtent}
                   fips={props.fips}
-                  state={areaName}
+                  state={!props.fips && areaName}
                   stateAbbr={props.subarea}
                   width={contentWidth + 40}
                   height={chartHeight}
@@ -711,7 +711,7 @@ export function RTSubareaOverview(props) {
                   showHistory={showHistory}
                   showExtent={showExtent}
                   fips={props.fips}
-                  state={areaName}
+                  state={!props.fips && areaName}
                   stateAbbr={props.subarea}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
@@ -737,7 +737,7 @@ export function RTSubareaOverview(props) {
                     showHistory={showHistory}
                     showExtent={showExtent}
                     fips={props.fips}
-                    state={areaName}
+                    state={!props.fips && areaName}
                     stateAbbr={props.subarea}
                     width={contentWidth + 40} // + 40}
                     height={chartHeight} //}
