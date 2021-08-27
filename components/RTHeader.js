@@ -145,7 +145,7 @@ export function RTHeader(props) {
             cases and deaths for nearly every state and county in the US. Our
             methodology can be found on{" "}
             <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v2">
-              medRxiv{" "}
+              medRxiv
             </a>
             , with regular updates to our model documented{" "}
             <a href="/updates.pdf">here</a>. You can run our model with your own
@@ -163,14 +163,11 @@ export function RTHeader(props) {
             will lack uncertainty intervals.
           </p>
           <p>
-            Delaware: recent results are{" "}
-            <a href="https://github.com/CSSEGISandData/COVID-19/issues/4461">
-              currently unreliable
-            </a>
-            . Florida no longer reports county-level deaths, so we don't use
-            their county-level deaths data after June 5th. Nebraska no longer
-            consistently reports cases or deaths, and we are in the process of
-            archiving their estimates.
+            <strong>Recent data quality issues</strong>: Florida no longer
+            reports county-level deaths, so we don't use their county-level
+            deaths data after June 5th. Nebraska hasn't consistently reported at
+            the county-level since June, so we have archived their county-level
+            estimates.
           </p>
           <div
             style={{
@@ -185,103 +182,17 @@ export function RTHeader(props) {
                 key="1"
                 header={
                   <strong>
-                    August 16: We've begun using a new model which takes into
-                    account county- and state-level vaccination data
+                    Beginning August 27th: uncertainty estimates for all states.
                   </strong>
                 }
               >
-                <Collapse defaultActiveKey={[]} bordered={false}>
-                  <Panel
-                    header="Vaccinations started 8 months ago. Why are vaccines only now included in the model?"
-                    key="1"
-                  >
-                    <p>
-                      Because Covidestim performs automated daily model runs, we
-                      need reliable data sources for any data that went in our
-                      model. Data sources that consistently report the
-                      vaccination coverage by age group at the county level were
-                      not available until a couple months ago.
-                    </p>
-                    <p>
-                      We have now combined multiple data sources to make
-                      vaccination data suitable for our new model. Now that we
-                      have developed and evaluated this model update, we are
-                      releasing it.
-                    </p>
-                  </Panel>
-                  <Panel
-                    header="How does the inclusion of vaccination data change how Covidestim works?"
-                    key="2"
-                  >
-                    <p>
-                      The probability of dying from a COVID-19 infection is
-                      lower after vaccination. Using the vaccination coverage
-                      data, we adjust the modeled probability of dying if
-                      infected for each county and state over time. See our{" "}
-                      <a href="/updates.pdf">model updates</a> for a more
-                      detailed explanation.
-                    </p>
-                  </Panel>
-                  <Panel
-                    header="How does this update change the results?"
-                    key="3"
-                  >
-                    <p>The results have primarily changed in two ways:</p>
-                    <ol>
-                      <li>
-                        Earlier in the pandemic (throughout 2020), the estimated
-                        daily infections during peaks are, for some counties,
-                        lower than the estimates from the previous version of
-                        the model. Consequently, these counties also show a
-                        lower ‘percent ever infected’.
-                      </li>
-                      <li>
-                        For the period since vaccinations started (early 2021),
-                        our new model produces slightly higher estimates of the
-                        number of infections than the previous version of the
-                        model did.
-                      </li>
-                    </ol>
-                    <p>
-                      You can compare the new and old models using the “Show
-                      history” toggle on the county-level pages. This
-                      functionality will soon be available for states, too.
-                    </p>
-                  </Panel>
-                  <Panel
-                    header="The new results are different. Does this new model invalidate the output from old model runs that did not include vaccinations?"
-                    key="4"
-                  >
-                    <p>
-                      We do not know the true number of infections in a county
-                      or state. Both versions of the Covidestim model produce
-                      estimates of the number of infections and Rt based on
-                      observed data and several assumptions. We think the new
-                      estimates better represent the number of infections in a
-                      county, because it takes the changes in mortality into
-                      account.
-                    </p>
-                  </Panel>
-                  <Panel
-                    header="Where can I find more information about the changes made?"
-                    key="5"
-                  >
-                    <p>
-                      Take a look at our{" "}
-                      <a href="/updates.pdf">model updates</a> document. If
-                      you'd like to look at the source code, the key code diff
-                      is{" "}
-                      <a href="https://github.com/covidestim/covidestim/compare/107322535ec8f1e253a9dd7413e495611765635d...1d9fad480e157b3001ed69e363f04050ea095c69">
-                        here
-                      </a>
-                      , and there are many other changes to other repositories
-                      in our{" "}
-                      <a href="https://github.com/covidestim">organization</a>.
-                      See the <a href="#footer">bottom</a> of the page for
-                      details on the project.
-                    </p>
-                  </Panel>
-                </Collapse>
+                We had been unable to publish uncertainty estimates for all
+                states due to the time constraints we had for running the model
+                (10 hours). We have now developed a method to compute
+                uncertainty intervals for states which would normally not have
+                uncertainty estimates. We use the available uncertainty
+                estimates from other states to compute these intervals. More
+                details <a href="/updates.pdf">here</a>.
               </Panel>
             </Collapse>
           </div>
