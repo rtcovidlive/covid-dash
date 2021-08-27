@@ -122,6 +122,7 @@ export const StateR0Display = React.forwardRef((props, ref) => {
                       position: "relative",
                       top: 0.5,
                       color: "goldenrod",
+                      textDecoration: "none !important",
                     }}
                     className="icon-chevron-right"
                   ></span>

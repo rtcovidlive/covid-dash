@@ -22,6 +22,8 @@ import {
 } from "date-fns";
 import { useCountyResults } from "../lib/data";
 import { StateRtChart } from "./StateRtChart";
+import { AddCounty } from "./AddCounty";
+import { Button } from "antd";
 import { Row, Col } from "./Grid";
 import { Slider, Spin, Space, Alert } from "antd";
 import { SelectOutlined, ZoomInOutlined } from "@ant-design/icons";
@@ -143,6 +145,11 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     "https://covidestim.s3.us-east-2.amazonaws.com/latest/summary.pack.gz";
   const albersURL =
     "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
+
+  const clearFips = () => {
+    setFips([]);
+    document.cookie = `fips=${encodeURIComponent("")}`;
+  };
 
   let addFips = (info) => {
     if (_.findIndex(fips, (d) => info.fips === d.fips) === -1) {
@@ -322,6 +329,14 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
                   onChange={handleSliderChange}
                 />
               </Col>
+              <Col size={props.colsPerChart}>
+                <AddCounty addFips={addFips} />
+                {fips.length > 1 && (
+                  <Button onClick={clearFips} type="dashed" danger>
+                    Clear all counties
+                  </Button>
+                )}
+              </Col>
               {!props.isSmallScreen && (
                 <TrayCharts
                   key="traychart-1"
@@ -460,34 +475,6 @@ export function TrayCharts(props) {
   let modes = mapModes(props.selectedOutcome);
   let refsByFIPS = {};
 
-  let hoverHelp = (
-    <Col key="placeholder" size={props.colsPerChart} align="left">
-      <div className="state-rt-display">
-        <Row style={{ marginRight: 32 }}>
-          <Col verticalAlign="middle" size={props.state ? 16 : 24}>
-            <HelperTitle className="state-rt-display-name" level={2}>
-              <ZoomInOutlined /> Hover county for detail
-            </HelperTitle>
-          </Col>
-        </Row>
-      </div>
-    </Col>
-  );
-
-  let addHelp = (
-    <Col key="placeholder" size={props.colsPerChart} align="left">
-      <div className="state-rt-display">
-        <Row style={{ marginRight: 32 }}>
-          <Col verticalAlign="middle" size={props.state ? 16 : 24}>
-            <HelperTitle className="state-rt-display-name" level={2}>
-              <SelectOutlined /> Click a county
-            </HelperTitle>
-          </Col>
-        </Row>
-      </div>
-    </Col>
-  );
-
   const countyCharts = _.map(props.selectedCounties, (county, i) => (
     <TrayChartsItem
       county={county}
@@ -507,8 +494,7 @@ export function TrayCharts(props) {
     />
   ));
 
-  if (props.selectedCounties.length === 0 && props.isHover) return null;
-  else if (props.selectedCounties.length === 0) return [addHelp];
+  if (props.selectedCounties.length === 0) return null;
   else return [...countyCharts];
 }
 ///////////////
