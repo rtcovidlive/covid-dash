@@ -6,7 +6,6 @@ import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { ShareButtons } from "./ShareButtons";
 import { DiffOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
-import { Collapse } from "antd";
 import { GithubOutlined } from "@ant-design/icons";
 
 export const MainTitle = styled(Title)`
@@ -51,8 +50,6 @@ export const HeaderInner = styled.div`
 `;
 
 export function RTHeader(props) {
-  const { Panel } = Collapse;
-
   useLayoutEffect(() => {
     window.twttr && window.twttr.widgets.load();
     window.FB && window.FB.XFBML.parse();
@@ -163,39 +160,24 @@ export function RTHeader(props) {
             will lack uncertainty intervals.
           </p>
           <p>
-            <strong>Recent data quality issues</strong>: Florida no longer
-            reports county-level deaths, so we don't use their county-level
-            deaths data after June 5th. Nebraska hasn't consistently reported at
-            the county-level since June, so we have archived their county-level
-            estimates.
+            <span
+              style={{
+                borderRadius: 4,
+                backgroundColor: "#ffad5c",
+                padding: "4.5px 8px",
+              }}
+            >
+              <strong>
+                New blog post:{" "}
+                <a
+                  target="_blank"
+                  href="https://blog.covidestim.org/posts/data-pipeline/"
+                >
+                  Navigating the COVID-19 data jungle
+                </a>
+              </strong>
+            </span>
           </p>
-          <div
-            style={{
-              backgroundColor: "rgb(29, 171, 252)",
-              marginBottom: "20px",
-              padding: "10px",
-              maxWidth: "1000px",
-            }}
-          >
-            <Collapse defaultActiveKey={[]} bordered={false}>
-              <Panel
-                key="1"
-                header={
-                  <strong>
-                    Beginning August 27th: uncertainty estimates for all states.
-                  </strong>
-                }
-              >
-                We had been unable to publish uncertainty estimates for all
-                states due to the time constraints we had for running the model
-                (10 hours). We have now developed a method to compute
-                uncertainty intervals for states which would normally not have
-                uncertainty estimates. We use the available uncertainty
-                estimates from other states to compute these intervals. More
-                details <a href="/updates.pdf">here</a>.
-              </Panel>
-            </Collapse>
-          </div>
         </HeaderInner>
       </div>
     </>
