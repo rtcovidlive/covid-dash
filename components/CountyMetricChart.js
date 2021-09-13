@@ -20,8 +20,11 @@ import {
   useNeighboringCountyResults,
   useInputData,
   useInputDataFromDate,
+  useStateInputData,
+  useStateInputDataFromDate,
 } from "../lib/data";
 import { format as d3format } from "d3-format";
+import { max } from "d3-array";
 import { utcFormat } from "d3-time-format";
 import { timeDay } from "d3-time";
 import { useState } from "react";
@@ -346,15 +349,27 @@ export function CountyMetricChart(props) {
 }
 
 export function CountyInputChart(props) {
-  const { measure, fips, width, height, date } = props;
+  const { measure, state, fips, width, height, date, barDomain } = props;
 
   const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
   const [minDateSeen, setMinDateSeen] = useState("2100-01-01");
 
-  const { data: latestData, error: latestError } = useInputData(fips);
-  const { data, error } = date
+  const { data: latestCountyData, error: latestCountyError } =
+    useInputData(fips);
+  const { data: dataCounty, error: errorCounty } = date
     ? useInputDataFromDate(fips, date)
     : useInputData(fips);
+
+  const { data: latestStateData, error: latestStateError } =
+    useStateInputData(state);
+  const { data: dataState, error: errorState } = date
+    ? useStateInputDataFromDate(state, date)
+    : useStateInputData(state);
+
+  const latestData = fips ? latestCountyData : latestStateData;
+  const latestError = fips ? latestCountyError : latestStateError;
+  const data = fips ? dataCounty : dataState;
+  const error = fips ? errorCounty : errorState;
 
   if (data && data.length > 0) {
     const maxDateForRunDate = _.maxBy(data, (d) => d.date).date;
@@ -376,7 +391,7 @@ export function CountyInputChart(props) {
           message="No data"
           description={`We don't have archived ${
             measure === "cases" ? "case" : "death"
-          } data this far back for this county`}
+          } data this far back for this ${fips ? "county" : "state"}`}
           type="error"
           showIcon
         />
@@ -421,6 +436,8 @@ export function CountyInputChart(props) {
     }
   );
 
+  const yDomainForEverything = data && [0, 1.1 * max(data, (d) => +d[measure])];
+
   return (
     <XYPlot
       className="svg-container"
@@ -431,7 +448,7 @@ export function CountyInputChart(props) {
           new Date(maxDateSeen).getTime(),
         ]
       }
-      yDomain={conf.yDomain}
+      yDomain={barDomain ? yDomainForEverything : null}
       width={width}
       height={height}
       getX={(d) => new Date(d.date).getTime()}

@@ -395,9 +395,11 @@ function ControlRow(props) {
 }
 
 const CountyInputView = function (props) {
-  const { fips, width, height, lastDrawLocation, setLastDrawLocation } = props;
+  const { state, fips, width, height, lastDrawLocation, setLastDrawLocation } =
+    props;
 
   const [inputDataDate, setInputDataDate] = useState(null);
+  const [barDomain, setBarDomain] = useState(false);
 
   const onDateChange = (date, dateString) => {
     if (dateString.length > 0) setInputDataDate(dateString);
@@ -407,11 +409,22 @@ const CountyInputView = function (props) {
   return (
     <>
       <DatePicker onChange={onDateChange} placeholder="Choose a date" />
+      <Switch
+        size="small"
+        style={{ marginLeft: 15 }}
+        checked={barDomain}
+        onClick={(e) => setBarDomain(!barDomain)}
+      />{" "}
+      <span style={{ color: "grey", fontSize: "0.8em" }}>
+        Include all observations?
+      </span>
       <RTChartWrapper>
         <CountyInputChart
           date={inputDataDate}
           fips={fips}
+          state={state}
           measure={"cases"}
+          barDomain={barDomain}
           width={width}
           height={height}
           lastDrawLocation={lastDrawLocation}
@@ -422,7 +435,9 @@ const CountyInputView = function (props) {
         <CountyInputChart
           date={inputDataDate}
           fips={fips}
+          state={state}
           measure={"deaths"}
+          barDomain={barDomain}
           width={width}
           height={height}
           lastDrawLocation={lastDrawLocation}
@@ -748,7 +763,7 @@ export function RTSubareaOverview(props) {
                 </RTChartWrapper>
               </>
             )}
-            {props.fips && contentWidth && (
+            {contentWidth && (
               <>
                 <ChartTitle level={2}>Model input data</ChartTitle>
                 <Explanation>
@@ -764,6 +779,7 @@ export function RTSubareaOverview(props) {
                 </Explanation>
                 <CountyInputView
                   fips={props.fips}
+                  state={!props.fips && areaName}
                   width={contentWidth + 40}
                   height={(chartHeight + 120) / 2}
                   lastDrawLocation={lastDrawLocation}
