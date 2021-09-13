@@ -32,7 +32,7 @@ class TestAdjustedViz {
       left: 30,
       top: 0,
       right: 0,
-      bottom: 0,
+      bottom: 30,
     };
     this._mainChartInnerHeight =
       this._mainChartOuterHeight -
