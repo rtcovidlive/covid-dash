@@ -521,6 +521,13 @@ p {
 .rt-header-update-entry-alert:hover {
   background-color: rgba(235, 83, 88, 0.25) !important;
 }
+.rt-header-update-entry-orange {
+  background-color: rgba(255, 169, 56, 0.15);
+  color: #ec7d1b;
+}
+.rt-header-update-entry-orange:hover {
+  background-color: rgba(255, 169, 56, 0.25) !important;
+}
 .rt-header-update-entry-yellow {
   background-color: rgba(233, 221, 83, 0.25);
   color: $yellow-link-color;

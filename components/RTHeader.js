@@ -5,7 +5,11 @@ import Link from "next/link";
 import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { ShareButtons } from "./ShareButtons";
-import { DiffOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
+import {
+  DiffOutlined,
+  ReadOutlined,
+  VerticalAlignBottomOutlined,
+} from "@ant-design/icons";
 import { GithubOutlined } from "@ant-design/icons";
 
 export const MainTitle = styled(Title)`
@@ -87,7 +91,16 @@ export function RTHeader(props) {
                 href={"/updates.pdf"}
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
-                <DiffOutlined /> <strong>(8/16) New model changes</strong>
+                <DiffOutlined /> <strong>Model changelog</strong>
+              </a>
+            </div>
+            <div className="rt-header-update-entry rt-header-update-entry-orange">
+              <a
+                target="_blank"
+                href="https://blog.covidestim.org/"
+                style={{ color: "inherit", textDecoration: "inherit" }}
+              >
+                <ReadOutlined /> <strong>Read our blog</strong>
               </a>
             </div>
             <div
@@ -133,9 +146,8 @@ export function RTHeader(props) {
           </div>
           <p>
             <strong>
-              The <i>covidestim</i> project tries to paint the most complete,
-              current, and granular picture possible of the U.S. COVID-19
-              epidemic
+              <i>covidestim</i> tries to paint a complete, current, and granular
+              picture of the U.S. COVID-19 epidemic
             </strong>
             . We use an in-house statistical model that combines evidence on
             COVID-19 transmission, natural history and diagnosis with reported
@@ -152,31 +164,20 @@ export function RTHeader(props) {
             <a href="https://github.com/CSSEGISandData/COVID-19">
               Johns Hopkins CSSE
             </a>
-            . We fit county-level models using an optimization algorithm. The
-            state-level models are fit using a Hamiltonian Monte Carlo (HMC)
-            algorithm to provide point estimates as well as measures of
-            uncertainty. If HMC fitting does not converge for a state, the
-            optimization algorithm is used instead that day, and the results
-            will lack uncertainty intervals.
-          </p>
-          <p>
-            <span
-              style={{
-                borderRadius: 4,
-                backgroundColor: "#ffad5c",
-                padding: "4.5px 8px",
-              }}
-            >
-              <strong>
-                New blog post:{" "}
-                <a
-                  target="_blank"
-                  href="https://blog.covidestim.org/posts/data-pipeline/"
-                >
-                  Navigating the COVID-19 data jungle
-                </a>
-              </strong>
-            </span>
+            . We fit counties using the{" "}
+            <a href="https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm">
+              BFGS
+            </a>{" "}
+            optimization algorithm, and state models using the slower{" "}
+            <a href="https://en.wikipedia.org/wiki/Hamiltonian_Monte_Carlo">
+              HMC
+            </a>{" "}
+            algorithm, which yields uncertainty intervals. When a state run
+            takes too long, we rerun it with BFGS and use a{" "}
+            <a href="https://blog.covidestim.org/posts/uncertainty-intervals/">
+              method
+            </a>{" "}
+            to estimate the uncertainty.
           </p>
         </HeaderInner>
       </div>
