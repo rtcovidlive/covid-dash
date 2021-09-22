@@ -1,4 +1,5 @@
 import { LineSeries } from "react-vis";
+import { useState } from "react";
 
 // `SplitLineSeries` takes exactly the same props as `@d3/react-vis`'s
 // LineSeries, and one additional integer, `dashLastNDays`. It returns
@@ -8,9 +9,13 @@ import { LineSeries } from "react-vis";
 // sure the right-hand <LineSeries> is dashed, or dotted if it's the case that
 // the arguments to `SplieLineSeries` specify a dashed line.
 export function SplitLineSeries(props) {
-  const { key, strokeStyle, data, dashLastNDays, ...other } = props;
+  const { key, strokeStyle, data, dashLastNDays, onNearestXY, ...other } =
+    props;
 
   if (!data || !data.length) return [];
+
+  const hintActiveSide = props.hintActiveSide;
+  const setHintActiveSide = props.setHintActiveSide;
 
   const len = data.length;
 
@@ -26,6 +31,12 @@ export function SplitLineSeries(props) {
       key={key + "-left"}
       data={dataLeft}
       strokeStyle={strokeStyle} // Keep original stroke style
+      onNearestXY={(value) =>
+        hintActiveSide === "L" && onNearestXY && onNearestXY(value)
+      }
+      onSeriesMouseOver={(e) =>
+        hintActiveSide === "R" && setHintActiveSide("L")
+      }
     />,
     <LineSeries
       {...other}
@@ -33,6 +44,12 @@ export function SplitLineSeries(props) {
       data={dataRight}
       strokeStyle={strokeStyleRight}
       strokeDasharray={strokeDasharrayRight}
+      onNearestXY={(value) =>
+        hintActiveSide === "R" && onNearestXY && onNearestXY(value)
+      }
+      onSeriesMouseOver={(e) =>
+        hintActiveSide === "L" && setHintActiveSide("R")
+      }
     />,
   ];
 }

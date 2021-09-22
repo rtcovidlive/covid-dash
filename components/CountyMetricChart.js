@@ -148,6 +148,7 @@ export function CountyMetricChart(props) {
   const [value, setValue] = useState(false);
   const [modelRunDate, setModelRunDate] = useState(false);
   const [neighborKeys, setNeighborKeys] = useState(null);
+  const [hintActiveSide, setHintActiveSide] = useState("R");
 
   const resultsGrouped = data && groupBy(data, "run.date");
   const resultsArray = data && _.toArray(resultsGrouped);
@@ -268,24 +269,31 @@ export function CountyMetricChart(props) {
           })
         )}
 
-      {_.flatMap(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) =>
-        SplitLineSeries({
-          dashLastNDays: 14,
-          data: clipper(v),
-          key: "history-" + k,
-          color:
-            k === numSeries - 1 && conf.strokeColorEmphasis
-              ? conf.strokeColorEmphasis
-              : conf.strokeColor || "black",
-          opacity: 0.2 + logitScale(12, 0.7)(k / (numSeries - 1)) / 0.7,
-          strokeWidth: k === numSeries - 1 ? "4px" : "2px",
-          onNearestXY: (value) =>
-            k === numSeries - 1 &&
-            !showNeighbors &&
-            !showHistory &&
-            setValue(value),
-        })
-      )}
+      {showHistory &&
+        _.flatMap(resultsArray.slice(0, resultsArray.length - 1), (v, k) =>
+          SplitLineSeries({
+            dashLastNDays: 14,
+            data: clipper(v),
+            key: "history-" + k,
+            color: conf.strokeColor || "black",
+            opacity: 0.2 + logitScale(12, 0.7)(k / (numSeries - 2)) / 0.7,
+            strokeWidth: k === numSeries - 1 ? "4px" : "2px",
+            onNearestXY: null,
+          })
+        )}
+
+      {SplitLineSeries({
+        dashLastNDays: 14,
+        data: clipper(_.last(resultsArray)),
+        key: "present-lineseries",
+        color: conf.strokeColorEmphasis,
+        strokeWidth: "4px",
+        hintActiveSide,
+        setHintActiveSide,
+        onNearestXY: (value) => {
+          !showNeighbors && !showHistory && setValue(value);
+        },
+      })}
 
       {showHistory && (
         <MarkSeries
