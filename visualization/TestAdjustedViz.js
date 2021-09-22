@@ -22,6 +22,8 @@ class TestAdjustedViz {
     this._mainChartInfectionStroke = "rgba(0, 145, 255, 1)";
     this._mainChartBars = "rgb(50,50,0,0.1)";
     this._mainChartDark = "rgba(50, 50, 0, 0.5)";
+
+    this._dashLastNDays = 14;
   }
 
   setDimensions(width, height) {
@@ -313,18 +315,43 @@ class TestAdjustedViz {
         event.stopPropagation();
         self.handleMouseout();
       });
+
     chartContent
       .selectAll("mainContentLine." + series)
-      .data((d) => [d.series.slice(skip)])
+      .data((d) => [
+        d.series.slice(skip, d.series.length - self._dashLastNDays),
+      ])
       .join("path")
       .style("cursor", "pointer")
       .attr("stroke", stroke)
       .attr("fill", "none")
       .attr("stroke-width", "2px")
       .attr("d", (d) => {
+        console.log(d);
         let thisLine = line()
           .x((o) => this.x(this.dataPointDate(o)) + this._barWidth / 2)
           .y((o) => this.mainChartY(o[series]));
+        console.log(thisLine(d));
+        return thisLine(d);
+      });
+
+    chartContent
+      .selectAll("mainContentLine." + series + "-lastN")
+      .data((d) => [d.series.slice(d.series.length - self._dashLastNDays - 1)])
+      .join("path")
+      .style("cursor", "pointer")
+      .attr("stroke", stroke)
+      .attr("fill", "none")
+      .attr("stroke-width", "2px")
+      .attr("stroke-dashoffset", 0.0)
+      .attr("stroke-dasharray", "1 4")
+      .attr("stroke-linecap", "square")
+      .attr("d", (d) => {
+        console.log(d);
+        let thisLine = line()
+          .x((o) => this.x(this.dataPointDate(o)) + this._barWidth / 2)
+          .y((o) => this.mainChartY(o[series]));
+        console.log(thisLine(d));
         return thisLine(d);
       });
   }
