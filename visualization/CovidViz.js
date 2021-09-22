@@ -80,6 +80,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.DerivedR0: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "r0",
             legend: "Rt",
             label: "Rt",
@@ -108,6 +110,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.DerivedR0NoUI: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "r0",
             legend: "Rt",
             label: "Rt",
@@ -129,6 +133,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfections: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "onsets",
             legend: "True infections",
             label: "True infections",
@@ -152,6 +158,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfectionsNoUI: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "onsets",
             legend: "True infections",
             label: "True infections",
@@ -173,6 +181,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfectionsPC: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "onsetsPC",
             legend: "Infections per 100k",
             label: "Infections per 100k",
@@ -196,6 +206,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfectionsPCNoUI: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "onsetsPC",
             legend: "True infections per 100k",
             label: "True infections per 100k",
@@ -216,6 +228,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.Seroprevalence: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "cumulative",
             legend: "% ever infected",
             label: "% ever infected",
@@ -239,6 +253,8 @@ class CovidViz {
         }
         case Constants.MetricOptions.SeroprevalenceNoUI: {
           conf = {
+            dashLastNDays: 14,
+            displayPreliminary: false,
             submetric: "cumulative",
             legend: "% ever infected",
             label: "% ever infected",
@@ -818,7 +834,7 @@ class CovidViz {
       .data((d) => {
         let series = d.series;
         if (conf.dashLastNDays) {
-          return [series.slice(0, series.length)];
+          return [series.slice(0, series.length - conf.dashLastNDays)];
         }
         return [series];
       })
@@ -1014,7 +1030,7 @@ class CovidViz {
           if (isSamePoint) {
             let isAfterLastNDays =
               index >= d.series.length - conf.dashLastNDays;
-            if (!isAfterLastNDays) {
+            if (!isAfterLastNDays || !conf.displayPreliminary) {
               metricsAtPoint.push({
                 weight: "normal",
                 text: conf.formatDatapointForTooltip(
