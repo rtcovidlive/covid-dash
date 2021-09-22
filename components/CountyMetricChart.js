@@ -258,8 +258,9 @@ export function CountyMetricChart(props) {
       {showNeighbors &&
         _.flatMap(neighborResultsArray, (v, k) =>
           SplitLineSeries({
+            dashLastNDays: 14,
             data: clipper(v),
-            key: k + "neighbors",
+            key: "neighbors-" + k,
             color: conf.neighborStrokeColor || "black",
             opacity: 0.4,
             strokeWidth: "1.5px",
@@ -269,8 +270,9 @@ export function CountyMetricChart(props) {
 
       {_.flatMap(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) =>
         SplitLineSeries({
+          dashLastNDays: 14,
           data: clipper(v),
-          key: k,
+          key: "history-" + k,
           color:
             k === numSeries - 1 && conf.strokeColorEmphasis
               ? conf.strokeColorEmphasis
