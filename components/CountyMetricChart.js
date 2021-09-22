@@ -12,6 +12,7 @@ import {
   Hint,
   DiscreteColorLegend,
 } from "react-vis";
+import { SplitLineSeries } from "../visualization/SplitLineSeries.js";
 import _ from "lodash";
 import {
   useStateResults,
@@ -255,36 +256,34 @@ export function CountyMetricChart(props) {
       )}
 
       {showNeighbors &&
-        _.map(neighborResultsArray, (v, k) => (
-          <LineSeries
-            data={clipper(v)}
-            key={k + "neighbors"}
-            color={conf.neighborStrokeColor || "black"}
-            opacity={0.4}
-            strokeWidth={"1.5px"}
-            strokeStyle={"dashed"}
-          />
-        ))}
+        _.flatMap(neighborResultsArray, (v, k) =>
+          SplitLineSeries({
+            data: clipper(v),
+            key: k + "neighbors",
+            color: conf.neighborStrokeColor || "black",
+            opacity: 0.4,
+            strokeWidth: "1.5px",
+            strokeStyle: "dashed",
+          })
+        )}
 
-      {_.map(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) => (
-        <LineSeries
-          data={clipper(v)}
-          key={k}
-          color={
+      {_.flatMap(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) =>
+        SplitLineSeries({
+          data: clipper(v),
+          key: k,
+          color:
             k === numSeries - 1 && conf.strokeColorEmphasis
               ? conf.strokeColorEmphasis
-              : conf.strokeColor || "black"
-          }
-          opacity={0.2 + logitScale(12, 0.7)(k / (numSeries - 1)) / 0.7}
-          strokeWidth={k === numSeries - 1 ? "4px" : "2px"}
-          onNearestXY={(value) =>
+              : conf.strokeColor || "black",
+          opacity: 0.2 + logitScale(12, 0.7)(k / (numSeries - 1)) / 0.7,
+          strokeWidth: k === numSeries - 1 ? "4px" : "2px",
+          onNearestXY: (value) =>
             k === numSeries - 1 &&
             !showNeighbors &&
             !showHistory &&
-            setValue(value)
-          }
-        />
-      ))}
+            setValue(value),
+        })
+      )}
 
       {showHistory && (
         <MarkSeries
