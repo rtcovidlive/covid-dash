@@ -277,7 +277,7 @@ export function CountyMetricChart(props) {
             key: "history-" + k,
             color: conf.strokeColor || "black",
             opacity: 0.2 + logitScale(12, 0.7)(k / (numSeries - 2)) / 0.7,
-            strokeWidth: k === numSeries - 1 ? "4px" : "2px",
+            strokeWidth: "2px",
             onNearestXY: null,
           })
         )}
