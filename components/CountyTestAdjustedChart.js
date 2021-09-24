@@ -3,12 +3,9 @@ import {
   XAxis,
   YAxis,
   HorizontalGridLines,
-  VerticalGridLines,
-  LineSeries,
-  MarkSeries,
   VerticalBarSeries,
-  Highlight,
 } from "react-vis";
+import { SplitLineSeries } from "../visualization/SplitLineSeries.js";
 import _ from "lodash";
 import { useCountyResults, useInputData } from "../lib/data";
 import { format } from "date-fns";
@@ -81,30 +78,6 @@ export function CountyTestAdjustedChart(props) {
         style={{ line: { stroke: "black", strokeWidth: 1 } }}
       />
 
-      {_.map(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) => (
-        <LineSeries
-          data={selectMeasure(
-            v,
-            props.type == "cases" ? "infections" : "deaths"
-          )}
-          key={k}
-          color={"rgba(0, 145, 255, 1)"}
-          opacity={showHistory ? 0.1 : 1}
-        />
-      ))}
-
-      {_.map(showHistory ? resultsArray : [_.last(resultsArray)], (v, k) => (
-        <LineSeries
-          data={selectMeasure(
-            v,
-            props.type == "cases" ? "cases.fitted" : "deaths.fitted"
-          )}
-          key={k}
-          color={"rgba(50, 50, 0, 1)"}
-          opacity={showHistory ? 0.1 : 1}
-        />
-      ))}
-
       {inputData && (
         <VerticalBarSeries
           data={selectMeasure(
@@ -118,6 +91,60 @@ export function CountyTestAdjustedChart(props) {
           barWidth={0.85}
         />
       )}
+
+      {showHistory &&
+        _.flatMap(resultsArray.slice(0, resultsArray.length - 1), (v, k) =>
+          SplitLineSeries({
+            dashLastNDays: 14,
+            data: selectMeasure(
+              v,
+              props.type == "cases" ? "infections" : "deaths"
+            ),
+            key: "history-" + k,
+            color: "rgba(0, 145, 255, 1)",
+            opacity: 0.1,
+            onNearestXY: null,
+          })
+        )}
+
+      {SplitLineSeries({
+        dashLastNDays: 14,
+        data: selectMeasure(
+          _.last(resultsArray),
+          props.type == "cases" ? "infections" : "deaths"
+        ),
+        key: "present",
+        color: "rgba(0, 145, 255, 1)",
+        opacity: 1,
+        onNearestXY: null,
+      })}
+
+      {showHistory &&
+        _.flatMap(resultsArray.slice(0, resultsArray.length - 1), (v, k) =>
+          SplitLineSeries({
+            dashLastNDays: 14,
+            data: selectMeasure(
+              v,
+              props.type == "cases" ? "cases.fitted" : "deaths.fitted"
+            ),
+            key: "history-" + k,
+            color: "rgba(50, 50, 0, 1)",
+            opacity: 0.1,
+            onNearestXY: null,
+          })
+        )}
+
+      {SplitLineSeries({
+        dashLastNDays: 14,
+        data: selectMeasure(
+          _.last(resultsArray),
+          props.type == "cases" ? "cases.fitted" : "deaths.fitted"
+        ),
+        key: "present",
+        color: "rgba(50, 50, 0, 1)",
+        opacity: 1,
+        onNearestXY: null,
+      })}
     </XYPlot>
   );
 }
