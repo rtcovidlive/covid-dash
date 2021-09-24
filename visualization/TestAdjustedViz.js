@@ -327,11 +327,9 @@ class TestAdjustedViz {
       .attr("fill", "none")
       .attr("stroke-width", "2px")
       .attr("d", (d) => {
-        console.log(d);
         let thisLine = line()
           .x((o) => this.x(this.dataPointDate(o)) + this._barWidth / 2)
           .y((o) => this.mainChartY(o[series]));
-        console.log(thisLine(d));
         return thisLine(d);
       });
 
@@ -347,11 +345,9 @@ class TestAdjustedViz {
       .attr("stroke-dasharray", "1 4")
       .attr("stroke-linecap", "square")
       .attr("d", (d) => {
-        console.log(d);
         let thisLine = line()
           .x((o) => this.x(this.dataPointDate(o)) + this._barWidth / 2)
           .y((o) => this.mainChartY(o[series]));
-        console.log(thisLine(d));
         return thisLine(d);
       });
   }

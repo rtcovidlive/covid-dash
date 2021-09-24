@@ -30,7 +30,6 @@ export function CountyTestAdjustedChart(props) {
     return _.map(results, (r) => ({ date: r.date, y: r[measure] }));
   };
 
-  console.log(inputData);
   const yDomain =
     data &&
     data.length &&
