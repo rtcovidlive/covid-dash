@@ -179,6 +179,25 @@ export function RTHeader(props) {
             </a>{" "}
             to estimate the uncertainty.
           </p>
+          <p>
+            <span
+              style={{
+                borderRadius: 4,
+                backgroundColor: "#ffad5c",
+                padding: "4.5px 8px",
+              }}
+            >
+              <strong>
+                New blog post:{" "}
+                <a
+                  target="_blank"
+                  href="https://blog.covidestim.org/posts/understanding-rt/"
+                >
+                  Understanding R<sub>t</sub>
+                </a>
+              </strong>
+            </span>
+          </p>
         </HeaderInner>
       </div>
     </>
