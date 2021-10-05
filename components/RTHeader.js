@@ -180,7 +180,13 @@ export function RTHeader(props) {
             to estimate the uncertainty.
           </p>
           <p>
-            <span
+            <strong>10/5:</strong> Model estimates for Connecticut are
+            unreliable due to a dump of deaths from months ago. We have{" "}
+            <a href="https://github.com/CSSEGISandData/COVID-19/issues/4724">
+              reported
+            </a>{" "}
+            the issue.
+            {/*<span
               style={{
                 borderRadius: 4,
                 backgroundColor: "#ffad5c",
@@ -197,6 +203,7 @@ export function RTHeader(props) {
                 </a>
               </strong>
             </span>
+            */}
           </p>
         </HeaderInner>
       </div>
