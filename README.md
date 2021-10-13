@@ -6,6 +6,15 @@ It's built using Next.js; to run it, type:
 
 `npm install` and then `npm run dev`
 
+This will start up a development server and print a localhost URL to use.
+
+The development server will watch for any changes to the repository, and it will
+live-reload affected components. Usually this will be seamless, but sometimes making
+changes will require a reload.
+
+The development build is significantly slower than the production build. It is very
+helpful to use [React Developer Tools][rdt] when developing on thie site.
+
 ## Key files
 
 ```
@@ -17,11 +26,11 @@ components/
 ├── RTBase.js              Sets up API calls and does other init-config actions
 ├── RTFooter.js            Footer code
 ├── RTHeader.js            Header code
-├── RTOverview.js          Basically the root node that all important
-                             components descend from
+├──*RTOverview.js*         The root node that all important
+                             components descend from. Start here.
 ├── RTSubareaChart.js      This and all following files are various wrappers
 ├── RTSubareaOverview.js     around the primary outcome charts used all over
-├── StateR0Display.js        the front page.
+├── StateR0Display.js        the front page. 
 ├── StateRtChart.js
 ├── StateRtMiniDisplay.js
 ├── [...] Others omitted
@@ -78,3 +87,4 @@ https://api.covidestim.org/latest_results?fips=eq.09009&date=gt.2021-10-01&selec
 
 [msgpack]: https://msgpack.org/index.html
 [postgrest]: https://postgrest.org/
+[rdt]: https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en
