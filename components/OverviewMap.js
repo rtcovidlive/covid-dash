@@ -187,7 +187,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   useEffect(() => {
     const config = {
       onDownloadProgress: function (e) {
-        setDataLoadProgress(e.loaded / 10000000);
+        setDataLoadProgress(e.loaded / 14000000);
       },
       responseType: "arraybuffer",
     };

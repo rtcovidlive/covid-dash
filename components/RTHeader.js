@@ -179,8 +179,7 @@ export function RTHeader(props) {
             </a>{" "}
             to estimate the uncertainty.
           </p>
-          <p>
-            <strong>11/8:</strong> Model estimates for New Hampshire are
+          {/*<strong>11/8:</strong> Model estimates for New Hampshire are
             currently unreliable due to a multi-week failure of the state's case
             reporting system. See{" "}
             <a href="https://github.com/CSSEGISandData/COVID-19/issues/4858">
@@ -190,8 +189,8 @@ export function RTHeader(props) {
             <a href="https://api.covidestim.org/latest_state_inputs?state=eq.New%20Hampshire&date=gt.2021-10-20&date=lte.2021-11-08&select=date,cases">
               stretch of model input data
             </a>
-            .
-            {/*<span
+            .*/}
+          {/*<span
               style={{
                 borderRadius: 4,
                 backgroundColor: "#ffad5c",
@@ -209,7 +208,6 @@ export function RTHeader(props) {
               </strong>
             </span>
             */}
-          </p>
         </HeaderInner>
       </div>
     </>
