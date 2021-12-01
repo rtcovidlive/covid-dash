@@ -297,7 +297,9 @@ export function CountyMetricChart(props) {
 
       {showHistory && (
         <MarkSeries
-          data={_.map(resultsArray, _.last)}
+          data={_.map(resultsArray, clipper)
+            .filter((d) => d.length > 0)
+            .map(_.last)}
           key={1000}
           color={conf.strokeColor}
           size={1}
