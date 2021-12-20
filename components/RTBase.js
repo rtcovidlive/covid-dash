@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { Util } from "lib/Util";
 import DataFetcher from "lib/DataFetcher";
 import { SWRConfig } from "swr";
+import { Modal } from "antd";
 
 const GoogleAnalyticsTag = dynamic(() => import("./GoogleAnalyticsTag"), {
   ssr: false,
@@ -58,6 +59,49 @@ export function RTBase(props) {
         setNewWidth();
       }, 250);
     });
+  }, [mainContentRef]);
+  useEffect(() => {
+    function info() {
+      Modal.info({
+        title: "Holiday modeling changes",
+        content: (
+          <div>
+            <p>
+              <ul style={{ paddingLeft: 0 }}>
+                <li>
+                  There will be{" "}
+                  <a href="https://www.wsj.com/articles/omicron-tracking-in-u-s-is-hindered-by-data-gaps-11640023264">
+                    extreme fluctuations in US COVID-19 data
+                  </a>{" "}
+                  over the holidays.
+                </li>
+                <li>
+                  As a compromise, our results from 12/23-1/2 will extrapolate
+                  from input data collected up until 12/23.
+                </li>
+                <li>Normal service will resume on 1/3.</li>
+                <li>We will make any further announcements on Twitter:</li>
+              </ul>
+            </p>
+            <a
+              class="twitter-timeline"
+              href="https://twitter.com/covidestim?ref_src=twsrc%5Etfw"
+              data-height={300}
+            >
+              Tweets by covidestim
+            </a>{" "}
+            <script
+              async
+              src="https://platform.twitter.com/widgets.js"
+              charset="utf-8"
+            ></script>
+          </div>
+        ),
+        onOk() {},
+      });
+    }
+
+    info();
   }, [mainContentRef]);
 
   var countryCode;
