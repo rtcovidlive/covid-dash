@@ -63,7 +63,7 @@ export function RTBase(props) {
   useEffect(() => {
     function info() {
       Modal.info({
-        title: "Holiday modeling changes",
+        title: "Use caution!",
         content: (
           <div>
             <p>
@@ -71,16 +71,21 @@ export function RTBase(props) {
                 <li>
                   There will be{" "}
                   <a href="https://www.wsj.com/articles/omicron-tracking-in-u-s-is-hindered-by-data-gaps-11640023264">
-                    extreme fluctuations in US COVID-19 data
+                    <b>extreme</b> fluctuations in US COVID-19 data reporting
                   </a>{" "}
                   over the holidays.
                 </li>
                 <li>
-                  As a compromise, our results from 12/23-1/2 will extrapolate
-                  from input data collected up until 12/23.
+                  Key parameters of the Omicron variant remain{" "}
+                  <b>highly uncertain as of 12/22</b>. In areas with high
+                  Omicron prevalence, we cannot speak to the accuracy of our
+                  estimates.
                 </li>
-                <li>Normal service will resume on 1/3.</li>
-                <li>We will make any further announcements on Twitter:</li>
+                <li>
+                  We will return on <b>1/3</b> to begin incorporating
+                  Omicron-specific assumptions into our model.
+                </li>
+                <li>Check Twitter for further announcements:</li>
               </ul>
             </p>
             <a
