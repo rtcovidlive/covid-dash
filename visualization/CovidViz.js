@@ -419,6 +419,7 @@ class CovidViz {
     this.y = scaleLinear()
       .domain(this._forceYDomain || [minCasesForSeries, maxCases * 1.05])
       .range([this._height - this._margin.bottom, this._margin.top])
+      .clamp(true)
       .nice();
   }
 
@@ -889,6 +890,35 @@ class CovidViz {
         return this.x(conf.i(d)) - 1;
       })
       .attr("cy", (d) => this.y(conf.m(d)));
+
+    pathContainer
+      .selectAll("path.lineenduparrow")
+      .data((d) => {
+        let series = d.series;
+        let len = series.length;
+        return [series[len - 1]];
+      })
+      .join("text")
+      .text((d) => {
+        return conf.m(d) > this.y.domain()[1] ? "▲" : "";
+      })
+      .attr("stroke-width", 0)
+      .attr("fill", (d) => {
+        let identifier = this._data[0].identifier;
+        return conf.lineColorForEntry(identifier, d);
+      })
+      .attr("x", (d) => {
+        return this.x(conf.i(d)) - 1;
+      })
+      .attr("font-size", lineEndLabelFont)
+      .attr("text-anchor", "middle")
+      .attr("font-weight", "bold")
+      .attr("y", (d) => {
+        let val = conf.m(d);
+        let y = this.y(conf.m(d));
+        return y - 3;
+      });
+
     pathContainer
       .selectAll("path.lineendtext")
       .data((d) => {
@@ -898,7 +928,7 @@ class CovidViz {
       })
       .join("text")
       .text((d) => {
-        let numberFormat = format(",.2f");
+        let numberFormat = format(conf.tooltipPrecision || ",.2f");
         return numberFormat(conf.m(d));
       })
       .attr("stroke-width", 0)
@@ -907,7 +937,7 @@ class CovidViz {
         return conf.lineColorForEntry(identifier, d);
       })
       .attr("x", (d) => {
-        return this.x(conf.i(d)) - 2;
+        return this.x(conf.i(d)) - 6;
       })
       .attr("font-size", lineEndLabelFont)
       .attr("text-anchor", "end")
@@ -915,7 +945,7 @@ class CovidViz {
       .attr("y", (d) => {
         let val = conf.m(d);
         let y = this.y(conf.m(d));
-        return val > 1 ? y - (lineEndLabelFont - 4) : y + lineEndLabelFont + 4;
+        return y + lineEndLabelFont / 2;
       });
 
     if (this._showMovingAverage) {

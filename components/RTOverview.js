@@ -29,7 +29,7 @@ export function RTOverview(props) {
   let outcomeTypes = {
     infectionsPC: {
       enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
-      yDomain: [0, 400],
+      yDomain: [0, 800],
       id: "infectionsPC",
       label: "Infections (per 100k)",
       background:
@@ -37,8 +37,8 @@ export function RTOverview(props) {
     },
     infections: {
       enabledModes: [Constants.MetricOptions.TrueInfections],
-      yDomain: [0, 100000],
-      yDomainCounty: [0, 5000],
+      yDomain: [0, 200000],
+      yDomainCounty: [0, 10000],
       id: "infections",
       label: "Infections (raw)",
       background:

@@ -60,8 +60,8 @@ const getSeriesConfig = function (metric) {
     case "infectionsPC": {
       conf = {
         shortName: "IPC",
-        yDomain: [0, 500],
-        yAxisTicks: [0, 100, 200, 300, 400],
+        yDomain: [0, 800],
+        yAxisTicks: [0, 100, 200, 300, 400, 600, 800],
         strokeColor: "rgb(100, 125, 160)",
         fillColorConf: "rgb(125, 200, 255)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
