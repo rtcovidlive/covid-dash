@@ -36,7 +36,7 @@
     "html-loader": "^1.1.0",
     "husky": "^4.2.5",
     "markdown-loader": "^5.1.0",
-    "marked": "^1.1.0",
+    "marked": "^4.0.10",
     "prettier": "^2.0.5",
     "pretty-quick": "^2.0.1",
     "webpack-cli": "^3.3.12"
