@@ -63,43 +63,17 @@ export function RTBase(props) {
   useEffect(() => {
     function info() {
       Modal.info({
-        title: "Use caution!",
+        title: "Heads up!",
         content: (
           <div>
             <p>
-              <ul style={{ paddingLeft: 0 }}>
-                <li>
-                  There will be{" "}
-                  <a href="https://www.wsj.com/articles/omicron-tracking-in-u-s-is-hindered-by-data-gaps-11640023264">
-                    <b>extreme</b> fluctuations in US COVID-19 data reporting
-                  </a>{" "}
-                  over the holidays.
-                </li>
-                <li>
-                  Key parameters of the Omicron variant remain{" "}
-                  <b>highly uncertain as of 12/22</b>. In areas with high
-                  Omicron prevalence, we cannot speak to the accuracy of our
-                  estimates.
-                </li>
-                <li>
-                  We will return on <b>1/3</b> to begin incorporating
-                  Omicron-specific assumptions into our model.
-                </li>
-                <li>Check Twitter for further announcements:</li>
-              </ul>
+              We're hard at work incorporating Omicron-specific assumptions into
+              our model, and expect to deploy a major update within two weeks.
+              Until then, use caution when interpreting recent estimates.
             </p>
-            <a
-              class="twitter-timeline"
-              href="https://twitter.com/covidestim?ref_src=twsrc%5Etfw"
-              data-height={300}
-            >
-              Tweets by covidestim
-            </a>{" "}
-            <script
-              async
-              src="https://platform.twitter.com/widgets.js"
-              charset="utf-8"
-            ></script>
+            <p>
+              <i>Wednesday, Jan 19</i>
+            </p>
           </div>
         ),
         onOk() {},
