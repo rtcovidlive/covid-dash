@@ -24,11 +24,6 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
             <img src="/hsph.png" width={Math.min(450, props.maxWidth)} />
           </a>
         </div>
-        <div style={{ marginTop: "25px", marginBottom: "25px" }}>
-          <a href="https://med.stanford.edu/covid19.html">
-            <img src="/stanford.png" width={Math.min(450, props.maxWidth)} />
-          </a>
-        </div>
         <p>
           This project was supported by{" "}
           <a href="https://govtribe.com/award/federal-grant-award/project-grant-nu38ot000297">
