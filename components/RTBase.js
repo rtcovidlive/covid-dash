@@ -63,16 +63,29 @@ export function RTBase(props) {
   useEffect(() => {
     function info() {
       Modal.info({
-        title: "Heads up!",
+        title: "Pausing our nowcasting service",
         content: (
           <div>
+            <p>To our users:</p>
             <p>
-              We're hard at work incorporating Omicron-specific assumptions into
-              our model, and expect to deploy a major update within two weeks.
-              Until then, use caution when interpreting recent estimates.
+              Since early Jan 2022, we have been working to implement several
+              important changes to our model to address differences in natural
+              history of disease and changes in immunity associated with the
+              emergence and spread of SARS-CoV-2 omicron variants. These changes
+              require large structural modifications and extensive testing.
             </p>
             <p>
-              <i>Wednesday, Jan 19</i>
+              We have elected to remove our nowcasts beginning in early Dec.
+              2021 and temporarily halt our daily model runs while we work on
+              this more stable version of our model for the omicron and
+              post-omicron era. We apologize for any disruptions, and want to
+              assure you that we are working nonstop to get Covidestim back up
+              and running with current nowcast estimates in the next few weeks.
+              Thanks for your patience and understanding.{" "}
+              <b>This change will occur on Wednesday, March 2.</b>
+            </p>
+            <p>
+              <i>Wednesday, Feb 23</i>
             </p>
           </div>
         ),
