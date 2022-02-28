@@ -123,6 +123,8 @@ export function CountyMetricChart(props) {
     routeToState,
   } = props;
 
+  const FROZEN_DATE = new Date("2021-12-01");
+
   const { data: dataCounty, error: errorCounty } = useCountyResults(fips);
   const { data: dataState, error: errorState } = useStateResults(state);
   const { data: dataNeighborCounty, error: errorNeighborCounty } =
@@ -130,14 +132,14 @@ export function CountyMetricChart(props) {
       fips,
       dataCounty
         ? _.maxBy(dataCounty, (d) => d["run.date"])["run.date"]
-        : utcFormat("%Y-%m-%d")(new Date())
+        : utcFormat("%Y-%m-%d")(FROZEN_DATE /*new Date()*/)
     );
   const { data: dataNeighborState, error: errorNeighborState } =
     useNeighboringStateResults(
       state,
       dataState
         ? _.maxBy(dataState, (d) => d["run.date"])["run.date"]
-        : utcFormat("%Y-%m-%d")(new Date())
+        : utcFormat("%Y-%m-%d")(FROZEN_DATE /*new Date()*/)
     );
 
   const key = state ? "state" : "fips";
@@ -200,7 +202,9 @@ export function CountyMetricChart(props) {
       ? d
       : _.filter(
           d,
-          (v) => new Date(v.date) > timeDay.offset(new Date(), -8 * 30)
+          (v) =>
+            new Date(v.date) >
+            timeDay.offset(FROZEN_DATE /*new Date()*/, -8 * 30)
         );
 
   return (
