@@ -93,9 +93,14 @@ export function RTOverview(props) {
     return null;
   }
 
+  const FROZEN_DATE = new Date("2021-12-02");
+
   const dateBounds =
     showExtent === "8mo"
-      ? [timeDay.offset(new Date(), -8 * 30), new Date()]
+      ? [
+          timeDay.offset(FROZEN_DATE /*new Date()*/, -8 * 30),
+          FROZEN_DATE /*new Date()*/,
+        ]
       : [null, null];
 
   let isLgSize = props.width >= 991 && props.width < 1200;

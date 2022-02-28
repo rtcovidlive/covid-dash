@@ -123,7 +123,7 @@ export function CountyMetricChart(props) {
     routeToState,
   } = props;
 
-  const FROZEN_DATE = new Date("2021-12-01");
+  const FROZEN_DATE = new Date("2021-12-02");
 
   const { data: dataCounty, error: errorCounty } = useCountyResults(fips);
   const { data: dataState, error: errorState } = useStateResults(state);
