@@ -2,10 +2,10 @@ import { LineSeries } from "react-vis";
 import { useState } from "react";
 
 // `SplitLineSeries` takes exactly the same props as `@d3/react-vis`'s
-// LineSeries, and one additional integer, `dashLastNDays`. It returns
+// LineSeries, and one additional integer, `dashLastNWeeks`. It returns
 // an array of two <LineSeries> components, which represent partition of the
 // data to be graphed into a "left" and a "right", where the "right" has
-// the last `dashLastNDays + 1` elements. Styling is applied to make
+// the last `dashLastNWeeks + 1` elements. Styling is applied to make
 // sure the right-hand <LineSeries> is dashed, or dotted if it's the case that
 // the arguments to `SplieLineSeries` specify a dashed line.
 //
@@ -17,7 +17,7 @@ import { useState } from "react";
 // will always fire the event regardless of how close the cursor is to their
 // actual SVG elements!
 export function SplitLineSeries(props) {
-  const { key, strokeStyle, data, dashLastNDays, onNearestXY, ...other } =
+  const { key, strokeStyle, data, dashLastNWeeks, onNearestXY, ...other } =
     props;
 
   if (!data || !data.length) return [];
@@ -29,9 +29,9 @@ export function SplitLineSeries(props) {
   const len = data.length;
 
   // Split one "line" into two lines, with the right line constituting the
-  // final `dashLastNDays` observations of data.
-  const dataLeft = data.slice(0, len - dashLastNDays);
-  const dataRight = data.slice(len - dashLastNDays - 1);
+  // final `dashLastNWeeks` observations of data.
+  const dataLeft = data.slice(0, len - dashLastNWeeks);
+  const dataRight = data.slice(len - dashLastNWeeks - 1);
 
   // Handle the case when the caller is already using a dashed strokestyle;
   // this is the case for the `<LineSeries/>` which represent results for

@@ -7,7 +7,7 @@ import {
 } from "react-vis";
 import { SplitLineSeries } from "../visualization/SplitLineSeries.js";
 import _ from "lodash";
-import { useCountyResults, useInputData } from "../lib/data";
+import { useLatestRun, useHistoricalRuns } from "../lib/data";
 import { format } from "date-fns";
 import { format as d3format } from "d3-format";
 import { useState } from "react";

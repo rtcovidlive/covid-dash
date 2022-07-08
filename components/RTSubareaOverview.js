@@ -11,14 +11,18 @@ import { Title } from "./Typography";
 import { DataFetchContext } from "lib/DataFetchContext";
 import { StateRtChart } from "./StateRtChart";
 import { CountyMetricChart, CountyInputChart } from "./CountyMetricChart";
-import { CountyTestAdjustedChart } from "./CountyTestAdjustedChart";
+// import { CountyTestAdjustedChart } from "./CountyTestAdjustedChart";
 import { TestAdjustedChart } from "./TestAdjustedChart";
 import { CaseGrowthChart } from "./CaseGrowthChart";
 import { ShareButtons } from "./ShareButtons";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 import { Switch, DatePicker, Tooltip, BackTop, Radio } from "antd";
-import { useStateResults, useCountyResults, useInputData } from "../lib/data";
+import {
+  useLatestNeighborRuns,
+  useHistoricalRuns,
+  useLatestRun,
+} from "../lib/data";
 import { USStatesByCode } from "../config/USStates";
 
 const rtRef = React.createRef();
@@ -108,7 +112,7 @@ const StatUnit = styled(StatLabel)`
   font-size: 12px;
 `;
 
-const StatNumber = styled.p`
+const StatNumber = styled.div`
   font-weight: 800;
   font-size: 22px;
   display: inline-block;
@@ -385,7 +389,7 @@ function ControlRow(props) {
               value={showExtent}
             >
               <Radio.Button value="all">All</Radio.Button>
-              <Radio.Button value="8mo">Last 8mo</Radio.Button>
+              <Radio.Button value="3mo">Last 3mo</Radio.Button>
             </Radio.Group>
           </StatNumber>
         </StatContent>
@@ -468,14 +472,7 @@ export function RTSubareaOverview(props) {
     ? config.counties[props.fips].county
     : `${props.subarea}`;
 
-  const { data: stateData, error: stateDataError } = useStateResults(areaName);
-
-  const { data: countyData, error: countyDataError } = useCountyResults(
-    props.fips
-  );
-  const { data: countyInputs, error: countyInputsError } = useInputData(
-    props.fips
-  );
+  // const { data, error } = useLatestRun(props.fips);
 
   let subAreaData = rtData.dataSeries[props.subarea];
 
@@ -662,7 +659,7 @@ export function RTSubareaOverview(props) {
                   )}
                 </Col>
               </SubHeaderRow>
-              {props.fips && (
+              {/*props.fips && (
                 <CountyStatRow
                   config={config}
                   data={subAreaData}
@@ -672,7 +669,7 @@ export function RTSubareaOverview(props) {
                   subarea={props.subarea}
                   isSmallScreen={isSmallScreen}
                 />
-              )}
+              )*/}
               <ControlRow
                 showHistory={showHistory}
                 setShowHistory={setShowHistory}
@@ -694,13 +691,14 @@ export function RTSubareaOverview(props) {
             {contentWidth && (
               <RTChartWrapper>
                 <CountyMetricChart
-                  measure={"Rt"}
+                  outcome={"r_t"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
                   showExtent={showExtent}
-                  fips={props.fips}
-                  state={!props.fips && areaName}
-                  stateAbbr={props.subarea}
+                  geoName={props.fips}
+                  // NEeds to be fixed! Somehow have to let CountyMetricChart
+                  // what type of geo this is! Or otherwise it can get it from API call!
+                  stateAbbr={null}
                   width={contentWidth + 40}
                   height={chartHeight}
                   lastDrawLocation={lastDrawLocation}
@@ -721,13 +719,12 @@ export function RTSubareaOverview(props) {
             {contentWidth && (
               <RTChartWrapper>
                 <CountyMetricChart
-                  measure={"infectionsPC"}
+                  outcome={"P100k_infections"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
                   showExtent={showExtent}
-                  fips={props.fips}
-                  state={!props.fips && areaName}
-                  stateAbbr={props.subarea}
+                  geoName={props.fips}
+                  stateAbbr={null}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
                   lastDrawLocation={lastDrawLocation}
@@ -747,13 +744,12 @@ export function RTSubareaOverview(props) {
                 </Explanation>
                 <RTChartWrapper>
                   <CountyMetricChart
-                    measure={"PEI"}
+                    outcome={"PC_infections_cumulative"}
                     showNeighbors={showNeighbors}
                     showHistory={showHistory}
                     showExtent={showExtent}
-                    fips={props.fips}
-                    state={!props.fips && areaName}
-                    stateAbbr={props.subarea}
+                    geoName={props.fips}
+                    stateAbbr={null}
                     width={contentWidth + 40} // + 40}
                     height={chartHeight} //}
                     lastDrawLocation={lastDrawLocation}
@@ -777,14 +773,14 @@ export function RTSubareaOverview(props) {
                   dropdown to inspect archived model input data to see if this
                   may be the case.
                 </Explanation>
-                <CountyInputView
+                {/*                <CountyInputView
                   fips={props.fips}
                   state={!props.fips && areaName}
                   width={contentWidth + 40}
                   height={(chartHeight + 120) / 2}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
-                />
+                /> */}
               </>
             )}
             <ChartTitle level={2}>
@@ -800,7 +796,7 @@ export function RTSubareaOverview(props) {
               see the degree of case underascertainment as the gap between the
               testing data and the infections curve.
             </Explanation>
-            {props.fips && contentWidth && (
+            {/*props.fips && contentWidth && (
               <RTChartWrapper>
                 <CountyTestAdjustedChart
                   type={"cases"}
@@ -811,14 +807,14 @@ export function RTSubareaOverview(props) {
                   showExtent={showExtent}
                 />
               </RTChartWrapper>
-            )}
-            {!props.fips && contentWidth && (
+            )*/}
+            {/*!props.fips && contentWidth && (
               <TestAdjustedChart
                 data={subAreaData}
                 width={contentWidth + 40}
                 height={chartHeight + 170}
               />
-            )}
+            )*/}
             {props.fips && contentWidth && (
               <>
                 <ChartTitle level={2}>
@@ -833,7 +829,7 @@ export function RTSubareaOverview(props) {
                   <ColorLabel>fitted deaths</ColorLabel>, and{" "}
                   <ColorLabelGrey>death data</ColorLabelGrey>.
                 </Explanation>
-                <RTChartWrapper>
+                {/*<RTChartWrapper>
                   <CountyTestAdjustedChart
                     type={"deaths"}
                     fips={props.fips}
@@ -842,7 +838,7 @@ export function RTSubareaOverview(props) {
                     showHistory={showHistory}
                     showExtent={showExtent}
                   />
-                </RTChartWrapper>
+                </RTChartWrapper>*/}
               </>
             )}
           </div>

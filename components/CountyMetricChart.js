@@ -15,39 +15,31 @@ import {
 import { SplitLineSeries } from "../visualization/SplitLineSeries.js";
 import _ from "lodash";
 import {
-  useStateResults,
-  useCountyResults,
-  useNeighboringStateResults,
-  useNeighboringCountyResults,
-  useInputData,
-  useInputDataFromDate,
-  useStateInputData,
-  useStateInputDataFromDate,
+  useLatestNeighborRuns,
+  useHistoricalRuns,
+  useLatestRun,
 } from "../lib/data";
 import { format as d3format } from "d3-format";
 import { max } from "d3-array";
 import { utcFormat } from "d3-time-format";
-import { timeDay } from "d3-time";
+import { utcDay } from "d3-time";
 import { useState } from "react";
 import sma from "sma";
 import { USCounties } from "../config/USCounties.js";
 import { Alert } from "antd";
 import styled from "styled-components";
 
-function groupBy(data, metric) {
-  return _.groupBy(data, (d) => d[metric]);
-}
-
 const Explanation = styled.p`
   margin: 10px 0px 10px 30px;
 `;
 
-const getSeriesConfig = function (metric) {
+const getSeriesConfig = function (outcome) {
   var conf;
 
-  switch (metric) {
-    case "Rt": {
+  switch (outcome) {
+    case "r_t": {
       conf = {
+        shortName: "Rt",
         yDomain: [0, 2],
         yAxisTicks: [0.5, 1, 1.5],
         strokeColor: "gray",
@@ -57,7 +49,7 @@ const getSeriesConfig = function (metric) {
       };
       break;
     }
-    case "infectionsPC": {
+    case "P100k_infections": {
       conf = {
         shortName: "IPC",
         yDomain: [0, 800],
@@ -68,7 +60,7 @@ const getSeriesConfig = function (metric) {
       };
       break;
     }
-    case "PEI": {
+    case "PC_infections_cumulative": {
       conf = {
         yDomain: [0, 1],
         yAxisTicks: [0, 0.33, 0.5, 0.67, 1.0],
@@ -108,11 +100,69 @@ const getSeriesConfig = function (metric) {
   return conf;
 };
 
+const addSpecialOutcomes = function (datum, outcome, pop) {
+  const safeMul = (x, y) => (x === null || y === null ? null : x * y);
+  const safeDiv = (x, y) => (x === null || y === null ? null : x / y);
+
+  if (outcome.startsWith("PC_") && datum[outcome] === undefined) {
+    const base_outcome = outcome.match(/^PC_(.*)$/)[1];
+
+    const newKeys = [
+      [`${outcome}_p2_5`, safeDiv(datum[`${base_outcome}_p2_5`], pop)],
+      [`${outcome}_p25`, safeDiv(datum[`${base_outcome}_p25`], pop)],
+      [`${outcome}`, safeDiv(datum[`${base_outcome}`], pop)],
+      [`${outcome}_p75`, safeDiv(datum[`${base_outcome}_p75`], pop)],
+      [`${outcome}_p97_5`, safeDiv(datum[`${base_outcome}_p97_5`], pop)],
+    ];
+
+    return { ...datum, ..._.fromPairs(newKeys) };
+  } else if (outcome.startsWith("P100k_") && datum[outcome] === undefined) {
+    const base_outcome = outcome.match(/^P100k_(.*)$/)[1];
+
+    const newKeys = [
+      [
+        `${outcome}_p2_5`,
+        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p2_5`], pop)),
+      ],
+      [
+        `${outcome}_p25`,
+        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p25`], pop)),
+      ],
+      [
+        `${outcome}`,
+        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}`], pop)),
+      ],
+      [
+        `${outcome}_p75`,
+        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p75`], pop)),
+      ],
+      [
+        `${outcome}_p97_5`,
+        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p97_5`], pop)),
+      ],
+    ];
+
+    return { ...datum, ..._.fromPairs(newKeys) };
+  } else if (outcome.startsWith("P100k") || outcome.startsWith("PC_")) {
+    return datum;
+  } else {
+    throw 'Outcome did not start with either "PC_" or "P100k"';
+  }
+};
+
+const runWithSpecialOutcomes = function (run, outcome) {
+  return {
+    ...run,
+    timeseries: run.timeseries.map((d) =>
+      addSpecialOutcomes(d, outcome, run.geo_info.pop)
+    ),
+  };
+};
+
 export function CountyMetricChart(props) {
   const {
-    measure,
-    fips,
-    state,
+    outcome,
+    geoName,
     stateAbbr,
     width,
     height,
@@ -123,48 +173,44 @@ export function CountyMetricChart(props) {
     routeToState,
   } = props;
 
-  const FROZEN_DATE = new Date("2021-12-02");
+  let { data: runLatestRaw, error } = useLatestRun(props.geoName);
 
-  const { data: dataCounty, error: errorCounty } = useCountyResults(fips);
-  const { data: dataState, error: errorState } = useStateResults(state);
-  const { data: dataNeighborCounty, error: errorNeighborCounty } =
-    useNeighboringCountyResults(
-      fips,
-      dataCounty
-        ? _.maxBy(dataCounty, (d) => d["run.date"])["run.date"]
-        : utcFormat("%Y-%m-%d")(FROZEN_DATE /*new Date()*/)
-    );
-  const { data: dataNeighborState, error: errorNeighborState } =
-    useNeighboringStateResults(
-      state,
-      dataState
-        ? _.maxBy(dataState, (d) => d["run.date"])["run.date"]
-        : utcFormat("%Y-%m-%d")(FROZEN_DATE /*new Date()*/)
-    );
+  let { data: runsNeighborsRaw, error: errorNeighbors } = useLatestNeighborRuns(
+    props.geoName
+  );
 
-  const key = state ? "state" : "fips";
-
-  const data = key === "fips" ? dataCounty : dataState;
-  const dataNeighbor = key === "fips" ? dataNeighborCounty : dataNeighborState;
+  let { data: runsHistoricalRaw, error: errorHistorical } = useHistoricalRuns(
+    props.geoName
+  );
 
   const [value, setValue] = useState(false);
   const [modelRunDate, setModelRunDate] = useState(false);
   const [neighborKeys, setNeighborKeys] = useState(null);
   const [hintActiveSide, setHintActiveSide] = useState("R");
 
-  const resultsGrouped = data && groupBy(data, "run.date");
-  const resultsArray = data && _.toArray(resultsGrouped);
+  let runLatest = runLatestRaw;
+  let runsNeighbors = runsNeighborsRaw;
+  let runsHistorical = runsHistoricalRaw;
 
-  const neighborResultsGrouped = dataNeighbor && groupBy(dataNeighbor, key);
-  const neighborResultsArray =
-    dataNeighbor && _.toArray(neighborResultsGrouped);
+  if (!runLatest) return null;
 
-  const hasConf =
-    key === "state" &&
-    resultsArray &&
-    resultsArray.length &&
-    _.last(resultsArray)[0]["Rt.lo"] !== null &&
-    _.last(resultsArray)[0]["Rt.lo"] !== "";
+  if (props.outcome.startsWith("P100k_") || props.outcome.startsWith("PC_")) {
+    if (runLatest) runLatest = runWithSpecialOutcomes(runLatest, props.outcome);
+
+    if (runsNeighbors)
+      runsNeighbors = runsNeighbors.map((d) =>
+        runWithSpecialOutcomes(d, props.outcome)
+      );
+
+    if (runsHistorical)
+      runsHistorical = runsHistorical.map((d) =>
+        runWithSpecialOutcomes(d, props.outcome)
+      );
+  }
+
+  const key = stateAbbr ? "state" : "fips";
+
+  const hasConf = runLatest && runLatest.method === "sampling";
 
   const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
 
@@ -173,38 +219,37 @@ export function CountyMetricChart(props) {
       return [
         { title: "Date", value: utcFormat("%b %e")(new Date(d.date)) },
         {
-          title: conf.shortName || measure,
+          title: conf.shortName || outcome,
           value: conf.yTickFormat
-            ? conf.yTickFormat(d[measure])
-            : d3format(",.2f")(d[measure]),
+            ? conf.yTickFormat(d[outcome])
+            : d3format(",.2f")(d[outcome]),
         },
       ];
-    else return [{ title: USCounties[d.fips].county, value: "Hmm" }];
+    else return [{ title: USCounties[d.geo_name].county, value: "Hmm" }];
   };
 
   const rundateFormatHint = (d) => [
     {
-      title: "Age",
-      value: `${timeDay.count(new Date(d["run.date"]), new Date())}d`,
+      title: "Run date",
+      value: utcFormat("%b %e")(new Date(d.run_date)),
     },
     {
-      title: "Date",
-      value: utcFormat("%b %e")(new Date(d["run.date"])),
+      title: "Age",
+      value: `${utcDay.count(new Date(d.run_date), new Date())}d`,
     },
   ];
 
-  const conf = getSeriesConfig(measure);
+  const conf = getSeriesConfig(outcome);
 
-  const numSeries = showHistory ? _.keys(resultsGrouped).length : 1;
+  const numSeries =
+    showHistory && runsHistorical ? runsHistorical.length + 1 : 1;
 
   const clipper = (d) =>
     showExtent === "all"
       ? d
       : _.filter(
           d,
-          (v) =>
-            new Date(v.date) >
-            timeDay.offset(FROZEN_DATE /*new Date()*/, -8 * 30)
+          (v) => new Date(v.date) > utcDay.offset(new Date(), -3 * 30)
         );
 
   return (
@@ -214,7 +259,7 @@ export function CountyMetricChart(props) {
       width={width}
       height={height}
       getX={(d) => new Date(d.date)}
-      getY={(d) => d[measure]}
+      getY={(d) => d[outcome]}
       xType="time"
       onMouseLeave={() => {
         setValue(false);
@@ -238,33 +283,35 @@ export function CountyMetricChart(props) {
         tickFormat={conf.yTickFormat}
       />
       <XAxis
-        tickTotal={showExtent === "all" ? 18 : 5}
+        // tickTotal={showExtent === "all" ? 18 : 5}
+        tickTotal={5}
         tickFormat={(d) => utcFormat("%b %e")(d)}
       />
 
-      {props.measure === "PEI" && (
+      {props.outcome === "PC_infections_cumulative" && runLatest && (
         <AreaSeries
-          data={clipper(_.last(resultsArray))}
+          data={clipper(runLatest.timeseries)}
           color={"rgb(235,235,240)"}
         />
       )}
 
-      {key === "state" && hasConf && (
+      {key === "state" && hasConf && runLatest && (
         <AreaSeries
-          data={clipper(_.last(resultsArray))}
+          data={clipper(runLatest.timeseries)}
           key={"conf"}
-          getY={(d) => d[measure + ".hi"]}
-          getY0={(d) => d[measure + ".lo"]}
+          getY={(d) => d[outcome + "_p97_5"]}
+          getY0={(d) => d[outcome + "_p2_5"]}
           color={conf.fillColorConf}
           opacity={0.7}
         />
       )}
 
       {showNeighbors &&
-        _.flatMap(neighborResultsArray, (v, k) =>
+        runsNeighbors &&
+        _.flatMap(runsNeighbors, (v, k) =>
           SplitLineSeries({
-            dashLastNDays: 14,
-            data: clipper(v),
+            dashLastNWeeks: 2,
+            data: clipper(v.timeseries),
             key: "neighbors-" + k,
             color: conf.neighborStrokeColor || "black",
             opacity: 0.4,
@@ -274,46 +321,61 @@ export function CountyMetricChart(props) {
         )}
 
       {showHistory &&
-        _.flatMap(resultsArray.slice(0, resultsArray.length - 1), (v, k) =>
-          SplitLineSeries({
-            dashLastNDays: 14,
-            data: clipper(v),
+        runsHistorical &&
+        _.flatMap(runsHistorical, (v, k) => {
+          return SplitLineSeries({
+            dashLastNWeeks: 2,
+            data: clipper(v.timeseries),
             key: "history-" + k,
             color: conf.strokeColor || "black",
             opacity: 0.2 + logitScale(12, 0.7)(k / (numSeries - 2)) / 0.7,
             strokeWidth: "2px",
             onNearestXY: null,
-          })
-        )}
+          });
+        })}
 
-      {SplitLineSeries({
-        dashLastNDays: 14,
-        data: clipper(_.last(resultsArray)),
-        key: "present-lineseries",
-        color: conf.strokeColorEmphasis,
-        strokeWidth: "4px",
-        hintActiveSide,
-        setHintActiveSide,
-        onNearestXY: (value) => {
-          !showNeighbors && !showHistory && setValue(value);
-        },
-      })}
+      {runLatest &&
+        SplitLineSeries({
+          dashLastNWeeks: 2,
+          data: clipper(runLatest.timeseries),
+          key: "present-lineseries",
+          color: conf.strokeColorEmphasis,
+          strokeWidth: "4px",
+          hintActiveSide,
+          setHintActiveSide,
+          onNearestXY: (value) => {
+            !showNeighbors && !showHistory && setValue(value);
+          },
+        })}
 
-      {showHistory && (
+      {showHistory && runLatest && runsHistorical && (
         <MarkSeries
-          data={_.map(resultsArray, clipper)
-            .filter((d) => d.length > 0)
-            .map(_.last)}
-          key={1000}
+          data={[runLatest, ...runsHistorical].map((d) => ({
+            ..._.last(d.timeseries),
+            run_date: d.run_date,
+          }))}
+          key={"markseries-historical-runs"}
           color={conf.strokeColor}
-          size={1}
+          size={1.7}
           onNearestXY={(value) =>
             !showNeighbors && showHistory && setModelRunDate(value)
           }
         />
       )}
 
-      {showNeighbors && neighborKeys && (
+      {runLatest && (
+        <MarkSeries
+          data={[runLatest].map((d) => ({
+            ..._.last(d.timeseries),
+            run_date: d.run_date,
+          }))}
+          key={"markseries-latest-run"}
+          color={conf.strokeColorEmphasis}
+          size={2.8}
+        />
+      )}
+
+      {showNeighbors && runsNeighbors && neighborKeys !== null && (
         <DiscreteColorLegend
           items={[
             {
@@ -342,18 +404,20 @@ export function CountyMetricChart(props) {
       )}
 
       {showNeighbors &&
-        _.map(neighborResultsArray, (v, k) => (
+        runsNeighbors &&
+        _.map(runsNeighbors, (v, k) => (
           <LineSeries
-            data={clipper(v)}
-            key={1000 + k}
-            color={neighborKeys === v[0][key] ? "black" : "transparent"}
+            data={clipper(v.timeseries)}
+            key={"neighbors-lineseries-" + k}
+            color="black"
+            //color={neighborKeys === v[0][key] ? "black" : "transparent"}
             opacity={0.7}
             size={6}
-            onSeriesMouseOver={(e) => setNeighborKeys(v[0][key])}
+            onSeriesMouseOver={(e) => setNeighborKeys(v.geo_name)}
             onSeriesMouseOut={(e) => setNeighborKeys(null)}
             onSeriesClick={(e) =>
               key === "fips"
-                ? routeToFIPS(USCounties[v[0].fips].abbr, v[0].fips)
+                ? routeToFIPS(USCounties[v.geo_name].abbr, v.geo_name)
                 : routeToState(stateAbbr)
             }
             style={{ cursor: "pointer" }}
@@ -364,10 +428,10 @@ export function CountyMetricChart(props) {
 }
 
 export function CountyInputChart(props) {
-  const { measure, state, fips, width, height, date, barDomain } = props;
+  const { outcome, geoName, width, height, date, barDomain } = props;
 
   const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
-  const [minDateSeen, setMinDateSeen] = useState("2100-01-01");
+  const [minDateSeen, setMinDateSeen] = useState("2300-01-01");
 
   const { data: latestCountyData, error: latestCountyError } =
     useInputData(fips);
@@ -405,7 +469,7 @@ export function CountyInputChart(props) {
         <Alert
           message="No data"
           description={`We don't have archived ${
-            measure === "cases" ? "case" : "death"
+            outcome === "cases" ? "case" : "death"
           } data this far back for this ${fips ? "county" : "state"}`}
           type="error"
           showIcon
@@ -413,10 +477,10 @@ export function CountyInputChart(props) {
       </Explanation>
     );
 
-  const conf = getSeriesConfig(measure);
+  const conf = getSeriesConfig(outcome);
 
   var sma_7d = sma(
-    _.map(data, (s) => s[measure]),
+    _.map(data, (s) => s[outcome]),
     7,
     (n) => n
   );
@@ -428,13 +492,13 @@ export function CountyInputChart(props) {
     sma_7d,
     (date, avg) => {
       var d = { date: date };
-      d[measure] = avg;
+      d[outcome] = avg;
       return d;
     }
   );
 
   var sma_7d_latest = sma(
-    _.map(latestData, (s) => s[measure]),
+    _.map(latestData, (s) => s[outcome]),
     7,
     (n) => n
   );
@@ -446,12 +510,12 @@ export function CountyInputChart(props) {
     sma_7d_latest,
     (date, avg) => {
       var d = { date: date };
-      d[measure] = avg;
+      d[outcome] = avg;
       return d;
     }
   );
 
-  const yDomainForEverything = data && [0, 1.1 * max(data, (d) => +d[measure])];
+  const yDomainForEverything = data && [0, 1.1 * max(data, (d) => +d[outcome])];
 
   return (
     <XYPlot
@@ -467,7 +531,7 @@ export function CountyInputChart(props) {
       width={width}
       height={height}
       getX={(d) => new Date(d.date).getTime()}
-      getY={(d) => d[measure]}
+      getY={(d) => d[outcome]}
       xType="time"
       style={{
         backgroundColor: "white",

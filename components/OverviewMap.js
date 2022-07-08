@@ -20,7 +20,7 @@ import {
   eachWeekOfInterval,
   format as dateFormat,
 } from "date-fns";
-import { useCountyResults } from "../lib/data";
+import { useLatestRun } from "../lib/data";
 import { StateRtChart } from "./StateRtChart";
 import { AddCounty } from "./AddCounty";
 import { Button } from "antd";
@@ -519,7 +519,7 @@ function TrayChartsItem({
 }) {
   const fips = county.fips;
 
-  const { data, error } = useCountyResults(fips);
+  const { data, error } = useLatestRun(fips);
 
   if (!data)
     return (
