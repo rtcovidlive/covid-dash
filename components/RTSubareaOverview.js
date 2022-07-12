@@ -399,20 +399,57 @@ function ControlRow(props) {
 }
 
 const CountyInputView = function (props) {
-  const { state, fips, width, height, lastDrawLocation, setLastDrawLocation } =
+  const { geo_name, width, height, lastDrawLocation, setLastDrawLocation } =
     props;
 
   const [inputDataDate, setInputDataDate] = useState(null);
   const [barDomain, setBarDomain] = useState(false);
+  const [historicalRunID, setHistoricalRunID] = useState(null);
+
+  const { data: runLatest, error: runLatestError } = useLatestRun(geo_name, {
+    outcomes: null,
+  });
+
+  const { data: runsHistorical, error: runsHistoricalError } =
+    useHistoricalRuns(geo_name, { outcomes: null });
 
   const onDateChange = (date, dateString) => {
-    if (dateString.length > 0) setInputDataDate(dateString);
-    else setInputDataDate(null);
+    if (runLatest && runLatest.run_date === dateString) {
+      setHistoricalRunID(null);
+      return;
+    }
+
+    if (dateString.length > 0) {
+      setInputDataDate(dateString);
+
+      if (runsHistorical) {
+        const run = _.find(runsHistorical, (d) => d.run_date === dateString);
+
+        if (run) setHistoricalRunID(run.run_id);
+      }
+    } else setInputDataDate(null);
+  };
+
+  const allowableTimestamps =
+    runLatest && runsHistorical
+      ? [runLatest, ...runsHistorical].map(({ run_date }) =>
+          new Date(run_date).getTime()
+        )
+      : [];
+
+  const dateIsDisabled = function (moment) {
+    const dateCandidate = moment.utc(true).startOf("day").toDate().getTime();
+
+    return allowableTimestamps.indexOf(dateCandidate) === -1;
   };
 
   return (
     <>
-      <DatePicker onChange={onDateChange} placeholder="Choose a date" />
+      <DatePicker
+        onChange={onDateChange}
+        disabledDate={dateIsDisabled}
+        placeholder="Choose a date"
+      />
       <Switch
         size="small"
         style={{ marginLeft: 15 }}
@@ -423,30 +460,22 @@ const CountyInputView = function (props) {
         Include all observations?
       </span>
       <RTChartWrapper>
-        <CountyInputChart
-          date={inputDataDate}
-          fips={fips}
-          state={state}
-          measure={"cases"}
-          barDomain={barDomain}
-          width={width}
-          height={height}
-          lastDrawLocation={lastDrawLocation}
-          setLastDrawLocation={setLastDrawLocation}
-        />
-      </RTChartWrapper>
-      <RTChartWrapper>
-        <CountyInputChart
-          date={inputDataDate}
-          fips={fips}
-          state={state}
-          measure={"deaths"}
-          barDomain={barDomain}
-          width={width}
-          height={height}
-          lastDrawLocation={lastDrawLocation}
-          setLastDrawLocation={setLastDrawLocation}
-        />
+        {runLatest &&
+          ["cases", "deaths", "hospi", "boost", "RR"].map((outcome) => {
+            return (
+              <CountyInputChart
+                runID={runLatest.run_id}
+                key={`county-input-chart-outcome-${outcome}`}
+                historicalRunID={historicalRunID}
+                outcome={outcome}
+                barDomain={barDomain}
+                width={width}
+                height={height}
+                lastDrawLocation={lastDrawLocation}
+                setLastDrawLocation={setLastDrawLocation}
+              />
+            );
+          })}
       </RTChartWrapper>
     </>
   );
@@ -773,14 +802,13 @@ export function RTSubareaOverview(props) {
                   dropdown to inspect archived model input data to see if this
                   may be the case.
                 </Explanation>
-                {/*                <CountyInputView
-                  fips={props.fips}
-                  state={!props.fips && areaName}
+                <CountyInputView
+                  geo_name={props.fips}
                   width={contentWidth + 40}
                   height={(chartHeight + 120) / 2}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
-                /> */}
+                />
               </>
             )}
             <ChartTitle level={2}>

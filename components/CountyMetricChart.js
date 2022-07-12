@@ -18,6 +18,7 @@ import {
   useLatestNeighborRuns,
   useHistoricalRuns,
   useLatestRun,
+  useInputsForRun,
 } from "../lib/data";
 import { format as d3format } from "d3-format";
 import { max } from "d3-array";
@@ -405,19 +406,18 @@ export function CountyMetricChart(props) {
 
       {showNeighbors &&
         runsNeighbors &&
-        _.map(runsNeighbors, (v, k) => (
+        _.map(runsNeighbors, (run, k) => (
           <LineSeries
-            data={clipper(v.timeseries)}
+            data={clipper(run.timeseries)}
             key={"neighbors-lineseries-" + k}
             color="black"
-            //color={neighborKeys === v[0][key] ? "black" : "transparent"}
-            opacity={0.7}
+            opacity={neighborKeys === run.geo_name ? 0.7 : 0.3}
             size={6}
-            onSeriesMouseOver={(e) => setNeighborKeys(v.geo_name)}
+            onSeriesMouseOver={(e) => setNeighborKeys(run.geo_name)}
             onSeriesMouseOut={(e) => setNeighborKeys(null)}
             onSeriesClick={(e) =>
               key === "fips"
-                ? routeToFIPS(USCounties[v.geo_name].abbr, v.geo_name)
+                ? routeToFIPS(USCounties[run.geo_name].abbr, run.geo_name)
                 : routeToState(stateAbbr)
             }
             style={{ cursor: "pointer" }}
@@ -428,27 +428,54 @@ export function CountyMetricChart(props) {
 }
 
 export function CountyInputChart(props) {
-  const { outcome, geoName, width, height, date, barDomain } = props;
+  const { outcome, geoName, runID, historicalRunID, width, height, barDomain } =
+    props;
 
   const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
   const [minDateSeen, setMinDateSeen] = useState("2300-01-01");
 
-  const { data: latestCountyData, error: latestCountyError } =
-    useInputData(fips);
-  const { data: dataCounty, error: errorCounty } = date
-    ? useInputDataFromDate(fips, date)
-    : useInputData(fips);
+  const { data: inputsLatest, error: errorInputsLatest } =
+    useInputsForRun(runID);
 
-  const { data: latestStateData, error: latestStateError } =
-    useStateInputData(state);
-  const { data: dataState, error: errorState } = date
-    ? useStateInputDataFromDate(state, date)
-    : useStateInputData(state);
+  const { data: inputsHistorical, error: errorInputsHistorical } =
+    useInputsForRun(historicalRunID);
 
-  const latestData = fips ? latestCountyData : latestStateData;
-  const latestError = fips ? latestCountyError : latestStateError;
-  const data = fips ? dataCounty : dataState;
-  const error = fips ? errorCounty : errorState;
+  if (!inputsLatest) return null;
+
+  return (
+    <XYPlot
+      className="svg-container"
+      width={width}
+      height={height}
+      getX={(d) => new Date(d.date).getTime()}
+      getY={(d) => d[outcome]}
+      xType="time"
+      style={{
+        backgroundColor: "white",
+      }}
+    >
+      <XAxis tickFormat={(d) => utcFormat("%b %e")(d)} />
+
+      {inputsHistorical && (
+        <VerticalBarSeries
+          data={inputsHistorical}
+          key={"bars-historical"}
+          color="pink"
+          fill="pink"
+          barWidth={0.92}
+        />
+      )}
+
+      <VerticalBarSeries
+        data={inputsLatest}
+        key={"bars"}
+        color="black"
+        fill="black"
+        opacity={1}
+        barWidth={0.92}
+      />
+    </XYPlot>
+  );
 
   if (data && data.length > 0) {
     const maxDateForRunDate = _.maxBy(data, (d) => d.date).date;
