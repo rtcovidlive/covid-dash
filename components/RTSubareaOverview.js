@@ -399,19 +399,19 @@ function ControlRow(props) {
 }
 
 const CountyInputView = function (props) {
-  const { geo_name, width, height, lastDrawLocation, setLastDrawLocation } =
+  const { geoName, width, height, lastDrawLocation, setLastDrawLocation } =
     props;
 
   const [inputDataDate, setInputDataDate] = useState(null);
   const [barDomain, setBarDomain] = useState(false);
   const [historicalRunID, setHistoricalRunID] = useState(null);
 
-  const { data: runLatest, error: runLatestError } = useLatestRun(geo_name, {
+  const { data: runLatest, error: runLatestError } = useLatestRun(geoName, {
     outcomes: null,
   });
 
   const { data: runsHistorical, error: runsHistoricalError } =
-    useHistoricalRuns(geo_name, { outcomes: null });
+    useHistoricalRuns(geoName, { outcomes: null });
 
   const onDateChange = (date, dateString) => {
     if (runLatest && runLatest.run_date === dateString) {
@@ -556,7 +556,7 @@ export function RTSubareaOverview(props) {
     >
       <ShareButtons
         align={shareRowOnTop ? "left" : "right"}
-        href={`https://covidestim.org/${props.config.code}/${props.subArea}`}
+        href={`https://covidestim.org/${props.config.code}/${props.subarea}`}
       />
     </Col>
   );
@@ -724,7 +724,7 @@ export function RTSubareaOverview(props) {
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
                   showExtent={showExtent}
-                  geoName={props.fips}
+                  geoName={props.fips || areaName}
                   // NEeds to be fixed! Somehow have to let CountyMetricChart
                   // what type of geo this is! Or otherwise it can get it from API call!
                   stateAbbr={null}
@@ -752,7 +752,7 @@ export function RTSubareaOverview(props) {
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
                   showExtent={showExtent}
-                  geoName={props.fips}
+                  geoName={props.fips || areaName}
                   stateAbbr={null}
                   width={contentWidth + 40} // + 40}
                   height={chartHeight} //}
@@ -777,7 +777,7 @@ export function RTSubareaOverview(props) {
                     showNeighbors={showNeighbors}
                     showHistory={showHistory}
                     showExtent={showExtent}
-                    geoName={props.fips}
+                    geoName={props.fips || areaName}
                     stateAbbr={null}
                     width={contentWidth + 40} // + 40}
                     height={chartHeight} //}
@@ -803,7 +803,7 @@ export function RTSubareaOverview(props) {
                   may be the case.
                 </Explanation>
                 <CountyInputView
-                  geo_name={props.fips}
+                  geoName={props.fips || areaName}
                   width={contentWidth + 40}
                   height={(chartHeight + 120) / 2}
                   lastDrawLocation={lastDrawLocation}

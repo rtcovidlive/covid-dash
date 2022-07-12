@@ -209,7 +209,7 @@ export function CountyMetricChart(props) {
       );
   }
 
-  const key = stateAbbr ? "state" : "fips";
+  const key = runLatest.geo_type === "state" ? "state" : "fips";
 
   const hasConf = runLatest && runLatest.method === "sampling";
 
