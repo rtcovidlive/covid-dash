@@ -133,7 +133,7 @@ const StatContent = styled.div`
 
 const RTChartWrapper = styled.div`
   position: relative;
-  left: -30px;
+  left: -40px;
 `;
 
 function addCumulativeSum(series, key) {
@@ -404,6 +404,7 @@ const CountyInputView = function (props) {
 
   const [inputDataDate, setInputDataDate] = useState(null);
   const [barDomain, setBarDomain] = useState(false);
+  const [perCapita, setPerCapita] = useState(false);
   const [historicalRunID, setHistoricalRunID] = useState(null);
 
   const { data: runLatest, error: runLatestError } = useLatestRun(geoName, {
@@ -443,6 +444,10 @@ const CountyInputView = function (props) {
     return allowableTimestamps.indexOf(dateCandidate) === -1;
   };
 
+  const outcomes = perCapita
+    ? ["P100k_cases", "P100k_deaths", "P100k_hospi", "P100k_boost", "RR"]
+    : ["cases", "deaths", "hospi", "boost", "RR"];
+
   return (
     <>
       <DatePicker
@@ -459,17 +464,27 @@ const CountyInputView = function (props) {
       <span style={{ color: "grey", fontSize: "0.8em" }}>
         Include all observations?
       </span>
+      <Switch
+        size="small"
+        style={{ marginLeft: 15 }}
+        checked={perCapita}
+        onClick={(e) => setPerCapita(!perCapita)}
+      />{" "}
+      <span style={{ color: "grey", fontSize: "0.8em" }}>
+        Display per 100k?
+      </span>
       <RTChartWrapper>
         {runLatest &&
-          ["cases", "deaths", "hospi", "boost", "RR"].map((outcome) => {
+          outcomes.map((outcome) => {
             return (
               <CountyInputChart
                 runID={runLatest.run_id}
-                key={`county-input-chart-outcome-${outcome}`}
                 historicalRunID={historicalRunID}
                 outcome={outcome}
+                population={runLatest.geo_info.pop}
                 barDomain={barDomain}
-                width={width}
+                key={`county-input-chart-outcome-${outcome}`}
+                width={width + 40}
                 height={height}
                 lastDrawLocation={lastDrawLocation}
                 setLastDrawLocation={setLastDrawLocation}
@@ -805,7 +820,7 @@ export function RTSubareaOverview(props) {
                 <CountyInputView
                   geoName={props.fips || areaName}
                   width={contentWidth + 40}
-                  height={(chartHeight + 120) / 2}
+                  height={(chartHeight + 120) / 3}
                   lastDrawLocation={lastDrawLocation}
                   setLastDrawLocation={setLastDrawLocation}
                 />

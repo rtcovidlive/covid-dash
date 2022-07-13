@@ -53,8 +53,10 @@ const getSeriesConfig = function (outcome) {
     case "P100k_infections": {
       conf = {
         shortName: "IPC",
-        yDomain: [0, 800],
-        yAxisTicks: [0, 100, 200, 300, 400, 600, 800],
+        yDomain: [0, 1600],
+        yAxisTicks: [0, 100, 200, 400, 800, 1200],
+        yGridTicks: [0, 100, 200, 400, 800, 1200],
+        yTickFormat: d3format(".2s"),
         strokeColor: "rgb(100, 125, 160)",
         fillColorConf: "rgb(125, 200, 255)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
@@ -63,6 +65,7 @@ const getSeriesConfig = function (outcome) {
     }
     case "PC_infections_cumulative": {
       conf = {
+        shortName: "cumulative infections",
         yDomain: [0, 1],
         yAxisTicks: [0, 0.33, 0.5, 0.67, 1.0],
         yGridTicks: [0, 0.33, 0.5, 0.67, 1.0],
@@ -83,6 +86,30 @@ const getSeriesConfig = function (outcome) {
     }
     case "deaths": {
       conf = {
+        yTickFormat: d3format(".2s"),
+        color: "rgba(50, 50, 0, 1.0)",
+        fill: "rgba(50, 50, 0, 1.0)",
+      };
+      break;
+    }
+    case "hospi": {
+      conf = {
+        yTickFormat: d3format(".2s"),
+        shortName: "hospitalizations",
+      };
+      break;
+    }
+    case "boost": {
+      conf = {
+        yTickFormat: d3format(".2s"),
+        shortName: "booster",
+      };
+      break;
+    }
+    case "RR": {
+      conf = {
+        shortName: "risk-ratio",
+        yDomain: [0, 1],
         yTickFormat: d3format(".1f"),
         color: "rgba(50, 50, 0, 1.0)",
         fill: "rgba(50, 50, 0, 1.0)",
@@ -91,7 +118,6 @@ const getSeriesConfig = function (outcome) {
     }
     default: {
       conf = {
-        yDomain: [0, 10000],
         strokeColor: "rgb(56, 230, 252)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
       };
@@ -144,11 +170,9 @@ const addSpecialOutcomes = function (datum, outcome, pop) {
     ];
 
     return { ...datum, ..._.fromPairs(newKeys) };
-  } else if (outcome.startsWith("P100k") || outcome.startsWith("PC_")) {
-    return datum;
-  } else {
-    throw 'Outcome did not start with either "PC_" or "P100k"';
   }
+
+  return datum;
 };
 
 const runWithSpecialOutcomes = function (run, outcome) {
@@ -213,18 +237,35 @@ export function CountyMetricChart(props) {
 
   const hasConf = runLatest && runLatest.method === "sampling";
 
+  const quantiles = [
+    ["_p97_5", "97.5%"],
+    ["_p75", "75%"],
+    ["", "median"],
+    ["_p25", "25%"],
+    ["_p2_5", "2.5%"],
+  ];
+
   const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
 
   const formatHint = (d) => {
     if (!showNeighbors)
       return [
-        { title: "Date", value: utcFormat("%b %e")(new Date(d.date)) },
-        {
-          title: conf.shortName || outcome,
-          value: conf.yTickFormat
-            ? conf.yTickFormat(d[outcome])
-            : d3format(",.2f")(d[outcome]),
-        },
+        { title: "week ending", value: utcFormat("%b %e")(new Date(d.date)) },
+        ...(hasConf
+          ? quantiles.map(([suffix, name]) => ({
+              title: `${conf.shortName || outcome}, ${name}`,
+              value: conf.yTickFormat
+                ? conf.yTickFormat(d[outcome + suffix])
+                : d3format(",.2f")(d[outcome + suffix]),
+            }))
+          : [
+              {
+                title: conf.shortName || outcome,
+                value: conf.yTickFormat
+                  ? conf.yTickFormat(d[outcome])
+                  : d3format(",.2f")(d[outcome]),
+              },
+            ]),
       ];
     else return [{ title: USCounties[d.geo_name].county, value: "Hmm" }];
   };
@@ -253,6 +294,13 @@ export function CountyMetricChart(props) {
           (v) => new Date(v.date) > utcDay.offset(new Date(), -3 * 30)
         );
 
+  const selectedHistoricalBaseColor = "rgb(227, 221, 204)";
+
+  const historicalViewIsEnabled = showHistory && runsHistorical;
+  const historicalSelectViewIsActive =
+    showHistory && runsHistorical && modelRunDate;
+  const neighborViewIsEnabled = showNeighbors && runsNeighbors;
+
   return (
     <XYPlot
       className="svg-container"
@@ -261,7 +309,7 @@ export function CountyMetricChart(props) {
       height={height}
       getX={(d) => new Date(d.date)}
       getY={(d) => d[outcome]}
-      xType="time"
+      xType="time-utc"
       onMouseLeave={() => {
         setValue(false);
         setModelRunDate(false);
@@ -274,13 +322,14 @@ export function CountyMetricChart(props) {
       <HorizontalGridLines tickValues={conf.yGridTicks} />
       <VerticalGridLines
         style={{ opacity: 0.25 }}
-        tickTotal={showExtent === "all" ? 18 : 5}
+        tickValues={runLatest.timeseries.map((d) => new Date(d.date))}
       />
 
       <YAxis
         tickTotal={3}
         tickValues={conf.yAxisTicks}
         style={{ line: { opacity: 0 } }}
+        left={10}
         tickFormat={conf.yTickFormat}
       />
       <XAxis
@@ -289,26 +338,51 @@ export function CountyMetricChart(props) {
         tickFormat={(d) => utcFormat("%b %e")(d)}
       />
 
-      {props.outcome === "PC_infections_cumulative" && runLatest && (
+      {props.outcome === "PC_infections_cumulative" && (
         <AreaSeries
           data={clipper(runLatest.timeseries)}
           color={"rgb(235,235,240)"}
         />
       )}
 
-      {key === "state" && hasConf && runLatest && (
+      {hasConf && [
         <AreaSeries
           data={clipper(runLatest.timeseries)}
           key={"conf"}
           getY={(d) => d[outcome + "_p97_5"]}
           getY0={(d) => d[outcome + "_p2_5"]}
           color={conf.fillColorConf}
+          style={{ mixBlendMode: "multiply" }}
           opacity={0.7}
-        />
-      )}
+        />,
+        <AreaSeries
+          data={clipper(runLatest.timeseries)}
+          key={"conf-area-25-75"}
+          getY={(d) => d[outcome + "_p75"]}
+          getY0={(d) => d[outcome + "_p25"]}
+          color={conf.fillColorConf}
+          style={{ mixBlendMode: "multiply" }}
+          opacity={0.7}
+        />,
+      ]}
 
-      {showNeighbors &&
-        runsNeighbors &&
+      {
+        // runLatest.timeseries.map(d => {
+        //   const datumBottom = Object.assign({}, d);
+        //   const datumTop    = Object.assign({}, d);
+        //   datumBottom[outcome] = 0;
+        //   let data = [datumBottom, datumTop];
+        //   return (
+        //     <LineSeries
+        //       data={data}
+        //       color={"black"}
+        //       size={5}
+        //     />
+        //   );
+        // })
+      }
+
+      {neighborViewIsEnabled &&
         _.flatMap(runsNeighbors, (v, k) =>
           SplitLineSeries({
             dashLastNWeeks: 2,
@@ -321,8 +395,8 @@ export function CountyMetricChart(props) {
           })
         )}
 
-      {showHistory &&
-        runsHistorical &&
+      {historicalViewIsEnabled &&
+        !historicalSelectViewIsActive &&
         _.flatMap(runsHistorical, (v, k) => {
           return SplitLineSeries({
             dashLastNWeeks: 2,
@@ -335,48 +409,91 @@ export function CountyMetricChart(props) {
           });
         })}
 
-      {runLatest &&
-        SplitLineSeries({
-          dashLastNWeeks: 2,
-          data: clipper(runLatest.timeseries),
-          key: "present-lineseries",
-          color: conf.strokeColorEmphasis,
-          strokeWidth: "4px",
-          hintActiveSide,
-          setHintActiveSide,
-          onNearestXY: (value) => {
-            !showNeighbors && !showHistory && setValue(value);
-          },
-        })}
+      {SplitLineSeries({
+        dashLastNWeeks: 2,
+        data: clipper(runLatest.timeseries),
+        key: "present-lineseries",
+        color: conf.strokeColorEmphasis,
+        strokeWidth: "4px",
+        hintActiveSide,
+        setHintActiveSide,
+        onNearestXY: (value) => {
+          !showNeighbors && !showHistory && setValue(value);
+        },
+      })}
 
-      {showHistory && runLatest && runsHistorical && (
+      {historicalSelectViewIsActive &&
+        hasConf &&
+        runsHistorical
+          .filter(({ run_date }) => run_date === modelRunDate.run_date)
+          .map(({ timeseries }) => {
+            const commonProps = {
+              data: clipper(timeseries),
+              style: { mixBlendMode: "multiply" },
+              color: "rgb(200, 200, 200)",
+              opacity: 0.9,
+            };
+
+            return [
+              <AreaSeries
+                key="conf-historical"
+                getY={(d) => d[outcome + "_p97_5"]}
+                getY0={(d) => d[outcome + "_p2_5"]}
+                {...commonProps}
+              />,
+              <AreaSeries
+                key={"conf-historical-25-75"}
+                getY={(d) => d[outcome + "_p75"]}
+                getY0={(d) => d[outcome + "_p25"]}
+                {...commonProps}
+              />,
+            ];
+          })}
+
+      {historicalSelectViewIsActive &&
+        runsHistorical
+          .filter(({ run_date }) => run_date === modelRunDate.run_date)
+          .map(({ timeseries }) =>
+            SplitLineSeries({
+              dashLastNWeeks: 2,
+              data: clipper(timeseries),
+              key: "historical-lineseries",
+              color: selectedHistoricalBaseColor,
+              strokeWidth: "4px",
+            })
+          )}
+
+      {historicalViewIsEnabled && (
         <MarkSeries
           data={[runLatest, ...runsHistorical].map((d) => ({
             ..._.last(d.timeseries),
             run_date: d.run_date,
           }))}
           key={"markseries-historical-runs"}
-          color={conf.strokeColor}
-          size={1.7}
+          color={
+            historicalSelectViewIsActive
+              ? selectedHistoricalBaseColor
+              : conf.strokeColor
+          }
+          stroke={conf.strokeColor}
+          size={historicalSelectViewIsActive ? 2.8 : 1.7}
           onNearestXY={(value) =>
             !showNeighbors && showHistory && setModelRunDate(value)
           }
         />
       )}
 
-      {runLatest && (
-        <MarkSeries
-          data={[runLatest].map((d) => ({
-            ..._.last(d.timeseries),
-            run_date: d.run_date,
-          }))}
-          key={"markseries-latest-run"}
-          color={conf.strokeColorEmphasis}
-          size={2.8}
-        />
-      )}
+      <MarkSeries
+        data={[runLatest].map((d) => ({
+          ..._.last(d.timeseries),
+          run_date: d.run_date,
+        }))}
+        key={"markseries-latest-run"}
+        color={conf.strokeColorEmphasis}
+        size={2.8}
+      />
 
-      {showNeighbors && runsNeighbors && neighborKeys !== null && (
+      {neighborViewIsEnabled && neighborKeys !== null && (
         <DiscreteColorLegend
           items={[
             {
@@ -395,17 +512,17 @@ export function CountyMetricChart(props) {
         />
       )}
 
-      {value ? <Hint value={value} format={formatHint} /> : null}
+      {value && <Hint value={value} format={formatHint} />}
       {modelRunDate && (
         <Hint
           value={modelRunDate}
           style={{ margin: "10px" }}
+          align={{ horizontal: "right", vertical: "bottom" }}
           format={rundateFormatHint}
         />
       )}
 
-      {showNeighbors &&
-        runsNeighbors &&
+      {neighborViewIsEnabled &&
         _.map(runsNeighbors, (run, k) => (
           <LineSeries
             data={clipper(run.timeseries)}
@@ -428,164 +545,100 @@ export function CountyMetricChart(props) {
 }
 
 export function CountyInputChart(props) {
-  const { outcome, geoName, runID, historicalRunID, width, height, barDomain } =
-    props;
+  const {
+    outcome,
+    geoName,
+    runID,
+    historicalRunID,
+    width,
+    height,
+    barDomain,
+    population,
+  } = props;
 
   const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
   const [minDateSeen, setMinDateSeen] = useState("2300-01-01");
 
-  const { data: inputsLatest, error: errorInputsLatest } =
+  const { data: inputsLatestRaw, error: errorInputsLatest } =
     useInputsForRun(runID);
 
-  const { data: inputsHistorical, error: errorInputsHistorical } =
+  const { data: inputsHistoricalRaw, error: errorInputsHistorical } =
     useInputsForRun(historicalRunID);
 
-  if (!inputsLatest) return null;
+  if (!inputsLatestRaw) return null;
 
-  return (
-    <XYPlot
-      className="svg-container"
-      width={width}
-      height={height}
-      getX={(d) => new Date(d.date).getTime()}
-      getY={(d) => d[outcome]}
-      xType="time"
-      style={{
-        backgroundColor: "white",
-      }}
-    >
-      <XAxis tickFormat={(d) => utcFormat("%b %e")(d)} />
-
-      {inputsHistorical && (
-        <VerticalBarSeries
-          data={inputsHistorical}
-          key={"bars-historical"}
-          color="pink"
-          fill="pink"
-          barWidth={0.92}
-        />
-      )}
-
-      <VerticalBarSeries
-        data={inputsLatest}
-        key={"bars"}
-        color="black"
-        fill="black"
-        opacity={1}
-        barWidth={0.92}
-      />
-    </XYPlot>
+  const inputsLatest = inputsLatestRaw.map((d) =>
+    addSpecialOutcomes(d, outcome, population)
   );
+  let inputsHistorical = inputsHistoricalRaw;
 
-  if (data && data.length > 0) {
-    const maxDateForRunDate = _.maxBy(data, (d) => d.date).date;
-    const minDateForRunDate = _.minBy(data, (d) => d.date).date;
-
-    if (new Date(maxDateForRunDate) > new Date(maxDateSeen)) {
-      setMaxDateSeen(maxDateForRunDate);
-    }
-
-    if (new Date(minDateForRunDate) < new Date(minDateSeen)) {
-      setMinDateSeen(minDateForRunDate);
-    }
-  }
-
-  if (data && data.length === 0)
-    return (
-      <Explanation>
-        <Alert
-          message="No data"
-          description={`We don't have archived ${
-            outcome === "cases" ? "case" : "death"
-          } data this far back for this ${fips ? "county" : "state"}`}
-          type="error"
-          showIcon
-        />
-      </Explanation>
+  if (inputsHistorical)
+    inputsHistorical = inputsHistorical.map((d) =>
+      addSpecialOutcomes(d, outcome, population)
     );
 
   const conf = getSeriesConfig(outcome);
 
-  var sma_7d = sma(
-    _.map(data, (s) => s[outcome]),
-    7,
-    (n) => n
-  );
-
-  sma_7d = [0, 0, 0, 0, 0, 0].concat(sma_7d); // First 6 elements aren't part of sma
-
-  const sma_zipped = _.zipWith(
-    _.map(data, (d) => d.date),
-    sma_7d,
-    (date, avg) => {
-      var d = { date: date };
-      d[outcome] = avg;
-      return d;
-    }
-  );
-
-  var sma_7d_latest = sma(
-    _.map(latestData, (s) => s[outcome]),
-    7,
-    (n) => n
-  );
-
-  sma_7d_latest = [0, 0, 0, 0, 0, 0].concat(sma_7d_latest); // First 6 elements aren't part of sma
-
-  const sma_zipped_latest = _.zipWith(
-    _.map(latestData, (d) => d.date),
-    sma_7d_latest,
-    (date, avg) => {
-      var d = { date: date };
-      d[outcome] = avg;
-      return d;
-    }
-  );
-
-  const yDomainForEverything = data && [0, 1.1 * max(data, (d) => +d[outcome])];
+  const yDomain =
+    inputsLatest &&
+    (conf.yDomain || [0, 1.1 * max(inputsLatest, (d) => +d[outcome])]);
 
   return (
     <XYPlot
       className="svg-container"
-      xDomain={
-        maxDateSeen &&
-        minDateSeen && [
-          new Date(minDateSeen).getTime(),
-          new Date(maxDateSeen).getTime(),
-        ]
-      }
-      yDomain={barDomain ? yDomainForEverything : null}
       width={width}
       height={height}
+      margin={{ left: 40 }}
+      yDomain={yDomain}
       getX={(d) => new Date(d.date).getTime()}
       getY={(d) => d[outcome]}
-      xType="time"
+      xType="time-utc"
       style={{
         backgroundColor: "white",
       }}
     >
-      <HorizontalGridLines tickTotal={3} tickValues={conf.yGridTicks} />
-
-      <YAxis
-        tickTotal={3}
-        tickValues={conf.yAxisTicks}
-        style={{ line: { opacity: 0 } }}
-        tickFormat={conf.yTickFormat}
+      <HorizontalGridLines tickValues={conf.yGridTicks} />
+      <VerticalGridLines
+        style={{ opacity: 0.25 }}
+        tickValues={inputsLatest.map((d) => new Date(d.date))}
       />
-      <XAxis tickFormat={(d) => utcFormat("%b %e")(d)} />
+      <YAxis tickFormat={conf.yTickFormat} title={conf.shortName || outcome} />
 
-      <VerticalBarSeries
-        data={data}
-        key={"casebars"}
-        color={conf.color}
-        fill={conf.fill}
+      <XAxis
+        tickLabelAngle={-45}
+        height={100}
+        tickTotal={5}
+        tickFormat={(d) => utcFormat("%b %e")(d)}
+      />
+
+      {outcome === "RR" && (
+        <AreaSeries data={inputsLatest} color={"rgb(235,235,240)"} />
+      )}
+
+      <LineSeries
+        data={inputsLatest}
+        key={"bars-latest"}
+        color="black"
+        fill="black"
         opacity={1}
-        barWidth={0.92}
       />
 
-      <LineSeries data={sma_zipped_latest} color="rgb(179, 109, 25)" />
-      {date && <LineSeries data={sma_zipped} color="magenta" />}
-      {date && <MarkSeries data={[_.last(sma_zipped)]} color="magenta" />}
+      <MarkSeries
+        data={inputsLatest}
+        key={"marks-latest"}
+        color="black"
+        fill="black"
+        size={1.2}
+      />
+
+      {inputsHistorical && (
+        <LineSeries
+          data={inputsHistorical}
+          key={"bars-historical"}
+          color="magenta"
+          size={2}
+        />
+      )}
     </XYPlot>
   );
 }
