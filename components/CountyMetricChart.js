@@ -19,6 +19,7 @@ import {
   useHistoricalRuns,
   useLatestRun,
   useInputsForRun,
+  useLatestEnclosedRuns,
 } from "../lib/data";
 import { format as d3format } from "d3-format";
 import { max } from "d3-array";
@@ -86,7 +87,7 @@ const getSeriesConfig = function (outcome) {
     }
     case "deaths": {
       conf = {
-        yTickFormat: d3format(".2s"),
+        yTickFormat: d3format(".2r"),
         color: "rgba(50, 50, 0, 1.0)",
         fill: "rgba(50, 50, 0, 1.0)",
       };
@@ -94,7 +95,7 @@ const getSeriesConfig = function (outcome) {
     }
     case "hospi": {
       conf = {
-        yTickFormat: d3format(".2s"),
+        yTickFormat: d3format(".2r"),
         shortName: "hospitalizations",
       };
       break;
@@ -193,6 +194,7 @@ export function CountyMetricChart(props) {
     height,
     showNeighbors,
     showHistory,
+    showEnclosed,
     showExtent,
     routeToFIPS,
     routeToState,
@@ -208,14 +210,20 @@ export function CountyMetricChart(props) {
     props.geoName
   );
 
+  let { data: runsEnclosedRaw, error: errorEnclosed } = useLatestEnclosedRuns(
+    showEnclosed ? props.geoName : null
+  );
+
   const [value, setValue] = useState(false);
   const [modelRunDate, setModelRunDate] = useState(false);
   const [neighborKeys, setNeighborKeys] = useState(null);
+  const [enclosedKeys, setEnclosedKeys] = useState(null);
   const [hintActiveSide, setHintActiveSide] = useState("R");
 
   let runLatest = runLatestRaw;
   let runsNeighbors = runsNeighborsRaw;
   let runsHistorical = runsHistoricalRaw;
+  let runsEnclosed = runsEnclosedRaw;
 
   if (!runLatest) return null;
 
@@ -229,6 +237,11 @@ export function CountyMetricChart(props) {
 
     if (runsHistorical)
       runsHistorical = runsHistorical.map((d) =>
+        runWithSpecialOutcomes(d, props.outcome)
+      );
+
+    if (runsEnclosed)
+      runsEnclosed = runsEnclosed.map((d) =>
         runWithSpecialOutcomes(d, props.outcome)
       );
   }
@@ -297,9 +310,13 @@ export function CountyMetricChart(props) {
   const selectedHistoricalBaseColor = "rgb(227, 221, 204)";
 
   const historicalViewIsEnabled = showHistory && runsHistorical;
+
   const historicalSelectViewIsActive =
     showHistory && runsHistorical && modelRunDate;
+
   const neighborViewIsEnabled = showNeighbors && runsNeighbors;
+
+  const enclosedViewIsEnabled = showEnclosed && runsEnclosed;
 
   return (
     <XYPlot
@@ -314,6 +331,7 @@ export function CountyMetricChart(props) {
         setValue(false);
         setModelRunDate(false);
         setNeighborKeys(null);
+        setEnclosedKeys(null);
       }}
       style={{
         backgroundColor: "white",
@@ -418,7 +436,7 @@ export function CountyMetricChart(props) {
         hintActiveSide,
         setHintActiveSide,
         onNearestXY: (value) => {
-          !showNeighbors && !showHistory && setValue(value);
+          !showNeighbors && !showHistory && !showEnclosed && setValue(value);
         },
       })}
 
@@ -512,6 +530,24 @@ export function CountyMetricChart(props) {
         />
       )}
 
+      {!neighborViewIsEnabled &&
+        enclosedViewIsEnabled &&
+        enclosedKeys !== null && (
+          <DiscreteColorLegend
+            items={[
+              {
+                title: USCounties[enclosedKeys].county,
+                color: "rgba(227, 219, 163)",
+              },
+            ]}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+            }}
+          />
+        )}
+
       {value && <Hint value={value} format={formatHint} />}
       {modelRunDate && (
         <Hint
@@ -522,11 +558,32 @@ export function CountyMetricChart(props) {
         />
       )}
 
+      {enclosedViewIsEnabled &&
+        runsEnclosed.map((run) => (
+          <LineSeries
+            data={clipper(run.timeseries)}
+            key={"enclosed-lineseries-" + run.geo_name}
+            color={
+              enclosedKeys === run.geo_name
+                ? "rgb(227, 219, 163)"
+                : "rgb(186, 175, 101)"
+            }
+            opacity={enclosedKeys === run.geo_name ? 1.0 : 0.7}
+            size={enclosedKeys === run.geo_name ? 9 : 6}
+            onSeriesMouseOver={(e) => setEnclosedKeys(run.geo_name)}
+            onSeriesMouseOut={(e) => setEnclosedKeys(null)}
+            onSeriesClick={(e) =>
+              routeToFIPS(USCounties[run.geo_name].abbr, run.geo_name)
+            }
+            style={{ cursor: "pointer", mixBlendMode: "multiply" }}
+          />
+        ))}
+
       {neighborViewIsEnabled &&
         _.map(runsNeighbors, (run, k) => (
           <LineSeries
             data={clipper(run.timeseries)}
-            key={"neighbors-lineseries-" + k}
+            key={"neighbors-lineseries-" + run.geo_name}
             color="black"
             opacity={neighborKeys === run.geo_name ? 0.7 : 0.3}
             size={6}
@@ -618,8 +675,8 @@ export function CountyInputChart(props) {
       <LineSeries
         data={inputsLatest}
         key={"bars-latest"}
-        color="black"
-        fill="black"
+        curve="curveStepBefore"
+        color="#bbb"
         opacity={1}
       />
 

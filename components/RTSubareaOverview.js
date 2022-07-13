@@ -22,6 +22,7 @@ import {
   useLatestNeighborRuns,
   useHistoricalRuns,
   useLatestRun,
+  useLatestEnclosedRuns,
 } from "../lib/data";
 import { USStatesByCode } from "../config/USStates";
 
@@ -339,9 +340,15 @@ function ControlRow(props) {
     setShowHistory,
     showNeighbors,
     setShowNeighbors,
+    showCounties,
+    setShowCounties,
     showExtent,
     setShowExtent,
+    isState,
+    geoName,
   } = props;
+
+  const { data, error } = useLatestEnclosedRuns(showCounties ? geoName : null);
 
   let colsPerStat = 6;
   return (
@@ -378,6 +385,25 @@ function ControlRow(props) {
           </StatContent>
         </Tooltip>
       </Col>
+      {isState && (
+        <Col size={colsPerStat}>
+          <Tooltip
+            placement="top"
+            title="Show latest model run from each enclosed county"
+          >
+            <StatContent style={{ paddingTop: 20 }}>
+              <StatLabel>Show counties?</StatLabel>
+              <StatNumber>
+                <Switch
+                  checked={showCounties}
+                  onClick={(e) => setShowCounties(!showCounties)}
+                  loading={showCounties && !data}
+                />
+              </StatNumber>
+            </StatContent>
+          </Tooltip>
+        </Col>
+      )}
       <Col size={colsPerStat}>
         <StatContent style={{ paddingTop: 20 }}>
           <StatLabel>Data display</StatLabel>
@@ -505,6 +531,7 @@ export function RTSubareaOverview(props) {
   // Show estimate history, and show latest result from all neighboring counties?
   const [showHistory, setShowHistory] = useState(false);
   const [showNeighbors, setShowNeighbors] = useState(false);
+  const [showCounties, setShowCounties] = useState(false);
   const [showExtent, setShowExtent] = useState("all");
 
   let isSmallScreen = props.width <= 768;
@@ -719,8 +746,12 @@ export function RTSubareaOverview(props) {
                 setShowHistory={setShowHistory}
                 showNeighbors={showNeighbors}
                 setShowNeighbors={setShowNeighbors}
+                showCounties={showCounties}
+                setShowCounties={setShowCounties}
                 showExtent={showExtent}
                 setShowExtent={setShowExtent}
+                isState={props.fips ? false : true}
+                geoName={props.fips || areaName}
               />
             </Header>
             <ChartTitle level={2}>
@@ -738,6 +769,7 @@ export function RTSubareaOverview(props) {
                   outcome={"r_t"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
+                  showEnclosed={showCounties}
                   showExtent={showExtent}
                   geoName={props.fips || areaName}
                   // NEeds to be fixed! Somehow have to let CountyMetricChart
@@ -766,6 +798,7 @@ export function RTSubareaOverview(props) {
                   outcome={"P100k_infections"}
                   showNeighbors={showNeighbors}
                   showHistory={showHistory}
+                  showEnclosed={showCounties}
                   showExtent={showExtent}
                   geoName={props.fips || areaName}
                   stateAbbr={null}
@@ -791,6 +824,7 @@ export function RTSubareaOverview(props) {
                     outcome={"PC_infections_cumulative"}
                     showNeighbors={showNeighbors}
                     showHistory={showHistory}
+                    showEnclosed={showCounties}
                     showExtent={showExtent}
                     geoName={props.fips || areaName}
                     stateAbbr={null}
