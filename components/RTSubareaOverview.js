@@ -497,7 +497,7 @@ const CountyInputView = function (props) {
         onClick={(e) => setPerCapita(!perCapita)}
       />{" "}
       <span style={{ color: "grey", fontSize: "0.8em" }}>
-        Display per 100k?
+        Display per 100k, per day?
       </span>
       <RTChartWrapper>
         {runLatest &&
@@ -510,7 +510,7 @@ const CountyInputView = function (props) {
                 population={runLatest.geo_info.pop}
                 barDomain={barDomain}
                 key={`county-input-chart-outcome-${outcome}`}
-                width={width + 40}
+                width={width}
                 height={height}
                 lastDrawLocation={lastDrawLocation}
                 setLastDrawLocation={setLastDrawLocation}

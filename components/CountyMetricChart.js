@@ -67,9 +67,9 @@ const getSeriesConfig = function (outcome) {
     case "PC_infections_cumulative": {
       conf = {
         shortName: "cumulative infections",
-        yDomain: [0, 1],
-        yAxisTicks: [0, 0.33, 0.5, 0.67, 1.0],
-        yGridTicks: [0, 0.33, 0.5, 0.67, 1.0],
+        yDomain: [0, 1.5],
+        yAxisTicks: [0, 0.33, 0.5, 0.67, 1.0, 1.5],
+        yGridTicks: [0, 0.33, 0.5, 0.67, 1.0, 1.5],
         yTickFormat: d3format(".0%"),
         strokeColor: "rgb(100, 125, 160)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
@@ -95,7 +95,7 @@ const getSeriesConfig = function (outcome) {
     }
     case "hospi": {
       conf = {
-        yTickFormat: d3format(".2r"),
+        yTickFormat: d3format(".2s"),
         shortName: "hospitalizations",
       };
       break;
@@ -308,6 +308,8 @@ export function CountyMetricChart(props) {
         );
 
   const selectedHistoricalBaseColor = "rgb(227, 221, 204)";
+  const selectedHistoricalEmphasisColor = "rgb(235, 225, 152)";
+  const selectedHistoricalEmphasisStrokeColor = "rgb(143, 139, 109)";
 
   const historicalViewIsEnabled = showHistory && runsHistorical;
 
@@ -490,11 +492,15 @@ export function CountyMetricChart(props) {
           key={"markseries-historical-runs"}
           color={
             historicalSelectViewIsActive
-              ? selectedHistoricalBaseColor
+              ? selectedHistoricalEmphasisColor
               : conf.strokeColor
           }
-          stroke={conf.strokeColor}
-          size={historicalSelectViewIsActive ? 2.8 : 1.7}
+          stroke={
+            historicalSelectViewIsActive
+              ? selectedHistoricalEmphasisStrokeColor
+              : conf.strokeColor
+          }
+          size={historicalSelectViewIsActive ? 4 : 1.7}
           onNearestXY={(value) =>
             !showNeighbors && showHistory && setModelRunDate(value)
           }
