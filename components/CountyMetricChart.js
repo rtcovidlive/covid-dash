@@ -698,8 +698,18 @@ export function CountyInputChart(props) {
         <LineSeries
           data={inputsHistorical}
           key={"bars-historical"}
+          curve="curveStepBefore"
           color="magenta"
           size={2}
+        />
+      )}
+
+      {inputsHistorical && (
+        <MarkSeries
+          data={[_.last(inputsHistorical)]}
+          key={"marks-historical"}
+          color="magenta"
+          size={1.2}
         />
       )}
     </XYPlot>
