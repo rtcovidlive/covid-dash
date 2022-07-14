@@ -46,7 +46,7 @@ class OverviewMap {
     ).unknown("rgba(0,0,0,0)");
 
     this.color = this.ColorInfectionsPC;
-    this.accessor = "onsetsPC";
+    this.accessor = "infections_PC";
     this.date = null;
   }
 
@@ -72,8 +72,8 @@ class OverviewMap {
   }
 
   titleLegend() {
-    if (this.accessor === "r0") return "Effective reproduction number (Rt)";
-    else if (this.accessor === "onsetsPC")
+    if (this.accessor === "r_t") return "Effective reproduction number (Rt)";
+    else if (this.accessor === "infections_PC")
       return "Estimated infections / 100k / day";
     else if (this.accessor === "infections")
       return "Estimated infections / day";
@@ -92,27 +92,27 @@ class OverviewMap {
     switch (enabledModes[0]) {
       case Constants.MetricOptions.DerivedR0NoUI: {
         this.color = this.ColorR0;
-        this.accessor = "r0";
+        this.accessor = "r_t";
         break;
       }
       case Constants.MetricOptions.TrueInfectionsPCNoUI: {
         this.color = this.ColorInfectionsPC;
-        this.accessor = "onsetsPC";
+        this.accessor = "infections_PC";
         break;
       }
       case Constants.MetricOptions.TrueInfectionsNoUI: {
         this.color = this.ColorInfections;
-        this.accessor = "onsets";
+        this.accessor = "infections";
         break;
       }
       case Constants.MetricOptions.SeroprevalenceNoUI: {
         this.color = this.ColorSeroprevalence;
-        this.accessor = "cumulative";
+        this.accessor = "infections_cumulative";
         break;
       }
       default: {
         this.color = this.ColorInfectionsPC;
-        this.accessor = "onsetsPC";
+        this.accessor = "infections_PC";
         break;
       }
     }

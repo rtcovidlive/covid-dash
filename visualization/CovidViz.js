@@ -48,7 +48,7 @@ class CovidViz {
       switch (m) {
         case Constants.MetricOptions.ReportedNewCases: {
           conf = {
-            submetric: "cases_new",
+            submetric: "input_cases",
             legend: "Positives",
             label: "Cases",
             dashedLine: true,
@@ -70,7 +70,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.ReportedNewDeaths: {
           conf = {
-            submetric: "deaths_new",
+            submetric: "input_deaths",
             legend: "New Deaths",
             label: "Deaths",
             showAnnotations:
@@ -82,7 +82,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "r0",
+            submetric: "r_t",
             legend: "Rt",
             label: "Rt",
             colorCodeStroke: true,
@@ -93,18 +93,18 @@ class CovidViz {
             lineColorForEntry: (identifier, entry) => {
               return Util.colorCodeRt(
                 identifier,
-                entry.r0,
-                entry.r0_l80,
-                entry.r0_h80
+                entry.r_t,
+                entry.r_t_p2_5,
+                entry.r_t_p97_5
               );
             },
             drawYAxisLines: [1.0],
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "r0"];
+              let raw = dataPoint[metricOverride || "r_t"];
               return Math.max(0, raw);
             },
-            p5: (dataPoint) => this.m(dataPoint, "r0_l80"),
-            p95: (dataPoint) => this.m(dataPoint, "r0_h80"),
+            p5: (dataPoint) => this.m(dataPoint, "r_t_p2_5"),
+            p95: (dataPoint) => this.m(dataPoint, "r_t_p97_5"),
           };
           break;
         }
@@ -112,7 +112,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "r0",
+            submetric: "r_t",
             legend: "Rt",
             label: "Rt",
             colorCodeStroke: true,
@@ -135,7 +135,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "onsets",
+            submetric: "infections",
             legend: "True infections",
             label: "True infections",
             colorCodeStroke: false,
@@ -148,11 +148,11 @@ class CovidViz {
               return "rgba(0, 145, 255, 1)";
             },
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "onsets"];
+              let raw = dataPoint[metricOverride || "infections"];
               return Math.max(0, raw);
             },
-            p5: (dataPoint) => this.m(dataPoint, "onsets_l95"),
-            p95: (dataPoint) => this.m(dataPoint, "onsets_h95"),
+            p5: (dataPoint) => this.m(dataPoint, "infections_p2_5"),
+            p95: (dataPoint) => this.m(dataPoint, "infections_p97_5"),
           };
           break;
         }
@@ -160,7 +160,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "onsets",
+            submetric: "infections",
             legend: "True infections",
             label: "True infections",
             colorCodeStroke: false,
@@ -173,7 +173,7 @@ class CovidViz {
               return "rgba(0, 145, 255, 1)";
             },
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "onsets"];
+              let raw = dataPoint[metricOverride || "infections"];
               return Math.max(0, raw);
             },
           };
@@ -183,7 +183,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "onsetsPC",
+            submetric: "infections_PC",
             legend: "Infections per 100k",
             label: "Infections per 100k",
             colorCodeStroke: false,
@@ -196,11 +196,11 @@ class CovidViz {
               return "rgba(0, 145, 255, 1)";
             },
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "onsetsPC"];
+              let raw = dataPoint[metricOverride || "infections_PC"];
               return Math.max(0, raw);
             },
-            p5: (dataPoint) => this.m(dataPoint, "onsetsPC_l95"),
-            p95: (dataPoint) => this.m(dataPoint, "onsetsPC_h95"),
+            p5: (dataPoint) => this.m(dataPoint, "infections_PC_p2_5"),
+            p95: (dataPoint) => this.m(dataPoint, "infections_PC_p97_5"),
           };
           break;
         }
@@ -208,7 +208,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "onsetsPC",
+            submetric: "infections_PC",
             legend: "True infections per 100k",
             label: "True infections per 100k",
             colorCodeStroke: false,
@@ -220,7 +220,7 @@ class CovidViz {
               return "rgba(0, 145, 255, 1)";
             },
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "onsetsPC"];
+              let raw = dataPoint[metricOverride || "infections_PC"];
               return Math.max(0, raw);
             },
           };
@@ -230,7 +230,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "cumulative",
+            submetric: "infections_cumulative",
             legend: "% ever infected",
             label: "% ever infected",
             colorCodeStroke: false,
@@ -243,11 +243,12 @@ class CovidViz {
               return "rgba(0, 145, 255, 1)";
             },
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "cumulative"];
+              let raw = dataPoint[metricOverride || "infections_cumulative"];
               return Math.max(0, raw);
             },
-            p5: (dataPoint) => this.m(dataPoint, "cumulative_l95"),
-            p95: (dataPoint) => this.m(dataPoint, "cumulative_h95"),
+            p5: (dataPoint) => this.m(dataPoint, "infections_cumulative_p2_5"),
+            p95: (dataPoint) =>
+              this.m(dataPoint, "infections_cumulative_p97_5"),
           };
           break;
         }
@@ -255,7 +256,7 @@ class CovidViz {
           conf = {
             dashLastNDays: 14,
             displayPreliminary: false,
-            submetric: "cumulative",
+            submetric: "infections_cumulative",
             legend: "% ever infected",
             label: "% ever infected",
             colorCodeStroke: false,
@@ -268,7 +269,7 @@ class CovidViz {
               return "rgba(0, 145, 255, 1)";
             },
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "cumulative"];
+              let raw = dataPoint[metricOverride || "infections_cumulative"];
               return Math.max(0, raw);
             },
           };
