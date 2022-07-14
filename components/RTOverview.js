@@ -88,8 +88,8 @@ export function RTOverview(props) {
   }
 
   const dateBounds =
-    showExtent === "8mo"
-      ? [timeDay.offset(new Date(), -8 * 30), new Date()]
+    showExtent === "3mo"
+      ? [timeDay.offset(new Date(), -3 * 30), new Date()]
       : [null, null];
 
   let isLgSize = props.width >= 991 && props.width < 1200;
@@ -176,7 +176,7 @@ export function RTOverview(props) {
               value={showExtent}
             >
               <Radio.Button value="all">All</Radio.Button>
-              <Radio.Button value="8mo">Last 8mo</Radio.Button>
+              <Radio.Button value="3mo">Last 3mo</Radio.Button>
             </Radio.Group>
           </Row>
           <Row className="stacked-states-outer">
