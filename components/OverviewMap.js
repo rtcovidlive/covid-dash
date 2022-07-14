@@ -57,18 +57,18 @@ function reformatMapData(data) {
   const tf = utcFormat("%Y-%m-%d");
 
   const zipped = _.zipWith(
-    data.Rt,
+    data.r_t,
     data.date,
-    data.infectionsPC,
+    data.infections_PC,
     data.fips,
-    data.seroprevalence,
+    data.infections_cumulative,
     data.infections,
-    (r, d, i, f, sp, inf) => ({
-      r0: +r / 100,
+    (r, d, ipc, f, ic, inf) => ({
+      r_t: +r / 100,
       date: tf(new Date(d * 24 * 60 * 60 * 1000)),
-      onsetsPC: i,
-      cumulative: sp,
-      onsets: inf,
+      infections_PC: ipc,
+      infections_cumulative: ic,
+      infections: inf,
       fips: f,
       identifier: f,
     })
@@ -108,14 +108,21 @@ function identifyAndTransformLatestRun(data) {
   const filtered = data.filter((d) => d["run.date"] == maxDate);
 
   const result = filtered.map(
-    ({ PEI, date, fips, infections, infectionsPC, Rt }) => ({
-      cumulative: +PEI * 100,
+    ({
+      cumulative_infections,
+      date,
+      fips,
+      infections,
+      infections_PC,
+      r_t,
+    }) => ({
+      cumulative: +cumulative_infections * 100,
       date: date,
       fips: fips,
       identifier: fips,
-      onsets: +infections,
-      onsetsPC: +infectionsPC,
-      r0: +Rt,
+      infections: +infections,
+      infections_PC: +infections_PC,
+      r_t: +r_t,
     })
   );
   return result;
@@ -200,7 +207,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
         let [min, max] = extent(reformatted.keys());
 
         setMapData(reformatted);
-        setDateMinMax(["2020-02-01", max]);
+        setDateMinMax([min, max]);
         setDateToDisplay(max);
         setDataIsLoaded(true);
       },
@@ -249,11 +256,9 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
   if (svgWidth < 500) svgHeight = svgWidth;
 
-  let sliderMarks = ([min, max]) => {
-    let months = eachWeekOfInterval({
-      start: new Date(min),
-      end: new Date(max),
-    });
+  let sliderMarks = (mapData) => {
+    const months = Array.from(mapData.keys()).map((date) => new Date(date));
+    const [min, max] = [_.first(months), _.last(months)];
 
     if (svgWidth < 500) months = _.filter(months, (d) => d.getUTCDate() < 8);
 
@@ -262,15 +267,13 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     let monthsFormatted = _.zipObject(
       _.map(months, toEpoch),
       _.map(months, (d, i) => {
-        if (d.getUTCDate() < 8 && i < 2 && props.width > 768)
-          return <strong>{utcFormat("%b")(d) + " '20"}</strong>;
-        else if (
+        if (
           d.getUTCDate() < 8 &&
           d.getMonth() === 0 &&
-          d.getFullYear() === 2021 &&
+          d.getFullYear() === 2022 &&
           props.width > 768
         )
-          return <strong>Jan '21</strong>;
+          return <strong>Jan '22</strong>;
         else if (d.getUTCDate() < 8 && svgWidth >= 500)
           return utcFormat("%b")(d);
         else if (d.getUTCDate() < 8 && svgWidth < 500 && i % 2 === 0)
@@ -310,7 +313,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
             <Row className="stacked-states-outer">
               <Col size={24}>
                 <Slider
-                  marks={sliderMarks(dateMinMax)}
+                  marks={sliderMarks(mapData)}
                   step={null}
                   defaultValue={toEpoch(dateMinMax[1])}
                   tooltipVisible={true}

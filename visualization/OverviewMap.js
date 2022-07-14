@@ -75,8 +75,9 @@ class OverviewMap {
     if (this.accessor === "r0") return "Effective reproduction number (Rt)";
     else if (this.accessor === "onsetsPC")
       return "Estimated infections / 100k / day";
-    else if (this.accessor === "onsets") return "Estimated infections / day";
-    else if (this.accessor === "cumulative")
+    else if (this.accessor === "infections")
+      return "Estimated infections / day";
+    else if (this.accessor === "infections_cumulative")
       return "Percent ever infected, pink: NA";
     else return "Invalid accessor!!";
   }
