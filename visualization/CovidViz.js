@@ -80,7 +80,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.DerivedR0: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "r_t",
             legend: "Rt",
@@ -110,7 +110,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.DerivedR0NoUI: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "r_t",
             legend: "Rt",
@@ -133,7 +133,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfections: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections",
             legend: "True infections",
@@ -158,7 +158,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfectionsNoUI: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections",
             legend: "True infections",
@@ -181,7 +181,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfectionsPC: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_PC",
             legend: "Infections per 100k",
@@ -206,7 +206,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.TrueInfectionsPCNoUI: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_PC",
             legend: "True infections per 100k",
@@ -228,7 +228,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.Seroprevalence: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_cumulative",
             legend: "% ever infected",
@@ -254,7 +254,7 @@ class CovidViz {
         }
         case Constants.MetricOptions.SeroprevalenceNoUI: {
           conf = {
-            dashLastNDays: 14,
+            dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_cumulative",
             legend: "% ever infected",
@@ -835,8 +835,8 @@ class CovidViz {
       .selectAll("path.line")
       .data((d) => {
         let series = d.series;
-        if (conf.dashLastNDays) {
-          return [series.slice(0, series.length - conf.dashLastNDays)];
+        if (conf.dashLastNWeeks) {
+          return [series.slice(0, series.length - conf.dashLastNWeeks)];
         }
         return [series];
       })
@@ -852,13 +852,13 @@ class CovidViz {
       })
       .attr("stroke-dasharray", conf.dashedLine ? "1 3" : "0");
 
-    if (conf.dashLastNDays) {
+    if (conf.dashLastNWeeks) {
       pathContainer
         .selectAll("path.line-lastN")
         .data((d) => {
           let series = d.series;
           let len = series.length;
-          return [series.slice(len - conf.dashLastNDays - 1)];
+          return [series.slice(len - conf.dashLastNWeeks - 1)];
         })
         .join("path")
         .attr("fill", "none")
@@ -1060,15 +1060,15 @@ class CovidViz {
             (this._showMovingAverage && entry._moving) || conf.m(entry);
           if (isSamePoint) {
             let isAfterLastNDays =
-              index >= d.series.length - conf.dashLastNDays;
+              index >= d.series.length - conf.dashLastNWeeks;
             if (!isAfterLastNDays || !conf.displayPreliminary) {
               metricsAtPoint.push({
                 weight: "normal",
                 text: conf.formatDatapointForTooltip(
                   d.identifier,
                   dataPoint,
-                  conf.dashLastNDays
-                    ? index >= d.series.length - conf.dashLastNDays
+                  conf.dashLastNWeeks
+                    ? index >= d.series.length - conf.dashLastNWeeks
                     : false
                 ),
               });
