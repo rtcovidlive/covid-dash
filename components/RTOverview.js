@@ -78,12 +78,6 @@ export function RTOverview(props) {
   let isSmallScreen = props.width <= 768;
   let config = props.config;
 
-  // TODO move to Context
-  let adminQuery = Util.getQueryParams(document.location.search)["admin"];
-  if (adminQuery) {
-    document.cookie = `admin=${adminQuery}`;
-  }
-
   const rtData = useContext(DataFetchContext);
   let lastUpdated = rtData.modelLastRunDate;
   const [clickedOnState, setClickedOnState] = useState(null);
