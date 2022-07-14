@@ -27,9 +27,9 @@ function stateClickHandler(stateCode) {
 
 export function RTOverview(props) {
   let outcomeTypes = {
-    infectionsPC: {
+    infections_PC: {
       enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
-      yDomain: [0, 800],
+      yDomain: [0, 2000],
       id: "infections_PC",
       label: "Infections (per 100k)",
       background:
@@ -44,7 +44,7 @@ export function RTOverview(props) {
       background:
         "linear-gradient(90deg, rgba(0, 0, 4, 0.25) 0%, rgb(59, 15, 112, 0.25) 20%, rgb(140, 41, 129, 0.25) 40%, rgb(222, 73, 104, 0.25) 60%, rgb(254, 159, 109, 0.25) 80%, rgb(252, 253, 191, 0.25) 100%",
     },
-    r0: {
+    r_t: {
       enabledModes: [Constants.MetricOptions.DerivedR0],
       yDomain: [0.2, 2],
       id: "r_t",
@@ -56,7 +56,7 @@ export function RTOverview(props) {
       background:
         "linear-gradient(90deg, rgba(26, 26, 26, 0.25) 0%, rgba(134, 134, 134, 0.25) 20%, rgba(223, 223, 223, 0.25) 40%, rgba(252, 216, 197, 0.25) 60%, rgba(213, 95, 80, 0.25) 80%, rgba(103, 0, 31, 0.25) 100%)",
     },
-    seroprevalence: {
+    infections_cumulative: {
       enabledModes: [Constants.MetricOptions.Seroprevalence],
       yDomain: [0, 100],
       yDomainCounty: [0, 100],
@@ -68,7 +68,7 @@ export function RTOverview(props) {
   };
 
   const [selectedOutcome, useSelectedOutcome] = useState(
-    outcomeTypes.infectionsPC
+    outcomeTypes.infections_PC
   );
 
   let handleRadioButton = function (name) {
