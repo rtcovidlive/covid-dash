@@ -30,7 +30,7 @@ export function RTOverview(props) {
     infectionsPC: {
       enabledModes: [Constants.MetricOptions.TrueInfectionsPC],
       yDomain: [0, 800],
-      id: "infectionsPC",
+      id: "infections_PC",
       label: "Infections (per 100k)",
       background:
         "linear-gradient(90deg, rgba(0, 0, 4, 0.25) 0%, rgba(140, 41, 129, 0.25) 20%, rgba(254, 159, 109, 0.25) 40%, rgba(249, 251, 216, 0.25) 60%, rgba(236, 248, 250, 0.25) 80%, rgba(210, 248, 255, 0.25) 100%)",
@@ -47,7 +47,7 @@ export function RTOverview(props) {
     r0: {
       enabledModes: [Constants.MetricOptions.DerivedR0],
       yDomain: [0.2, 2],
-      id: "r0",
+      id: "r_t",
       label: (
         <span>
           Effective reproduction number (R<sub>t</sub>)
@@ -60,7 +60,7 @@ export function RTOverview(props) {
       enabledModes: [Constants.MetricOptions.Seroprevalence],
       yDomain: [0, 100],
       yDomainCounty: [0, 100],
-      id: "seroprevalence",
+      id: "infections_cumulative",
       label: "Percent ever infected",
       background:
         "linear-gradient(90deg,  rgba(255, 255, 217, 0.25) 0%, rgba(213, 238, 179, 0.25) 20%, rgba(115, 201, 189, 0.25) 40%, rgba(40, 151, 191, 0.25) 60%, rgba(35, 78, 160, 0.25) 80%, rgba(8, 29, 88, 0.25) 100%)",
