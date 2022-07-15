@@ -93,7 +93,7 @@ const getSeriesConfig = function (outcome) {
       };
       break;
     }
-    case "hospi": {
+    case "hosp": {
       conf = {
         yTickFormat: d3format(".2s"),
         shortName: "hospitalizations",
