@@ -64,13 +64,13 @@ const getSeriesConfig = function (outcome) {
       };
       break;
     }
-    case "PC_infections_cumulative": {
+    case "P100k_infections_cumulative": {
       conf = {
         shortName: "cumulative infections",
-        yDomain: [0, 1.5],
-        yAxisTicks: [0, 0.33, 0.5, 0.67, 1.0, 1.5],
-        yGridTicks: [0, 0.33, 0.5, 0.67, 1.0, 1.5],
-        yTickFormat: d3format(".0%"),
+        yDomain: [0, 2].map((n) => 1e5 * n),
+        yAxisTicks: [0, 0.33, 0.5, 0.67, 1.0, 1.5, 2].map((n) => 1e5 * n),
+        yGridTicks: [0, 0.33, 0.5, 0.67, 1.0, 1.5, 2].map((n) => 1e5 * n),
+        yTickFormat: d3format(".3s"),
         strokeColor: "rgb(100, 125, 160)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
         fillColorConf: "rgb(122, 192, 245)",
@@ -141,6 +141,33 @@ const addSpecialOutcomes = function (datum, outcome, pop) {
       [`${outcome}`, safeDiv(datum[`${base_outcome}`], pop)],
       [`${outcome}_p75`, safeDiv(datum[`${base_outcome}_p75`], pop)],
       [`${outcome}_p97_5`, safeDiv(datum[`${base_outcome}_p97_5`], pop)],
+    ];
+
+    return { ...datum, ..._.fromPairs(newKeys) };
+  } else if (
+    outcome === "P100k_infections_cumulative" &&
+    datum[outcome] === undefined
+  ) {
+    const base_outcome = outcome.match(/^P100k_(.*)$/)[1];
+
+    const newKeys = [
+      [
+        `${outcome}_p2_5`,
+        safeMul(100000, safeDiv(datum[`${base_outcome}_p2_5`], pop)),
+      ],
+      [
+        `${outcome}_p25`,
+        safeMul(100000, safeDiv(datum[`${base_outcome}_p25`], pop)),
+      ],
+      [`${outcome}`, safeMul(100000, safeDiv(datum[`${base_outcome}`], pop))],
+      [
+        `${outcome}_p75`,
+        safeMul(100000, safeDiv(datum[`${base_outcome}_p75`], pop)),
+      ],
+      [
+        `${outcome}_p97_5`,
+        safeMul(100000, safeDiv(datum[`${base_outcome}_p97_5`], pop)),
+      ],
     ];
 
     return { ...datum, ..._.fromPairs(newKeys) };
@@ -340,6 +367,18 @@ export function CountyMetricChart(props) {
       }}
     >
       <HorizontalGridLines tickValues={conf.yGridTicks} />
+      {outcome == "r_t" && (
+        <HorizontalGridLines
+          tickValues={[1]}
+          style={{ stroke: "rgb(204, 81, 69)" }}
+        />
+      )}
+      {outcome == "P100k_infections_cumulative" && (
+        <HorizontalGridLines
+          tickValues={[1e5]}
+          style={{ stroke: "rgb(204, 81, 69)" }}
+        />
+      )}
       <VerticalGridLines
         style={{ opacity: 0.25 }}
         tickValues={runLatest.timeseries.map((d) => new Date(d.date))}
@@ -358,7 +397,7 @@ export function CountyMetricChart(props) {
         tickFormat={(d) => utcFormat("%b %e")(d)}
       />
 
-      {props.outcome === "PC_infections_cumulative" && (
+      {props.outcome === "P100k_infections_cumulative" && (
         <AreaSeries
           data={clipper(runLatest.timeseries)}
           color={"rgb(235,235,240)"}
@@ -374,6 +413,7 @@ export function CountyMetricChart(props) {
           color={conf.fillColorConf}
           style={{ mixBlendMode: "multiply" }}
           opacity={0.7}
+          curve="curveCatmullRom"
         />,
         <AreaSeries
           data={clipper(runLatest.timeseries)}
@@ -383,6 +423,7 @@ export function CountyMetricChart(props) {
           color={conf.fillColorConf}
           style={{ mixBlendMode: "multiply" }}
           opacity={0.7}
+          curve="curveCatmullRom"
         />,
       ]}
 
@@ -452,6 +493,7 @@ export function CountyMetricChart(props) {
               style: { mixBlendMode: "multiply" },
               color: "rgb(200, 200, 200)",
               opacity: 0.9,
+              curve: "curveCatmullRom",
             };
 
             return [

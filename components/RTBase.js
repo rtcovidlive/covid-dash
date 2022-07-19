@@ -78,7 +78,7 @@ export function RTBase(props) {
       />
       <SWRConfig
         value={{
-          refreshInterval: 0,
+          refreshInterval: 1000 * 60 * 60,
           dedupingInterval: 1000 * 60 * 60,
           revalidateOnFocus: false,
         }}

@@ -808,15 +808,16 @@ export function RTSubareaOverview(props) {
             )}
             {contentWidth && (
               <>
-                <ChartTitle level={2}>Percent Ever Infected</ChartTitle>
+                <ChartTitle level={2}>Cumulative infections</ChartTitle>
                 <Explanation>
-                  Percent ever infected is our estimate of the number of
-                  individuals in the county or state population who have been
-                  infected at least once with COVID-19.
+                  Our best estimate of the number of infections that have
+                  occurred in this geography since the start of the pandemic on
+                  a per-capita basis. Displayed as infections per 100,000
+                  individuals. Uncertainty pre-December 2021 is not represented.
                 </Explanation>
                 <RTChartWrapper>
                   <CountyMetricChart
-                    outcome={"PC_infections_cumulative"}
+                    outcome={"P100k_infections_cumulative"}
                     showNeighbors={showNeighbors}
                     showHistory={showHistory}
                     showEnclosed={showCounties}
