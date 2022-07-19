@@ -426,6 +426,7 @@ const CountyInputView = function (props) {
   const [inputDataDate, setInputDataDate] = useState(null);
   const [barDomain, setBarDomain] = useState(false);
   const [perCapita, setPerCapita] = useState(false);
+  const [fitToData, setFitToData] = useState(false);
   const [historicalRunID, setHistoricalRunID] = useState(null);
 
   const { data: runLatest, error: runLatestError } = useLatestRun(geoName, {
@@ -479,21 +480,35 @@ const CountyInputView = function (props) {
       <Switch
         size="small"
         style={{ marginLeft: 15 }}
-        checked={barDomain}
-        onClick={(e) => setBarDomain(!barDomain)}
-      />{" "}
-      <span style={{ color: "grey", fontSize: "0.8em" }}>
-        Include all observations?
-      </span>
-      <Switch
-        size="small"
-        style={{ marginLeft: 15 }}
         checked={perCapita}
         onClick={(e) => setPerCapita(!perCapita)}
       />{" "}
       <span style={{ color: "grey", fontSize: "0.8em" }}>
         Display per 100k, per day?
       </span>
+      <Switch
+        size="small"
+        style={{ marginLeft: 15 }}
+        checked={fitToData}
+        onClick={(e) => setFitToData(!fitToData)}
+      />{" "}
+      <span style={{ color: "grey", fontSize: "0.8em" }}>
+        Show model fit to data?
+      </span>
+      {fitToData && (
+        <>
+          <Switch
+            size="small"
+            style={{ marginLeft: 15 }}
+            checked={barDomain}
+            onClick={(e) => setBarDomain(!barDomain)}
+          />
+          <span style={{ color: "grey", fontSize: "0.8em" }}>
+            {" "}
+            Show everything?
+          </span>
+        </>
+      )}
       <RTChartWrapper>
         {runLatest &&
           outcomes.map((outcome) => {
@@ -502,6 +517,8 @@ const CountyInputView = function (props) {
                 runID={runLatest.run_id}
                 historicalRunID={historicalRunID}
                 outcome={outcome}
+                fitToData={fitToData}
+                geoName={geoName}
                 population={runLatest.geo_info.pop}
                 barDomain={barDomain}
                 key={`county-input-chart-outcome-${outcome}`}
@@ -675,23 +692,7 @@ export function RTSubareaOverview(props) {
                       />
                     </SubareaName>
                   </Dropdown>
-                </Col>
-              </HeaderRow>
-              <StateStatRow
-                config={config}
-                data={subAreaData}
-                width={contentWidth}
-                subarea={props.subarea}
-                isSmallScreen={isSmallScreen}
-                showHistory={showHistory}
-                setShowHistory={setShowHistory}
-                showNeighbors={showNeighbors}
-                setShowNeighbors={setShowNeighbors}
-                style={{ opacity: props.fips ? 0.38 : 1 }}
-              />
-              <SubHeaderRow>
-                <Col size={24}>
-                  {!props.fips && <div>See county-level results: </div>}
+                  {!props.fips && <span>See county-level results: </span>}
                   {true && (
                     <Dropdown
                       options={countyMenuItems}
@@ -724,7 +725,19 @@ export function RTSubareaOverview(props) {
                     </Dropdown>
                   )}
                 </Col>
-              </SubHeaderRow>
+              </HeaderRow>
+              {/*<StateStatRow
+                config={config}
+                data={subAreaData}
+                width={contentWidth}
+                subarea={props.subarea}
+                isSmallScreen={isSmallScreen}
+                showHistory={showHistory}
+                setShowHistory={setShowHistory}
+                showNeighbors={showNeighbors}
+                setShowNeighbors={setShowNeighbors}
+                style={{ opacity: props.fips ? 0.38 : 1 }}
+              />*/}
               {/*props.fips && (
                 <CountyStatRow
                   config={config}

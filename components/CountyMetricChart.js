@@ -18,6 +18,7 @@ import {
   useLatestNeighborRuns,
   useHistoricalRuns,
   useLatestRun,
+  useRun,
   useInputsForRun,
   useLatestEnclosedRuns,
 } from "../lib/data";
@@ -57,7 +58,7 @@ const getSeriesConfig = function (outcome) {
         yDomain: [0, 1600],
         yAxisTicks: [0, 100, 200, 400, 800, 1200],
         yGridTicks: [0, 100, 200, 400, 800, 1200],
-        yTickFormat: d3format(".2s"),
+        yTickFormat: d3format(".3s"),
         strokeColor: "rgb(100, 125, 160)",
         fillColorConf: "rgb(125, 200, 255)",
         strokeColorEmphasis: "rgba(0, 145, 255, 1)",
@@ -128,86 +129,88 @@ const getSeriesConfig = function (outcome) {
   return conf;
 };
 
-const addSpecialOutcomes = function (datum, outcome, pop) {
+const addSpecialOutcomes = function (datum, outcomeNames, pop, perDay = true) {
   const safeMul = (x, y) => (x === null || y === null ? null : x * y);
   const safeDiv = (x, y) => (x === null || y === null ? null : x / y);
+  let newKeys = [];
+  const outcomes = Array.isArray(outcomeNames) ? outcomeNames : [outcomeNames];
 
-  if (outcome.startsWith("PC_") && datum[outcome] === undefined) {
-    const base_outcome = outcome.match(/^PC_(.*)$/)[1];
+  for (const outcome of outcomes) {
+    if (outcome.startsWith("PC_") && datum[outcome] === undefined) {
+      const base_outcome = outcome.match(/^PC_(.*)$/)[1];
 
-    const newKeys = [
-      [`${outcome}_p2_5`, safeDiv(datum[`${base_outcome}_p2_5`], pop)],
-      [`${outcome}_p25`, safeDiv(datum[`${base_outcome}_p25`], pop)],
-      [`${outcome}`, safeDiv(datum[`${base_outcome}`], pop)],
-      [`${outcome}_p75`, safeDiv(datum[`${base_outcome}_p75`], pop)],
-      [`${outcome}_p97_5`, safeDiv(datum[`${base_outcome}_p97_5`], pop)],
-    ];
+      newKeys = newKeys.concat([
+        [`${outcome}_p2_5`, safeDiv(datum[`${base_outcome}_p2_5`], pop)],
+        [`${outcome}_p25`, safeDiv(datum[`${base_outcome}_p25`], pop)],
+        [`${outcome}`, safeDiv(datum[`${base_outcome}`], pop)],
+        [`${outcome}_p75`, safeDiv(datum[`${base_outcome}_p75`], pop)],
+        [`${outcome}_p97_5`, safeDiv(datum[`${base_outcome}_p97_5`], pop)],
+      ]);
+    } else if (
+      outcome.startsWith("P100k_") &&
+      datum[outcome] === undefined &&
+      !perDay
+    ) {
+      const base_outcome = outcome.match(/^P100k_(.*)$/)[1];
 
-    return { ...datum, ..._.fromPairs(newKeys) };
-  } else if (
-    outcome === "P100k_infections_cumulative" &&
-    datum[outcome] === undefined
-  ) {
-    const base_outcome = outcome.match(/^P100k_(.*)$/)[1];
+      newKeys = newKeys.concat([
+        [
+          `${outcome}_p2_5`,
+          safeMul(100000, safeDiv(datum[`${base_outcome}_p2_5`], pop)),
+        ],
+        [
+          `${outcome}_p25`,
+          safeMul(100000, safeDiv(datum[`${base_outcome}_p25`], pop)),
+        ],
+        [`${outcome}`, safeMul(100000, safeDiv(datum[`${base_outcome}`], pop))],
+        [
+          `${outcome}_p75`,
+          safeMul(100000, safeDiv(datum[`${base_outcome}_p75`], pop)),
+        ],
+        [
+          `${outcome}_p97_5`,
+          safeMul(100000, safeDiv(datum[`${base_outcome}_p97_5`], pop)),
+        ],
+      ]);
+    } else if (
+      outcome.startsWith("P100k_") &&
+      datum[outcome] === undefined &&
+      perDay
+    ) {
+      const base_outcome = outcome.match(/^P100k_(.*)$/)[1];
 
-    const newKeys = [
-      [
-        `${outcome}_p2_5`,
-        safeMul(100000, safeDiv(datum[`${base_outcome}_p2_5`], pop)),
-      ],
-      [
-        `${outcome}_p25`,
-        safeMul(100000, safeDiv(datum[`${base_outcome}_p25`], pop)),
-      ],
-      [`${outcome}`, safeMul(100000, safeDiv(datum[`${base_outcome}`], pop))],
-      [
-        `${outcome}_p75`,
-        safeMul(100000, safeDiv(datum[`${base_outcome}_p75`], pop)),
-      ],
-      [
-        `${outcome}_p97_5`,
-        safeMul(100000, safeDiv(datum[`${base_outcome}_p97_5`], pop)),
-      ],
-    ];
-
-    return { ...datum, ..._.fromPairs(newKeys) };
-  } else if (outcome.startsWith("P100k_") && datum[outcome] === undefined) {
-    const base_outcome = outcome.match(/^P100k_(.*)$/)[1];
-
-    const newKeys = [
-      [
-        `${outcome}_p2_5`,
-        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p2_5`], pop)),
-      ],
-      [
-        `${outcome}_p25`,
-        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p25`], pop)),
-      ],
-      [
-        `${outcome}`,
-        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}`], pop)),
-      ],
-      [
-        `${outcome}_p75`,
-        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p75`], pop)),
-      ],
-      [
-        `${outcome}_p97_5`,
-        safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p97_5`], pop)),
-      ],
-    ];
-
-    return { ...datum, ..._.fromPairs(newKeys) };
+      newKeys = newKeys.concat([
+        [
+          `${outcome}_p2_5`,
+          safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p2_5`], pop)),
+        ],
+        [
+          `${outcome}_p25`,
+          safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p25`], pop)),
+        ],
+        [
+          `${outcome}`,
+          safeMul(100000 / 7, safeDiv(datum[`${base_outcome}`], pop)),
+        ],
+        [
+          `${outcome}_p75`,
+          safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p75`], pop)),
+        ],
+        [
+          `${outcome}_p97_5`,
+          safeMul(100000 / 7, safeDiv(datum[`${base_outcome}_p97_5`], pop)),
+        ],
+      ]);
+    }
   }
-
-  return datum;
+  return { ...datum, ..._.fromPairs(newKeys) };
 };
 
-const runWithSpecialOutcomes = function (run, outcome) {
+const runWithSpecialOutcomes = function (run, outcomes, perDay = true) {
   return {
     ...run,
     timeseries: run.timeseries.map((d) =>
-      addSpecialOutcomes(d, outcome, run.geo_info.pop)
+      addSpecialOutcomes(d, outcomes, run.geo_info.pop, perDay)
     ),
   };
 };
@@ -255,21 +258,25 @@ export function CountyMetricChart(props) {
   if (!runLatest) return null;
 
   if (props.outcome.startsWith("P100k_") || props.outcome.startsWith("PC_")) {
-    if (runLatest) runLatest = runWithSpecialOutcomes(runLatest, props.outcome);
+    const perDay = props.outcome.endsWith("infections_cumulative")
+      ? false
+      : true;
+    if (runLatest)
+      runLatest = runWithSpecialOutcomes(runLatest, props.outcome, perDay);
 
     if (runsNeighbors)
       runsNeighbors = runsNeighbors.map((d) =>
-        runWithSpecialOutcomes(d, props.outcome)
+        runWithSpecialOutcomes(d, props.outcome, perDay)
       );
 
     if (runsHistorical)
       runsHistorical = runsHistorical.map((d) =>
-        runWithSpecialOutcomes(d, props.outcome)
+        runWithSpecialOutcomes(d, props.outcome, perDay)
       );
 
     if (runsEnclosed)
       runsEnclosed = runsEnclosed.map((d) =>
-        runWithSpecialOutcomes(d, props.outcome)
+        runWithSpecialOutcomes(d, props.outcome, perDay)
       );
   }
 
@@ -649,12 +656,22 @@ export function CountyMetricChart(props) {
   );
 }
 
+const outcomeMap = {
+  cases: ["infections", "fitted_cases"],
+  deaths: ["deaths", "fitted_deaths"],
+  hosp: ["severe", "fitted_hospitalizations"],
+  P100k_cases: ["P100k_infections", "P100k_fitted_cases"],
+  P100k_deaths: ["P100k_deaths", "P100k_fitted_deaths"],
+  P100k_hosp: ["P100k_severe", "P100k_fitted_hospitalizations"],
+};
+
 export function CountyInputChart(props) {
   const {
     outcome,
     geoName,
     runID,
     historicalRunID,
+    fitToData,
     width,
     height,
     barDomain,
@@ -663,6 +680,12 @@ export function CountyInputChart(props) {
 
   const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
   const [minDateSeen, setMinDateSeen] = useState("2300-01-01");
+
+  const { data: runLatestRaw, error: errorRunLatest } = useLatestRun(
+    props.geoName
+  );
+  const { data: runHistoricalRaw, error: errorRunHistorical } =
+    useRun(historicalRunID);
 
   const { data: inputsLatestRaw, error: errorInputsLatest } =
     useInputsForRun(runID);
@@ -675,6 +698,7 @@ export function CountyInputChart(props) {
   const inputsLatest = inputsLatestRaw.map((d) =>
     addSpecialOutcomes(d, outcome, population)
   );
+
   let inputsHistorical = inputsHistoricalRaw;
 
   if (inputsHistorical)
@@ -682,11 +706,20 @@ export function CountyInputChart(props) {
       addSpecialOutcomes(d, outcome, population)
     );
 
+  let runLatest = runLatestRaw;
+
+  if (runLatest && fitToData && outcomeMap[outcome])
+    runLatest = runWithSpecialOutcomes(runLatest, outcomeMap[outcome], true);
+
   const conf = getSeriesConfig(outcome);
 
-  const yDomain =
-    inputsLatest &&
-    (conf.yDomain || [0, 1.1 * max(inputsLatest, (d) => +d[outcome])]);
+  let yDomain = conf.yDomain || [
+    0,
+    1.1 * max(inputsLatest, (d) => +d[outcome]),
+  ];
+
+  if (fitToData && barDomain && runLatest && outcomeMap[outcome])
+    yDomain = [0, max(runLatest.timeseries, (d) => d[outcomeMap[outcome][0]])];
 
   return (
     <XYPlot
@@ -735,6 +768,17 @@ export function CountyInputChart(props) {
         fill="black"
         size={1.2}
       />
+
+      {fitToData &&
+        runLatest &&
+        outcomeMap[outcome] &&
+        outcomeMap[outcome].map((o) => (
+          <LineSeries
+            data={runLatest.timeseries}
+            key={`fit-to-data-${o}`}
+            getY={(d) => d[o]}
+          />
+        ))}
 
       {inputsHistorical && (
         <LineSeries
