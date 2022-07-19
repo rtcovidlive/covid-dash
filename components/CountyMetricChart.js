@@ -711,6 +711,8 @@ export function CountyInputChart(props) {
   if (runLatest && fitToData && outcomeMap[outcome])
     runLatest = runWithSpecialOutcomes(runLatest, outcomeMap[outcome], true);
 
+  const fitToDataIsActive = runLatest && fitToData && outcomeMap[outcome];
+  const hasConf = runLatest && runLatest.method === "sampling";
   const conf = getSeriesConfig(outcome);
 
   let yDomain = conf.yDomain || [
@@ -718,7 +720,18 @@ export function CountyInputChart(props) {
     1.1 * max(inputsLatest, (d) => +d[outcome]),
   ];
 
-  if (fitToData && barDomain && runLatest && outcomeMap[outcome])
+  if (fitToData && barDomain && runLatest && outcomeMap[outcome] && hasConf)
+    yDomain = [
+      0,
+      max(runLatest.timeseries, (d) => d[outcomeMap[outcome][0] + "_p97_5"]),
+    ];
+  else if (
+    fitToData &&
+    barDomain &&
+    runLatest &&
+    outcomeMap[outcome] &&
+    !hasConf
+  )
     yDomain = [0, max(runLatest.timeseries, (d) => d[outcomeMap[outcome][0]])];
 
   return (
@@ -769,14 +782,38 @@ export function CountyInputChart(props) {
         size={1.2}
       />
 
-      {fitToData &&
-        runLatest &&
-        outcomeMap[outcome] &&
-        outcomeMap[outcome].map((o) => (
+      {fitToDataIsActive &&
+        hasConf &&
+        outcomeMap[outcome].map((o, i) => [
+          <AreaSeries
+            data={runLatest.timeseries}
+            key={"conf-area-95"}
+            getY={(d) => d[o + "_p97_5"]}
+            getY0={(d) => d[o + "_p2_5"]}
+            color={i === 0 ? "lightgreen" : "grey"}
+            style={{ mixBlendMode: "multiply" }}
+            opacity={0.3}
+            curve="curveCatmullRom"
+          />,
+          <AreaSeries
+            data={runLatest.timeseries}
+            key={"conf-area-25-75"}
+            getY={(d) => d[o + "_p75"]}
+            getY0={(d) => d[o + "_p25"]}
+            color={i === 0 ? "lightgreen" : "grey"}
+            style={{ mixBlendMode: "multiply" }}
+            opacity={0.6}
+            curve="curveCatmullRom"
+          />,
+        ])}
+
+      {fitToDataIsActive &&
+        outcomeMap[outcome].map((o, i) => (
           <LineSeries
             data={runLatest.timeseries}
             key={`fit-to-data-${o}`}
             getY={(d) => d[o]}
+            color={i === 0 ? "rgb(30, 130, 40)" : "black"}
           />
         ))}
 
