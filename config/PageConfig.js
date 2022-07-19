@@ -15,8 +15,7 @@ console.log(`Base URL is ${BASE_URL}`);
 
 export const LOOPBACK_BASE_URL =
   process.env["DEV_HOST"] || `http://localhost:${LOOPBACK_PORT}`;
-export const CDN_ROOT =
-  "https://covidestim.s3.us-east-2.amazonaws.com/omicron-test";
+export const CDN_ROOT = "https://cdn.covidestim.org/omicron-test";
 
 class Config {
   constructor(

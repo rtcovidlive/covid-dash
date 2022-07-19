@@ -124,10 +124,8 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [hoverFips, setHoverFips] = useState([]);
   const [fips, setFips] = useState(cookieFips);
 
-  const url =
-    "https://covidestim.s3.us-east-2.amazonaws.com/omicron-test/summary.pack.gz";
-  const albersURL =
-    "https://covidestim.s3.us-east-2.amazonaws.com/counties-albers-10m.json";
+  const url = "https://cdn.covidestim.org/omicron-test/summary.pack.gz";
+  const albersURL = "https://cdn.covidestim.org/counties-albers-10m.json";
 
   const clearFips = () => {
     setFips([]);

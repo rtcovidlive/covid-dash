@@ -115,9 +115,7 @@ export function RTHeader(props) {
             </div>
             <div className="rt-header-update-entry rt-header-update-entry-alert">
               <a
-                href={
-                  "https://covidestim.s3.us-east-2.amazonaws.com/latest/estimates.csv"
-                }
+                href={"https://cdn.covidestim.org/latest/estimates.csv"}
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
                 <VerticalAlignBottomOutlined /> County estimates
@@ -125,9 +123,7 @@ export function RTHeader(props) {
             </div>
             <div className="rt-header-update-entry rt-header-update-entry-alert">
               <a
-                href={
-                  "https://covidestim.s3.us-east-2.amazonaws.com/latest/state/estimates.csv"
-                }
+                href={"https://cdn.covidestim.org/latest/state/estimates.csv"}
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
                 <VerticalAlignBottomOutlined /> State estimates
