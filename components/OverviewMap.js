@@ -231,7 +231,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   if (svgWidth < 500) svgHeight = svgWidth;
 
   let sliderMarks = (mapData) => {
-    const months = Array.from(mapData.keys()).map((date) => new Date(date));
+    let months = Array.from(mapData.keys()).map((date) => new Date(date));
     const [min, max] = [_.first(months), _.last(months)];
 
     if (svgWidth < 500) months = _.filter(months, (d) => d.getUTCDate() < 8);
