@@ -1,4 +1,4 @@
-import { select, event, mouse } from "d3-selection";
+import { select, event } from "d3-selection";
 import { scaleSequential, scaleDiverging } from "d3-scale";
 import {
   interpolateYlGnBu,
@@ -8,7 +8,6 @@ import {
 import { interpolateRgbBasis } from "d3-interpolate";
 import { geoPath, geoIdentity } from "d3-geo";
 import { timeFormat } from "d3-time-format";
-import { nest } from "d3-collection";
 import { zoom, zoomIdentity, zoomTransform } from "d3-zoom";
 import { mesh, feature } from "topojson-client";
 import _ from "lodash";

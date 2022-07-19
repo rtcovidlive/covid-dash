@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect, useLayoutEffect } from "react";
 import styled from "styled-components";
 import Dropdown from "./Dropdown";
-import Link from "next/link";
 import { Navigation } from "../lib/Navigation";
 import { RTFooter } from "./RTFooter";
 import _ from "lodash";
@@ -9,11 +8,7 @@ import { format } from "d3-format";
 import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { DataFetchContext } from "lib/DataFetchContext";
-import { StateRtChart } from "./StateRtChart";
 import { CountyMetricChart, CountyInputChart } from "./CountyMetricChart";
-// import { CountyTestAdjustedChart } from "./CountyTestAdjustedChart";
-import { TestAdjustedChart } from "./TestAdjustedChart";
-import { CaseGrowthChart } from "./CaseGrowthChart";
 import { ShareButtons } from "./ShareButtons";
 import { Util } from "lib/Util";
 import Constants from "lib/Constants";
@@ -873,25 +868,6 @@ export function RTSubareaOverview(props) {
               see the degree of case underascertainment as the gap between the
               testing data and the infections curve.
             </Explanation>
-            {/*props.fips && contentWidth && (
-              <RTChartWrapper>
-                <CountyTestAdjustedChart
-                  type={"cases"}
-                  fips={props.fips}
-                  width={contentWidth + 40}
-                  height={chartHeight}
-                  showHistory={showHistory}
-                  showExtent={showExtent}
-                />
-              </RTChartWrapper>
-            )*/}
-            {/*!props.fips && contentWidth && (
-              <TestAdjustedChart
-                data={subAreaData}
-                width={contentWidth + 40}
-                height={chartHeight + 170}
-              />
-            )*/}
             {props.fips && contentWidth && (
               <>
                 <ChartTitle level={2}>

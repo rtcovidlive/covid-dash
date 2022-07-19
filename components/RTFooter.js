@@ -1,5 +1,4 @@
 import React from "react";
-import { Title } from "./Typography";
 import { Row } from "./Grid";
 
 export const RTFooter = React.forwardRef(function (props, footerRef) {

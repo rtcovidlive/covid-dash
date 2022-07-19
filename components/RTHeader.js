@@ -1,7 +1,6 @@
 import { useLayoutEffect } from "react";
 import styled from "styled-components";
 import { timeFormat } from "d3-time-format";
-import Link from "next/link";
 import { Row, Col } from "./Grid";
 import { Title } from "./Typography";
 import { ShareButtons } from "./ShareButtons";

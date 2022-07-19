@@ -1,13 +1,5 @@
 import _ from "lodash";
-import React, {
-  useMemo,
-  useState,
-  useEffect,
-  useRef,
-  PureComponent,
-  Fragment,
-} from "react";
-import DataFetcher from "lib/DataFetcher";
+import React, { useMemo, useState, useEffect, Fragment } from "react";
 import { StateR0Display } from "./StateR0Display";
 import axios from "axios";
 import { decode } from "@ygoe/msgpack";
@@ -21,27 +13,11 @@ import {
   format as dateFormat,
 } from "date-fns";
 import { useLatestRun } from "../lib/data";
-import { StateRtChart } from "./StateRtChart";
 import { AddCounty } from "./AddCounty";
-import { Button } from "antd";
 import { Row, Col } from "./Grid";
-import { Slider, Spin, Space, Alert } from "antd";
-import { SelectOutlined, ZoomInOutlined } from "@ant-design/icons";
+import { Button, Slider, Spin, Alert } from "antd";
 import { Util } from "lib/Util";
-import { Title, HelperTitle } from "./Typography";
-
-import {
-  TooltipWrapper,
-  TooltipDate,
-  TooltipStat,
-  TooltipLabel,
-  RTSubareaChart,
-  LegendContainer,
-  LegendRow,
-  LegendLine,
-  LegendLabel,
-} from "./RTSubareaChart";
-
+import { RTSubareaChart } from "./RTSubareaChart";
 import OverviewMap from "visualization/OverviewMap";
 
 let toEpoch = (d) => Math.floor(new Date(d).valueOf() / (1000 * 60 * 60 * 24));

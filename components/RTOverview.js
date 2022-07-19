@@ -8,7 +8,6 @@ import { StateR0Display } from "./StateR0Display";
 import { RTFooter } from "./RTFooter";
 import RTHeader from "./RTHeader";
 import OverviewMapSuper from "./OverviewMap";
-import { Util } from "lib/Util";
 import Constants from "lib/Constants";
 import { Radio } from "antd";
 import { timeDay } from "d3-time";

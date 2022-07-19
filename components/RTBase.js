@@ -8,7 +8,6 @@ import dynamic from "next/dynamic";
 import { Util } from "lib/Util";
 import DataFetcher from "lib/DataFetcher";
 import { SWRConfig } from "swr";
-import { Modal } from "antd";
 
 const GoogleAnalyticsTag = dynamic(() => import("./GoogleAnalyticsTag"), {
   ssr: false,
