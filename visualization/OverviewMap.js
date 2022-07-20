@@ -24,7 +24,7 @@ class OverviewMap {
     this._addHoverFips = addHoverFips;
 
     this.ColorSeroprevalence = scaleSequential(
-      [0, 75],
+      [0, 200000],
       interpolateYlGnBu
     ).unknown("rgba(194, 171, 207)");
 
@@ -77,7 +77,7 @@ class OverviewMap {
     else if (this.accessor === "infections")
       return "Estimated infections / day";
     else if (this.accessor === "infections_cumulative")
-      return "Percent ever infected, pink: NA";
+      return "Cumulative infections, pink: NA";
     else return "Invalid accessor!!";
   }
 

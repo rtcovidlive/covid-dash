@@ -60,7 +60,7 @@ export function RTOverview(props) {
       yDomain: [0, 100],
       yDomainCounty: [0, 100],
       id: "infections_cumulative",
-      label: "Percent ever infected",
+      label: "Cumulative infections",
       background:
         "linear-gradient(90deg,  rgba(255, 255, 217, 0.25) 0%, rgba(213, 238, 179, 0.25) 20%, rgba(115, 201, 189, 0.25) 40%, rgba(40, 151, 191, 0.25) 60%, rgba(35, 78, 160, 0.25) 80%, rgba(8, 29, 88, 0.25) 100%)",
     },
