@@ -697,14 +697,14 @@ export function CountyInputChart(props) {
   if (!inputsLatestRaw) return null;
 
   const inputsLatest = inputsLatestRaw.map((d) =>
-    addSpecialOutcomes(d, outcome, population)
+    addSpecialOutcomes(d, outcome, population, true)
   );
 
   let inputsHistorical = inputsHistoricalRaw;
 
   if (inputsHistorical)
     inputsHistorical = inputsHistorical.map((d) =>
-      addSpecialOutcomes(d, outcome, population)
+      addSpecialOutcomes(d, outcome, population, true)
     );
 
   let runLatest = runLatestRaw;
