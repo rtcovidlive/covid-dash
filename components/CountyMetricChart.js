@@ -678,18 +678,22 @@ export function CountyInputChart(props) {
     population,
   } = props;
 
-  const { data: runLatestRaw, error: errorRunLatest } = useLatestRun(
-    props.geoName
-  );
+  // Data from latest run
+  const { data: runLatestRaw, error: errorRunLatest } = useLatestRun(geoName);
+
+  // Data from historical run, if the ID passed was not null
   const { data: runHistoricalRaw, error: errorRunHistorical } =
     useRun(historicalRunID);
 
+  // Inputs from the latest run
   const { data: inputsLatestRaw, error: errorInputsLatest } =
     useInputsForRun(runID);
 
+  // Inputs from historical run, if ID passed was not null
   const { data: inputsHistoricalRaw, error: errorInputsHistorical } =
     useInputsForRun(historicalRunID);
 
+  // Don't bother rendering anything unless we at least have the input data
   if (!inputsLatestRaw) return null;
 
   const inputsLatest = inputsLatestRaw.map((d) =>
@@ -704,12 +708,19 @@ export function CountyInputChart(props) {
     );
 
   let runLatest = runLatestRaw;
+  let runHistorical = runHistoricalRaw;
 
-  if (runLatest && fitToData && outcomeMap[outcome])
-    runLatest = runWithSpecialOutcomes(runLatest, outcomeMap[outcome], true);
+  // Here we select which run will be used if `fitToData` is enabled. If
+  // a historical run has been selected by the user, we always choose to
+  // display that over the most recent run.
+  let run = runLatest;
+  if (runLatest && !runHistorical && fitToData && outcomeMap[outcome])
+    run = runWithSpecialOutcomes(runLatest, outcomeMap[outcome], true);
+  else if (runHistorical && fitToData && outcomeMap[outcome])
+    run = runWithSpecialOutcomes(runHistorical, outcomeMap[outcome], true);
 
-  const fitToDataIsActive = runLatest && fitToData && outcomeMap[outcome];
-  const hasConf = runLatest && runLatest.method === "sampling";
+  const fitToDataIsActive = run && fitToData && outcomeMap[outcome];
+  const hasConf = run && run.method === "sampling";
   const conf = getSeriesConfig(outcome);
 
   let yDomain = conf.yDomain || [
@@ -717,19 +728,14 @@ export function CountyInputChart(props) {
     1.1 * max(inputsLatest, (d) => +d[outcome]),
   ];
 
-  if (fitToData && barDomain && runLatest && outcomeMap[outcome] && hasConf)
+  // Use the largest UI for the selected outcome if a UI is available
+  if (fitToData && barDomain && run && outcomeMap[outcome] && hasConf)
     yDomain = [
       0,
-      max(runLatest.timeseries, (d) => d[outcomeMap[outcome][0] + "_p97_5"]),
+      max(run.timeseries, (d) => d[outcomeMap[outcome][0] + "_p97_5"]),
     ];
-  else if (
-    fitToData &&
-    barDomain &&
-    runLatest &&
-    outcomeMap[outcome] &&
-    !hasConf
-  )
-    yDomain = [0, max(runLatest.timeseries, (d) => d[outcomeMap[outcome][0]])];
+  else if (fitToData && barDomain && run && outcomeMap[outcome] && !hasConf)
+    yDomain = [0, max(run.timeseries, (d) => d[outcomeMap[outcome][0]])];
 
   return (
     <XYPlot
@@ -783,7 +789,7 @@ export function CountyInputChart(props) {
         hasConf &&
         outcomeMap[outcome].map((o, i) => [
           <AreaSeries
-            data={runLatest.timeseries}
+            data={run.timeseries}
             key={"conf-area-95"}
             getY={(d) => d[o + "_p97_5"]}
             getY0={(d) => d[o + "_p2_5"]}
@@ -793,7 +799,7 @@ export function CountyInputChart(props) {
             curve="curveCatmullRom"
           />,
           <AreaSeries
-            data={runLatest.timeseries}
+            data={run.timeseries}
             key={"conf-area-25-75"}
             getY={(d) => d[o + "_p75"]}
             getY0={(d) => d[o + "_p25"]}
@@ -807,7 +813,7 @@ export function CountyInputChart(props) {
       {fitToDataIsActive &&
         outcomeMap[outcome].map((o, i) => (
           <LineSeries
-            data={runLatest.timeseries}
+            data={run.timeseries}
             key={`fit-to-data-${o}`}
             getY={(d) => d[o]}
             color={i === 0 ? "rgb(30, 130, 40)" : "black"}
