@@ -692,38 +692,40 @@ export function RTSubareaOverview(props) {
                       />
                     </SubareaName>
                   </Dropdown>
-                  {!props.fips && <span>See county-level results: </span>}
-                  {true && (
-                    <Dropdown
-                      options={countyMenuItems}
-                      minWidth={220}
-                      onSelect={(e) => {
-                        if (e.key === "_overall") {
-                          Navigation.navigateToSubArea(
-                            props.config.code,
-                            e.abbr,
-                            document.location.search
-                          );
-                        } else {
-                          Navigation.navigateToCounty(
-                            props.config.code,
-                            e.abbr,
-                            e.key,
-                            document.location.search
-                          );
-                        }
-                      }}
-                    >
-                      <CountyName level={1}>
-                        {countyName}
-
-                        <span
-                          style={{ fontSize: "0.6em", marginLeft: 5 }}
-                          className="icon-caret-down"
-                        />
-                      </CountyName>
-                    </Dropdown>
+                  {!props.fips && (
+                    <span style={{ paddingLeft: 10, paddingRight: 10 }}>
+                      See county-level results:
+                    </span>
                   )}
+                  <Dropdown
+                    options={countyMenuItems}
+                    minWidth={220}
+                    onSelect={(e) => {
+                      if (e.key === "_overall") {
+                        Navigation.navigateToSubArea(
+                          props.config.code,
+                          e.abbr,
+                          document.location.search
+                        );
+                      } else {
+                        Navigation.navigateToCounty(
+                          props.config.code,
+                          e.abbr,
+                          e.key,
+                          document.location.search
+                        );
+                      }
+                    }}
+                  >
+                    <CountyName level={1}>
+                      {countyName}
+
+                      <span
+                        style={{ fontSize: "0.6em", marginLeft: 5 }}
+                        className="icon-caret-down"
+                      />
+                    </CountyName>
+                  </Dropdown>
                 </Col>
               </HeaderRow>
               {/*<StateStatRow
