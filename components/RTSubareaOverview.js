@@ -474,8 +474,11 @@ const CountyInputView = function (props) {
     <>
       <DatePicker
         onChange={onDateChange}
+        format="YYYY-MM-DD"
         disabledDate={dateIsDisabled}
-        placeholder="Choose a date"
+        allowClear={false}
+        placeholder="Choose model run"
+        style={{ width: 175 }}
       />
       <Switch
         size="small"
