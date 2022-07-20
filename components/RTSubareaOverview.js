@@ -869,45 +869,6 @@ export function RTSubareaOverview(props) {
                 />
               </>
             )}
-            <ChartTitle level={2}>
-              Infections, fitted cases, and case data
-            </ChartTitle>
-            <Explanation>
-              This chart shows how our estimated number of{" "}
-              <ColorLabelBlue>infections</ColorLabelBlue> compares to{" "}
-              <ColorLabelGrey>case data</ColorLabelGrey>, and to a{" "}
-              <ColorLabel>fitted cases</ColorLabel> timeseries produced during
-              model execution. Here, you can see the effects of reporting delays
-              as the "shift" between infections and fitted cases, and you can
-              see the degree of case underascertainment as the gap between the
-              testing data and the infections curve.
-            </Explanation>
-            {props.fips && contentWidth && (
-              <>
-                <ChartTitle level={2}>
-                  Deaths, fitted deaths, and reported death data
-                </ChartTitle>
-                <Explanation>
-                  Death ascertainment is much higher than case ascertainment for
-                  COVID-19 in the United States. However, incomplete
-                  ascertainment, as well as reporting delays, are usually
-                  evident in the following graph, which shows{" "}
-                  <ColorLabelBlue>deaths</ColorLabelBlue>,{" "}
-                  <ColorLabel>fitted deaths</ColorLabel>, and{" "}
-                  <ColorLabelGrey>death data</ColorLabelGrey>.
-                </Explanation>
-                {/*<RTChartWrapper>
-                  <CountyTestAdjustedChart
-                    type={"deaths"}
-                    fips={props.fips}
-                    width={contentWidth + 40}
-                    height={chartHeight}
-                    showHistory={showHistory}
-                    showExtent={showExtent}
-                  />
-                </RTChartWrapper>*/}
-              </>
-            )}
           </div>
         </div>
       </div>
