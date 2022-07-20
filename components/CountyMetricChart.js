@@ -654,10 +654,10 @@ export function CountyMetricChart(props) {
 
 const outcomeMap = {
   cases: ["infections", "fitted_cases"],
-  deaths: ["deaths", "fitted_deaths"],
+  deaths: ["deaths"], // Not showing fitted_deaths
   hosp: ["severe", "fitted_hospitalizations"],
   P100k_cases: ["P100k_infections", "P100k_fitted_cases"],
-  P100k_deaths: ["P100k_deaths", "P100k_fitted_deaths"],
+  P100k_deaths: ["P100k_deaths"], // Not showing fitted deaths
   P100k_hosp: ["P100k_severe", "P100k_fitted_hospitalizations"],
 };
 
