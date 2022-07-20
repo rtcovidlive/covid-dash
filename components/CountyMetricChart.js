@@ -104,7 +104,7 @@ const getSeriesConfig = function (outcome) {
     case "boost": {
       conf = {
         yTickFormat: d3format(".2s"),
-        shortName: "booster",
+        shortName: "boost+first-vax",
       };
       break;
     }
