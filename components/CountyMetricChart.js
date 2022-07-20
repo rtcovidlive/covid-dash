@@ -108,16 +108,6 @@ const getSeriesConfig = function (outcome) {
       };
       break;
     }
-    case "RR": {
-      conf = {
-        shortName: "risk-ratio",
-        yDomain: [0, 1],
-        yTickFormat: d3format(".1f"),
-        color: "rgba(50, 50, 0, 1.0)",
-        fill: "rgba(50, 50, 0, 1.0)",
-      };
-      break;
-    }
     default: {
       conf = {
         strokeColor: "rgb(56, 230, 252)",
@@ -764,10 +754,6 @@ export function CountyInputChart(props) {
         tickTotal={5}
         tickFormat={(d) => utcFormat("%b %e")(d)}
       />
-
-      {outcome === "RR" && (
-        <AreaSeries data={inputsLatest} color={"rgb(235,235,240)"} />
-      )}
 
       <LineSeries
         data={inputsLatest}

@@ -467,8 +467,8 @@ const CountyInputView = function (props) {
   };
 
   const outcomes = perCapita
-    ? ["P100k_hosp", "P100k_cases", "P100k_deaths", "P100k_boost", "RR"]
-    : ["hosp", "cases", "deaths", "boost", "RR"];
+    ? ["P100k_hosp", "P100k_cases", "P100k_deaths", "P100k_boost"]
+    : ["hosp", "cases", "deaths", "boost"];
 
   return (
     <>
