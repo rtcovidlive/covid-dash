@@ -20,6 +20,10 @@ Date.prototype.onSameDate = function (otherDate) {
   );
 };
 
+Date.prototype.onSameWeek = function (otherDate) {
+  return timeWeek.floor(this).getTime() === timeWeek.floor(otherDate).getTime();
+};
+
 class CovidViz {
   constructor(el, width, height, colorScales, margin, mouseMoveCallback) {
     this._el = el;
@@ -1055,7 +1059,7 @@ class CovidViz {
         let index = bisect(d.series, offset);
         if (index < d.series.length) {
           let entry = d.series[index];
-          let isSamePoint = conf.i(entry).onSameDate(offset);
+          let isSamePoint = conf.i(entry).onSameWeek(offset);
           let dataPoint =
             (this._showMovingAverage && entry._moving) || conf.m(entry);
           if (isSamePoint) {
