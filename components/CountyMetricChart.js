@@ -450,6 +450,7 @@ export function CountyMetricChart(props) {
             opacity: 0.4,
             strokeWidth: "1.5px",
             strokeStyle: "dashed",
+            curve: "curveCatmullRom",
           })
         )}
 
@@ -464,6 +465,7 @@ export function CountyMetricChart(props) {
             opacity: 0.2 + logitScale(12, 0.7)(k / (numSeries - 2)) / 0.7,
             strokeWidth: "2px",
             onNearestXY: null,
+            curve: "curveCatmullRom",
           });
         })}
 
@@ -475,6 +477,7 @@ export function CountyMetricChart(props) {
         strokeWidth: "4px",
         hintActiveSide,
         setHintActiveSide,
+        curve: "curveCatmullRom",
         onNearestXY: (value) => {
           !showNeighbors && !showHistory && !showEnclosed && setValue(value);
         },
@@ -519,6 +522,7 @@ export function CountyMetricChart(props) {
               key: "historical-lineseries",
               color: selectedHistoricalBaseColor,
               strokeWidth: "4px",
+              curve: "curveCatmullRom",
             })
           )}
 
@@ -615,6 +619,7 @@ export function CountyMetricChart(props) {
             }
             opacity={enclosedKeys === run.geo_name ? 1.0 : 0.7}
             size={enclosedKeys === run.geo_name ? 9 : 6}
+            curve="curveCatmullRom"
             onSeriesMouseOver={(e) => setEnclosedKeys(run.geo_name)}
             onSeriesMouseOut={(e) => setEnclosedKeys(null)}
             onSeriesClick={(e) =>
@@ -632,6 +637,7 @@ export function CountyMetricChart(props) {
             color="black"
             opacity={neighborKeys === run.geo_name ? 0.7 : 0.3}
             size={6}
+            curve="curveCatmullRom"
             onSeriesMouseOver={(e) => setNeighborKeys(run.geo_name)}
             onSeriesMouseOut={(e) => setNeighborKeys(null)}
             onSeriesClick={(e) =>
@@ -803,6 +809,7 @@ export function CountyInputChart(props) {
             key={`fit-to-data-${o}`}
             getY={(d) => d[o]}
             color={i === 0 ? "rgb(30, 130, 40)" : "black"}
+            curve="curveCatmullRom"
           />
         ))}
 
