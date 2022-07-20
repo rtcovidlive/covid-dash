@@ -678,9 +678,6 @@ export function CountyInputChart(props) {
     population,
   } = props;
 
-  const [maxDateSeen, setMaxDateSeen] = useState("1970-01-01");
-  const [minDateSeen, setMinDateSeen] = useState("2300-01-01");
-
   const { data: runLatestRaw, error: errorRunLatest } = useLatestRun(
     props.geoName
   );
