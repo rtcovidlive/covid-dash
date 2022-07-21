@@ -129,7 +129,7 @@ class CovidViz {
             },
             drawYAxisLines: [1.0],
             m: (dataPoint, metricOverride) => {
-              let raw = dataPoint[metricOverride || "r0"];
+              let raw = dataPoint[metricOverride || "r_t"];
               return Math.max(0, raw);
             },
           };
@@ -235,8 +235,8 @@ class CovidViz {
             dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_cumulative",
-            legend: "% ever infected",
-            label: "% ever infected",
+            legend: "cumulative infections",
+            label: "cumulative infections",
             colorCodeStroke: false,
             tooltipPrecision: ",.1f",
             showAnnotations:
@@ -261,8 +261,8 @@ class CovidViz {
             dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_cumulative",
-            legend: "% ever infected",
-            label: "% ever infected",
+            legend: "cumulative infections",
+            label: "cumulative infections",
             colorCodeStroke: false,
             tooltipPrecision: ",.1f",
             showAnnotations:

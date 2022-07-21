@@ -76,33 +76,6 @@ function reformatMapData(data) {
 //    series: _.sortBy(series, (d) => d.date),
 //  };
 //}
-function identifyAndTransformLatestRun(data) {
-  if (!data || !data.length) return data;
-
-  const maxDate = _.maxBy(data, (d) => d["run.date"])["run.date"];
-
-  const filtered = data.filter((d) => d["run.date"] == maxDate);
-
-  const result = filtered.map(
-    ({
-      cumulative_infections,
-      date,
-      fips,
-      infections,
-      infections_PC,
-      r_t,
-    }) => ({
-      cumulative: +cumulative_infections * 100,
-      date: date,
-      fips: fips,
-      identifier: fips,
-      infections: +infections,
-      infections_PC: +infections_PC,
-      r_t: +r_t,
-    })
-  );
-  return result;
-}
 
 export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapData, setMapData] = useState(null);
@@ -426,8 +399,6 @@ export class OverviewMapChart extends RTSubareaChart {
       this.props.dateToDisplay != nextProps.dateToDisplay ||
       this.props.selectedOutcome != nextProps.selectedOutcome
     ) {
-      console.log("changing metric to");
-      console.log(modeMap(nextProps.selectedOutcome.enabledModes));
       this.handleMetricChange(
         nextProps.dateToDisplay,
         modeMap(nextProps.selectedOutcome.enabledModes)
@@ -462,6 +433,7 @@ export function TrayCharts(props) {
 
   const countyCharts = _.map(props.selectedCounties, (county, i) => (
     <TrayChartsItem
+      key={i}
       county={county}
       i={i}
       colsPerChart={props.colsPerChart}
@@ -521,7 +493,7 @@ function TrayChartsItem({
       </Col>
     );
 
-  if (!data.length)
+  if (error || (data && data.code))
     return (
       <Col
         key={`${fips},nope`}
@@ -533,7 +505,7 @@ function TrayChartsItem({
           <Alert
             message="Error"
             type="error"
-            message={`We have no results for ${county.name}`}
+            message={`No results for ${county.name}`}
             showIcon
             style={{ margin: 5, cursor: "pointer" }}
             onClick={(e) => handleRemoveFIPS && handleRemoveFIPS(fips)}
@@ -544,8 +516,20 @@ function TrayChartsItem({
 
   const reformattedData = {
     identifier: fips,
-    series: identifyAndTransformLatestRun(data),
+    population: data.geo_info.pop,
+    series: data.timeseries.map(
+      ({ date, infections_cumulative, infections, r_t }) => ({
+        date,
+        identifier: fips,
+        infections_cumulative,
+        infections: infections / 7,
+        infections_PC: ((1e5 / 7) * infections) / data.geo_info.pop,
+        r_t,
+      })
+    ),
   };
+
+  console.log(reformattedData);
 
   const stateAbbr = Util.abbrState(county.state, "abbr");
 
