@@ -79,12 +79,8 @@ const ColorLabelGrey = styled(ColorLabel)`
   background-color: grey;
 `;
 
-const ColorLabelBlue = styled(ColorLabel)`
-  background-color: rgb(0, 145, 255);
-`;
-
-const ColorLabelBrown = styled(ColorLabel)`
-  background-color: rgb(179, 109, 25);
+const ColorLabelGreen = styled(ColorLabel)`
+  background-color: rgb(29, 161, 0);
 `;
 
 const ChartTitle = styled(Title)`
@@ -856,15 +852,16 @@ export function RTSubareaOverview(props) {
               <>
                 <ChartTitle level={2}>Model input data</ChartTitle>
                 <Explanation>
-                  The <ColorLabelGrey>case</ColorLabelGrey> and{" "}
-                  <ColorLabel>death</ColorLabel> data used in the latest model
-                  run, and the 7-day{" "}
-                  <ColorLabelBrown>moving average</ColorLabelBrown>.
-                  Retrospective edits to this data are common to correct
-                  previous errors. These edits (and the errors that precede
-                  them) can influence our estimates a lot. You can use the
-                  dropdown to inspect archived model input data to see if this
-                  may be the case.
+                  The reported weekly case, hospitalizations, deaths, and
+                  booster data. <strong>"Show model fit to data?"</strong>{" "}
+                  displays fitted{" "}
+                  <ColorLabelGrey>hospitalizations</ColorLabelGrey>,{" "}
+                  <ColorLabelGrey>cases</ColorLabelGrey>, and{" "}
+                  <ColorLabelGrey>deaths</ColorLabelGrey>, and related estimates{" "}
+                  <ColorLabelGreen>severe cases</ColorLabelGreen>,{" "}
+                  <ColorLabelGreen>infections</ColorLabelGreen>, and{" "}
+                  <ColorLabelGreen>deaths</ColorLabelGreen>{" "}
+                  <i>by date of occurrence</i>.
                 </Explanation>
                 <CountyInputView
                   geoName={props.fips || areaName}
