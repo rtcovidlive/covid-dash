@@ -700,6 +700,7 @@ export function RTSubareaOverview(props) {
                       See county-level results:
                     </span>
                   )}
+                  {props.fips && <div width={1}></div>}
                   <Dropdown
                     options={countyMenuItems}
                     minWidth={220}
