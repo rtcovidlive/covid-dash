@@ -207,6 +207,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     var resizeTimer;
     function setNewWidth() {
       if (ref.current) {
+        console.log(Math.ceil(ref.current.getBoundingClientRect().width));
         setContentWidth(Math.ceil(ref.current.getBoundingClientRect().width));
       }
     }
@@ -225,7 +226,8 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     setDateToDisplay(fromEpoch(val));
   };
 
-  const svgWidth = contentWidth;
+  const svgWidth =
+    contentWidth >= 500 ? Math.min(1000, contentWidth - 40) : contentWidth;
   let svgHeight = Math.floor(Math.min(550, 0.33 * contentWidth));
 
   if (svgWidth < 500) svgHeight = svgWidth;
@@ -268,43 +270,49 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
   if (dataIsLoaded && boundsIsLoaded && contentWidth) {
     return (
       <Fragment>
-        <div className="rt-container-wrapper-map">
-          <Col size={24} align="center" ref={ref}>
-            <OverviewMapChart
-              data={data}
-              width={svgWidth}
-              height={svgHeight}
-              addFips={addFips}
-              addHoverFips={addHoverFipsThrottled}
-              dateToDisplay={dateToDisplay}
-              selectedOutcome={props.selectedOutcome}
-              marginLeft={0}
-            />
-          </Col>
+        <div className="rt-container-wrapper">
+          <div className="rt-container rt-container-wide">
+            <Row className="stacked-states-outer">
+              <Col size={24} align="center" ref={ref}>
+                <OverviewMapChart
+                  data={data}
+                  width={svgWidth}
+                  height={svgHeight}
+                  addFips={addFips}
+                  addHoverFips={addHoverFipsThrottled}
+                  dateToDisplay={dateToDisplay}
+                  selectedOutcome={props.selectedOutcome}
+                  marginLeft={0}
+                />
+              </Col>
+            </Row>
+          </div>
         </div>
         <div className="rt-container-wrapper">
           <div className="rt-container rt-container-wide">
             <Row className="stacked-states-outer">
               <Col size={24}>
-                <Slider
-                  marks={sliderMarks(mapData)}
-                  step={null}
-                  defaultValue={toEpoch(dateMinMax[1])}
-                  tooltipVisible={true}
-                  min={toEpoch(dateMinMax[0])}
-                  max={toEpoch(dateMinMax[1])}
-                  tipFormatter={(epoch) => {
-                    const d = new Date(epoch * 24 * 3600 * 1000);
-                    const md = utcFormat("%b %d")(d);
+                <div style={{ maxWidth: svgWidth }}>
+                  <Slider
+                    marks={sliderMarks(mapData)}
+                    step={null}
+                    defaultValue={toEpoch(dateMinMax[1])}
+                    tooltipVisible={true}
+                    min={toEpoch(dateMinMax[0])}
+                    max={toEpoch(dateMinMax[1])}
+                    tipFormatter={(epoch) => {
+                      const d = new Date(epoch * 24 * 3600 * 1000);
+                      const md = utcFormat("%b %d")(d);
 
-                    const diff = differenceInDays(new Date(), d);
+                      const diff = differenceInDays(new Date(), d);
 
-                    if (diff <= 40) return `${md}, ${diff}d ago`;
+                      if (diff <= 40) return `${md}, ${diff}d ago`;
 
-                    return md;
-                  }}
-                  onChange={handleSliderChange}
-                />
+                      return md;
+                    }}
+                    onChange={handleSliderChange}
+                  />
+                </div>
               </Col>
               <Col size={props.colsPerChart}>
                 <AddCounty addFips={addFips} />
@@ -466,7 +474,6 @@ export function TrayCharts(props) {
       selectedOutcome={props.selectedOutcome}
       isHover={props.isHover}
       handleRemoveFIPS={props.handleRemoveFIPS}
-      ref={refsByFIPS[county.fips] || React.createRef()}
       dateBounds={props.dateBounds}
     />
   ));
