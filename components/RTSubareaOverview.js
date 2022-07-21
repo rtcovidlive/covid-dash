@@ -432,6 +432,8 @@ const CountyInputView = function (props) {
   const { data: runsHistorical, error: runsHistoricalError } =
     useHistoricalRuns(geoName, { outcomes: null });
 
+  if (runLatest && runLatest.code) return <h1>No data</h1>;
+
   const onDateChange = (date, dateString) => {
     if (runLatest && runLatest.run_date === dateString) {
       setHistoricalRunID(null);
@@ -553,8 +555,6 @@ export function RTSubareaOverview(props) {
   let countyName = props.fips
     ? config.counties[props.fips].county
     : `${props.subarea}`;
-
-  // const { data, error } = useLatestRun(props.fips);
 
   let subAreaData = rtData.dataSeries[props.subarea];
 

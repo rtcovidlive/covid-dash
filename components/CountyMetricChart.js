@@ -14,6 +14,7 @@ import {
 } from "react-vis";
 import { SplitLineSeries } from "../visualization/SplitLineSeries.js";
 import _ from "lodash";
+import { Util } from "../lib/Util.js";
 import {
   useLatestNeighborRuns,
   useHistoricalRuns,
@@ -239,6 +240,8 @@ export function CountyMetricChart(props) {
   const [neighborKeys, setNeighborKeys] = useState(null);
   const [enclosedKeys, setEnclosedKeys] = useState(null);
   const [hintActiveSide, setHintActiveSide] = useState("R");
+
+  if (runLatestRaw && runLatestRaw.code) return <h1>No data</h1>;
 
   let runLatest = runLatestRaw;
   let runsNeighbors = runsNeighborsRaw;
@@ -643,7 +646,7 @@ export function CountyMetricChart(props) {
             onSeriesClick={(e) =>
               key === "fips"
                 ? routeToFIPS(USCounties[run.geo_name].abbr, run.geo_name)
-                : routeToState(stateAbbr)
+                : routeToState(Util.abbrState(neighborKeys, "abbr"))
             }
             style={{ cursor: "pointer" }}
           />
