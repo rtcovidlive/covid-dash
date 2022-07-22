@@ -54,22 +54,23 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
 
         <p>
           We can avoid these biases by estimating R<sub>t</sub> from the number
-          of new infections each day. We estimate new infections using a
+          of new infections that occur in a given week. We estimate new infections using a
           statistical model that combines information about reported cases,
-          reported deaths, the percentage of the population vaccinated, disease
-          stage duration, and disease severity and mortality risks.{" "}
+          reported hospitalizations, reported administered first and booster 
+          doses of COVID-19 vaccines, the percentage of the population vaccinated, 
+          disease stage duration, and disease severity and mortality risks.{" "}
           <strong>
             Our infections metric takes into account the delays mentioned above,
             and includes individuals who haven't tested positive
           </strong>
-          . Once we estimate the number of new infections each day, we can use
+          . Once we estimate the number of new infections each week, we can use
           that number to produce a more robust estimate of R<sub>t</sub>.{" "}
           <strong>
             Present-day estimates of R<sub>t</sub> are highly uncertain, and can
             change dramatically over time
           </strong>
-          . We feel most confident about results for dates which are at least 14
-          days in the past. Additionally, R<sub>t</sub> is easy to misinterpret.
+          . We feel most confident about results for dates which are at least 2 weeks
+          in the past. Additionally, R<sub>t</sub> is easy to misinterpret.
           In many cases, we expect users will find our{" "}
           <i>Infections per capita</i> metric to be more useful. See{" "}
           <a href="https://www.nature.com/articles/d41586-020-02009-w">here</a>{" "}
