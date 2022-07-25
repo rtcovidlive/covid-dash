@@ -617,7 +617,7 @@ export function CountyMetricChart(props) {
             key={"enclosed-lineseries-" + run.geo_name}
             color={
               enclosedKeys === run.geo_name
-                ? "rgb(227, 219, 163)"
+                ? "rgb(191, 152, 69)"
                 : "rgb(186, 175, 101)"
             }
             opacity={enclosedKeys === run.geo_name ? 1.0 : 0.7}
