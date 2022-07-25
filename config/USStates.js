@@ -9,7 +9,7 @@ export const USStatesByCode = {
   CO: "Colorado",
   CT: "Connecticut",
   DE: "Delaware",
-  DC: "D.C.",
+  DC: "District of Columbia",
   FL: "Florida",
   GA: "Georgia",
   HI: "Hawaii",
@@ -53,7 +53,6 @@ export const USStatesByCode = {
   WV: "West Virginia",
   WI: "Wisconsin",
   WY: "Wyoming",
-  PR: "Puerto Rico",
 };
 
 export const StatesWithIssues = {};
