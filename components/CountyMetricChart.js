@@ -275,7 +275,7 @@ export function CountyMetricChart(props) {
 
   const key = runLatest.geo_type === "state" ? "state" : "fips";
 
-  const hasConf = runLatest && runLatest.method === "sampling";
+  const hasConf = runLatest && runLatest.geo_type === "state";
 
   const quantiles = [
     ["_p97_5", "97.5%"],
@@ -719,7 +719,7 @@ export function CountyInputChart(props) {
     run = runWithSpecialOutcomes(runHistorical, outcomeMap[outcome], true);
 
   const fitToDataIsActive = run && fitToData && outcomeMap[outcome];
-  const hasConf = run && run.method === "sampling";
+  const hasConf = run && run.geo_type === "state";
   const conf = getSeriesConfig(outcome);
 
   let yDomain = conf.yDomain || [
