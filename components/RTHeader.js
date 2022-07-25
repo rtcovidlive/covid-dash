@@ -115,7 +115,7 @@ export function RTHeader(props) {
             </div>
             <div className="rt-header-update-entry rt-header-update-entry-alert">
               <a
-                href={"https://cdn.covidestim.org/latest/estimates.csv"}
+                href={"https://cdn.covidestim.org/latest-v2/estimates.csv"}
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
                 <VerticalAlignBottomOutlined /> County estimates
@@ -123,7 +123,9 @@ export function RTHeader(props) {
             </div>
             <div className="rt-header-update-entry rt-header-update-entry-alert">
               <a
-                href={"https://cdn.covidestim.org/latest/state/estimates.csv"}
+                href={
+                  "https://cdn.covidestim.org/latest-v2/state/estimates.csv"
+                }
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
                 <VerticalAlignBottomOutlined /> State estimates
@@ -146,19 +148,19 @@ export function RTHeader(props) {
             </strong>
             . We use an in-house statistical model that combines evidence on
             COVID-19 transmission, natural history and diagnosis with reported
-            cases, hospitalizations and vaccinations, as well as estimated historic exposure 
-            and immunity for nearly every state and county in the US. A description of our
-            general methodology can be found on{" "}
+            cases, hospitalizations and vaccinations, as well as estimated
+            historic exposure and immunity for nearly every state and county in
+            the US. A description of our general methodology can be found on{" "}
             <a href="https://www.medrxiv.org/content/10.1101/2020.06.17.20133983v2">
               medRxiv
             </a>
             , with any updates and substantial changes to our model documented{" "}
             <a href="/updates.pdf">here</a>. You can run our model with your own
             data, using the <GithubOutlined />{" "}
-            <a href="https://pkg.covidestim.org/">covidestim</a> R package. 
-            The current version of our model assumes an infection mortality rate that is 
-           based on the Omicron variant and is therefore only appropriate to estimates
-           infections from December 2021 onwards. 
+            <a href="https://pkg.covidestim.org/">covidestim</a> R package. The
+            current version of our model assumes an infection mortality rate
+            that is based on the Omicron variant and is therefore only
+            appropriate to estimates infections from December 2021 onwards.
             State- and county-level data are sourced from{" "}
             <a href="https://github.com/CSSEGISandData/COVID-19">
               Johns Hopkins CSSE
