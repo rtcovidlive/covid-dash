@@ -765,7 +765,7 @@ export function RTSubareaOverview(props) {
               />
             </Header>
             <ChartTitle level={2}>
-              Effective Reproduction Number &middot; R<sub>t</sub>
+              R<sub>t</sub> &middot; Effective Reproduction Number
             </ChartTitle>
             <Explanation>
               R<sub>t</sub> is the average number of people who will become
