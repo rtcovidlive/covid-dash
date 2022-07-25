@@ -521,7 +521,8 @@ function TrayChartsItem({
       ({ date, infections_cumulative, infections, r_t }) => ({
         date,
         identifier: fips,
-        infections_cumulative,
+        infections_cumulative:
+          (1e5 * infections_cumulative) / data.geo_info.pop,
         infections: infections / 7,
         infections_PC: ((1e5 / 7) * infections) / data.geo_info.pop,
         r_t,
