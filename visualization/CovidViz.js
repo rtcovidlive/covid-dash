@@ -3,7 +3,7 @@ import _ from "lodash";
 import { select, mouse } from "d3-selection";
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
-import { line, area, curveBasis } from "d3-shape";
+import { line, area, curveCatmullRom, curveBasis } from "d3-shape";
 import { scaleLinear, scaleTime } from "d3-scale";
 import { timeDay, timeWeek, timeMonth } from "d3-time";
 import { axisBottom, axisRight, axisLeft } from "d3-axis";
@@ -335,7 +335,7 @@ class CovidViz {
           let domain = this.y.domain();
           let val = conf.p95(d);
           let useVal = Math.min(Math.max(domain[0], val), domain[1]);
-          return this.y(useVal);
+          return this.y(val);
         });
       activeSeries.push(conf);
     });
@@ -852,7 +852,7 @@ class CovidViz {
       )
       .attr("stroke-linecap", "butt")
       .attr("d", (d) => {
-        return conf.line(d);
+        return conf.line.curve(curveCatmullRom)(d);
       })
       .attr("stroke-dasharray", conf.dashedLine ? "1 3" : "0");
 
