@@ -7,6 +7,7 @@ import { ShareButtons } from "./ShareButtons";
 import {
   DiffOutlined,
   ReadOutlined,
+  BookOutlined,
   VerticalAlignBottomOutlined,
 } from "@ant-design/icons";
 import { GithubOutlined } from "@ant-design/icons";
@@ -88,6 +89,7 @@ export function RTHeader(props) {
             <div className="rt-header-update-entry rt-header-update-entry-yellow">
               <a
                 href={"/updates.pdf"}
+                target="_blank"
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
                 <DiffOutlined /> <strong>Model changelog</strong>
@@ -102,7 +104,7 @@ export function RTHeader(props) {
                 <ReadOutlined /> <strong>Read our blog</strong>
               </a>
             </div>
-            <div
+            {/*<div
               onClick={() =>
                 document
                   .getElementById("footer")
@@ -112,7 +114,20 @@ export function RTHeader(props) {
             >
               Last model run:{" "}
               {timeFormat("%-m/%-d at %-I:%M%p")(props.lastUpdated)}
-            </div>
+            </div>*/}
+            {
+              <div className="rt-header-update-entry">
+                <a
+                  href={
+                    "https://pkg.covidestim.org/reference/summary.covidestim_result.html"
+                  }
+                  style={{ color: "inherit", textDecoration: "inherit" }}
+                  target="_blank"
+                >
+                  <BookOutlined /> Data dictionary
+                </a>
+              </div>
+            }
             <div className="rt-header-update-entry rt-header-update-entry-alert">
               <a
                 href={"https://cdn.covidestim.org/latest-v2/estimates.csv"}
