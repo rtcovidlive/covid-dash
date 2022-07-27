@@ -8,6 +8,7 @@ import {
   DiffOutlined,
   ReadOutlined,
   BookOutlined,
+  ApiOutlined,
   VerticalAlignBottomOutlined,
 } from "@ant-design/icons";
 import { GithubOutlined } from "@ant-design/icons";
@@ -101,7 +102,7 @@ export function RTHeader(props) {
                 href="https://blog.covidestim.org/"
                 style={{ color: "inherit", textDecoration: "inherit" }}
               >
-                <ReadOutlined /> <strong>Read our blog</strong>
+                <ReadOutlined /> <strong>Blog</strong>
               </a>
             </div>
             {/*<div
@@ -115,19 +116,26 @@ export function RTHeader(props) {
               Last model run:{" "}
               {timeFormat("%-m/%-d at %-I:%M%p")(props.lastUpdated)}
             </div>*/}
-            {
-              <div className="rt-header-update-entry">
-                <a
-                  href={
-                    "https://pkg.covidestim.org/reference/summary.covidestim_result.html"
-                  }
-                  style={{ color: "inherit", textDecoration: "inherit" }}
-                  target="_blank"
-                >
-                  <BookOutlined /> Data dictionary
-                </a>
-              </div>
-            }
+            <div className="rt-header-update-entry">
+              <a
+                href={"https://covidestim.github.io/api_docs/"}
+                style={{ color: "inherit", textDecoration: "inherit" }}
+                target="_blank"
+              >
+                <ApiOutlined /> API
+              </a>
+            </div>
+            <div className="rt-header-update-entry">
+              <a
+                href={
+                  "https://pkg.covidestim.org/reference/summary.covidestim_result.html"
+                }
+                style={{ color: "inherit", textDecoration: "inherit" }}
+                target="_blank"
+              >
+                <BookOutlined /> Data dictionary
+              </a>
+            </div>
             <div className="rt-header-update-entry rt-header-update-entry-alert">
               <a
                 href={"https://cdn.covidestim.org/latest-v2/estimates.csv"}
