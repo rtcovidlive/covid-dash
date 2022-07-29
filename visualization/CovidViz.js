@@ -235,10 +235,10 @@ class CovidViz {
             dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_cumulative",
-            legend: "cumulative infections",
-            label: "cumulative infections",
+            legend: "cumulative infections per 100k",
+            label: "cumulative infections per 100k",
             colorCodeStroke: false,
-            tooltipPrecision: ",.1f",
+            tooltipPrecision: ",.3s",
             showAnnotations:
               this._showAnnotations && this._enabledModes.length === 1,
             confidenceBounds: true,
@@ -261,10 +261,10 @@ class CovidViz {
             dashLastNWeeks: 2,
             displayPreliminary: false,
             submetric: "infections_cumulative",
-            legend: "cumulative infections",
-            label: "cumulative infections",
+            legend: "cumulative infections per 100k",
+            label: "cumulative infections per 100k",
             colorCodeStroke: false,
-            tooltipPrecision: ",.1f",
+            tooltipPrecision: ",.3s",
             showAnnotations:
               this._showAnnotations && this._enabledModes.length === 1,
             confidenceBounds: false,
@@ -876,7 +876,7 @@ class CovidViz {
         });
     }
 
-    let lineEndLabelFont = this._annotationsFontSize + 2;
+    let lineEndLabelFont = this._annotationsFontSize + 4;
     pathContainer
       .selectAll("path.lineendmarker")
       .data((d) => {
@@ -936,7 +936,9 @@ class CovidViz {
         let numberFormat = format(conf.tooltipPrecision || ",.2f");
         return numberFormat(conf.m(d));
       })
-      .attr("stroke-width", 0)
+      .attr("stroke-width", 0.6)
+      .attr("stroke-opacity", 0.75)
+      .attr("stroke", "#fff")
       .attr("fill", (d) => {
         let identifier = this._data[0].identifier;
         return conf.lineColorForEntry(identifier, d);
