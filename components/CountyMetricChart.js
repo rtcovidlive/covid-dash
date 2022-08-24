@@ -28,7 +28,6 @@ import { max } from "d3-array";
 import { utcFormat } from "d3-time-format";
 import { utcDay } from "d3-time";
 import { useState } from "react";
-import sma from "sma";
 import { USCounties } from "../config/USCounties.js";
 import { Alert } from "antd";
 import styled from "styled-components";
