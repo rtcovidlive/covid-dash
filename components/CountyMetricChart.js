@@ -36,6 +36,10 @@ const Explanation = styled.p`
   margin: 10px 0px 10px 30px;
 `;
 
+// @input str "outcome" Name of an outcome
+//
+// @output object, contains various aesthetic options that will be passed to
+//   `react-vis` components.
 const getSeriesConfig = function (outcome) {
   var conf;
 
@@ -119,6 +123,22 @@ const getSeriesConfig = function (outcome) {
   return conf;
 };
 
+// @input object "datum" an object representing model output, or model input,
+//   for a particular day or week.
+//
+// @input string-array or string "outcomeNames" the name or names of outcomes
+//   that need to be computed from outcomes that already exist in "datum".
+//   These new outcomes are always per-capita, or per-100k versions of existing
+//   outcomes.
+//
+// @input Number "pop" the population size of the geography that is represented
+//   by "datum".
+//
+// @input bool "perDay" When calculating per-capita and per-100k metrics,
+//   "perDay" == true will divide the outcomes by 7, in order to convert from
+//   weekly rates to daily rates.
+//
+// @return object, the modified datum with new keys "outcomeNames".
 const addSpecialOutcomes = function (datum, outcomeNames, pop, perDay = true) {
   const safeMul = (x, y) => (x === null || y === null ? null : x * y);
   const safeDiv = (x, y) => (x === null || y === null ? null : x / y);
@@ -196,6 +216,8 @@ const addSpecialOutcomes = function (datum, outcomeNames, pop, perDay = true) {
   return { ...datum, ..._.fromPairs(newKeys) };
 };
 
+// This takes a run, as returned by one of the use*Run() functions, and maps
+// its timeseries data through `addSpecialOutcomes`.
 const runWithSpecialOutcomes = function (run, outcomes, perDay = true) {
   return {
     ...run,
@@ -205,6 +227,21 @@ const runWithSpecialOutcomes = function (run, outcomes, perDay = true) {
   };
 };
 
+// This is the graph component that is used for all of the charts on the state
+// or county detail pages, besides the charts at the bottom that show input
+// data. Those graphs are implemented by the <CountyInputChart/> component.
+//
+// @param string "outcome" Outcome to display.
+// @param string "geoName" Name of the geography.
+// @param string "stateAbbr" Abbreviation of state, or of the enclosing state.
+// @param int "width" width of graph
+// @param int "height" heigh of graph
+// @param bool "showNeighbors" Show estimates of neighbors?
+// @param bool "showHistory" Show estimates from historical runs of the same geo?
+// @param bool "showEnclosed" Show estimates of enclosed (county) geographies?
+// @param string "showExtent" If "all", show all data. If "3mo", show last 3 months
+// @param fn "routeToFIPS" Function that routes the user to an arbitrary county detail page
+// @param fn "routeToState" Function that routes the user to an arbitrary state detail page
 export function CountyMetricChart(props) {
   const {
     outcome,
@@ -220,6 +257,8 @@ export function CountyMetricChart(props) {
     routeToState,
   } = props;
 
+  // See SWR library docs for how this pattern works. Under the hood, this is hoo
+  // a React hook.
   let { data: runLatestRaw, error } = useLatestRun(props.geoName);
 
   let { data: runsNeighborsRaw, error: errorNeighbors } = useLatestNeighborRuns(
@@ -230,6 +269,10 @@ export function CountyMetricChart(props) {
     props.geoName
   );
 
+  // See SWR library docs for this pattern. This code conditionally fetches,
+  // possibly from SWR's cache, the latest enclosed runs, but only if the user
+  // has asked for that to happen. This saves bandwidth/improves page
+  // responsiveness.
   let { data: runsEnclosedRaw, error: errorEnclosed } = useLatestEnclosedRuns(
     showEnclosed ? props.geoName : null
   );
@@ -249,10 +292,14 @@ export function CountyMetricChart(props) {
 
   if (!runLatest) return null;
 
+  // Handle the case where we need to compute per-capita or per-100k rates
+  // for the data that we've grabbed from the API (the API does not return any
+  // data as per-capita.
   if (props.outcome.startsWith("P100k_") || props.outcome.startsWith("PC_")) {
     const perDay = props.outcome.endsWith("infections_cumulative")
       ? false
       : true;
+
     if (runLatest)
       runLatest = runWithSpecialOutcomes(runLatest, props.outcome, perDay);
 
@@ -322,9 +369,12 @@ export function CountyMetricChart(props) {
 
   const conf = getSeriesConfig(outcome);
 
+  // The "1" accounts for the latest run, which is always shown for all of the
+  // different use cases for this component.
   const numSeries =
     showHistory && runsHistorical ? runsHistorical.length + 1 : 1;
 
+  // Takes timeseries data and clips it to the last 3mo, if called for.
   const clipper = (d) =>
     showExtent === "all"
       ? d
@@ -338,13 +388,11 @@ export function CountyMetricChart(props) {
   const selectedHistoricalEmphasisStrokeColor = "rgb(143, 139, 109)";
 
   const historicalViewIsEnabled = showHistory && runsHistorical;
+  const neighborViewIsEnabled = showNeighbors && runsNeighbors;
+  const enclosedViewIsEnabled = showEnclosed && runsEnclosed;
 
   const historicalSelectViewIsActive =
     showHistory && runsHistorical && modelRunDate;
-
-  const neighborViewIsEnabled = showNeighbors && runsNeighbors;
-
-  const enclosedViewIsEnabled = showEnclosed && runsEnclosed;
 
   return (
     <XYPlot
@@ -396,6 +444,7 @@ export function CountyMetricChart(props) {
         tickFormat={(d) => utcFormat("%b %e")(d)}
       />
 
+      {/* The order of all of the following components is pretty sensitive. */}
       {props.outcome === "P100k_infections_cumulative" && (
         <AreaSeries
           data={clipper(runLatest.timeseries)}
@@ -425,22 +474,6 @@ export function CountyMetricChart(props) {
           curve="curveCatmullRom"
         />,
       ]}
-
-      {
-        // runLatest.timeseries.map(d => {
-        //   const datumBottom = Object.assign({}, d);
-        //   const datumTop    = Object.assign({}, d);
-        //   datumBottom[outcome] = 0;
-        //   let data = [datumBottom, datumTop];
-        //   return (
-        //     <LineSeries
-        //       data={data}
-        //       color={"black"}
-        //       size={5}
-        //     />
-        //   );
-        // })
-      }
 
       {neighborViewIsEnabled &&
         _.flatMap(runsNeighbors, (v, k) =>
@@ -654,6 +687,8 @@ export function CountyMetricChart(props) {
   );
 }
 
+// This maps between input-data names ("cases", "deaths", etc) and model outcomes
+// that the user has the option of viewing alongside input data.
 const outcomeMap = {
   cases: ["infections", "fitted_cases"],
   deaths: ["deaths"], // Not showing fitted_deaths

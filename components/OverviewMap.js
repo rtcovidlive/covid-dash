@@ -27,9 +27,11 @@ let fromEpoch = (d) => {
   return utcFormat("%Y-%m-%d")(obj);
 };
 
+// Takes MessagePack data and reformats it so that we can easily access the
+// timeseries data for a particular week and county.
 function reformatMapData(data) {
   // Reimplementing `fromEpoch` here to avoid unneccessary construction of
-  // large numbers of classes.
+  // large numbers of objects.
   const tf = utcFormat("%Y-%m-%d");
 
   const zipped = _.zipWith(
@@ -50,9 +52,6 @@ function reformatMapData(data) {
     })
   );
 
-  // Delete states
-  // const filtered = _.filter(zipped, (d) => !d.fips.startsWith("29"));
-
   const nested = nest()
     .key((d) => d.date)
     .key((d) => d.fips)
@@ -61,21 +60,6 @@ function reformatMapData(data) {
 
   return nested;
 }
-
-//function dataForCounty(data, fips) {
-//  let series = [];
-//
-//  data.each((vals, date) => {
-//    let dataForDate = vals.get(fips);
-//
-//    if (dataForDate) series.push(dataForDate);
-//  });
-//
-//  return {
-//    identifier: fips,
-//    series: _.sortBy(series, (d) => d.date),
-//  };
-//}
 
 export const OverviewMapSuper = React.forwardRef((props, ref) => {
   const [mapData, setMapData] = useState(null);
@@ -99,6 +83,11 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
   const url = "https://cdn.covidestim.org/latest-v2/summary.pack.gz";
   const albersURL = "https://cdn.covidestim.org/counties-albers-10m.json";
+
+  // BEGIN: Functions that manage the tray of county graphs that lie directly
+  // beneath the map. We want to persist the counties in the tray across
+  // pageloads, so we use a cookie to store a comma-separated list of the
+  // counties that the user has added to the tray.
 
   const clearFips = () => {
     setFips([]);
@@ -138,9 +127,14 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     document.cookie = `fips=${encodeURIComponent(str)}`;
   };
 
+  // END: tray-related code
+
   useEffect(() => {
     const config = {
       onDownloadProgress: function (e) {
+        // 5000000 is a fake size for the download of the MessagePack data used
+        // for the map. IIRC, this is faked because the gzip-encoding results
+        // in the HTTP header not declaring a file size.
         setDataLoadProgress(e.loaded / 5000000);
       },
       responseType: "arraybuffer",
@@ -199,6 +193,8 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
     setDateToDisplay(fromEpoch(val));
   };
 
+  // In general, this site relies heavily on React for layout, rather than
+  // a CSS-centric approach.
   const svgWidth =
     contentWidth >= 500 ? Math.min(1000, contentWidth - 40) : contentWidth;
   let svgHeight = Math.floor(Math.min(550, 0.33 * contentWidth));
@@ -222,6 +218,7 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
           d.getFullYear() === 2022 &&
           props.width > 768
         )
+          // This will eventually need to be updated for 2023...
           return <strong>Jan '22</strong>;
         else if (d.getUTCDate() < 8 && svgWidth >= 500)
           return utcFormat("%b")(d);
@@ -359,6 +356,10 @@ export const OverviewMapSuper = React.forwardRef((props, ref) => {
 
 export default OverviewMapSuper;
 
+// This is some scaffolding used to translate between outcomes that are
+// displayed with uncertainty intervals in front-page graphs, and outcomes that
+// are never displayed with uncertainty intervals, because they are sourced
+// from county-level data. (County-level data never has uncertainty intervals).
 let modeMap = function (modes) {
   return _.map(modes, (mode) => {
     if (mode === "True infections") return "True infections no UI";
@@ -378,6 +379,12 @@ let modeMap = function (modes) {
   });
 };
 
+// This is glue code, the only important thing that's happening here is in the
+// `shouldComponentUpdate` method, where we take control of React's diffing
+// process. This is in order to make sure that we allow React to rerender
+// the D3 viz if internal state changes, or if the size of the map is going
+// to change. Otherwise, date-slider changes or metric/outcome-selection changes
+// are handled by us, through the `handleMetricChange` callback.
 export class OverviewMapChart extends RTSubareaChart {
   constructor(props) {
     super(props);
@@ -423,6 +430,7 @@ export class OverviewMapChart extends RTSubareaChart {
   }
 }
 
+// Parent component for all of the TrayCharts.
 export function TrayCharts(props) {
   function mapModes(selectedOutcome) {
     return modeMap(selectedOutcome.enabledModes);
@@ -453,10 +461,23 @@ export function TrayCharts(props) {
   if (props.selectedCounties.length === 0) return null;
   else return [...countyCharts];
 }
-///////////////
-///////////////
-///////////////
-///////////////
+
+// @param {name, fips, state} "county"
+// @param int "i" index of the item with the larger traycharts component
+// @param int "colsPerChart" number of columns per chart
+// @param string, left|center|right "align" horizontal alignment grid-element
+// @param spacerOffset
+// @param rowCount
+// @param "ref" React ref
+// @param bool "isSmallScreen"
+// @param [strings...] "modes" enabled modes (aka metrics/outcomes)
+// @param int "contentWidth" page width in px
+// @param isHover
+// @param {} "selectedOutcome" config options for the enabled mode/metric/outcome
+// @param fn(fips) "handleRemoveFIPS" call this to remove a TrayChartsItem for some fips code
+// @param unsure "dateBounds" bounds on the dates to display. This is used to
+//   either show all dates in the dataset, or to show the most recent 3 months'
+//   worth.
 function TrayChartsItem({
   county,
   i,
