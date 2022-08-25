@@ -30,7 +30,7 @@ components/
                              components descend from. Start here.
 ├── RTSubareaChart.js      This and all following files are various wrappers
 ├── RTSubareaOverview.js     around the primary outcome charts used all over
-├── StateR0Display.js        the front page. 
+├── StateR0Display.js        the front page.
 ├── StateRtChart.js
 ├── StateRtMiniDisplay.js
 ├── [...] Others omitted
@@ -50,8 +50,8 @@ visualization/
 
 The website requires two JSON files to run.
 
-One file contains state-level timeseries results across several outcomes, 
-and these data are used to render all of the state-level graphs displayed on 
+One file contains state-level timeseries results across several outcomes,
+and these data are used to render all of the state-level graphs displayed on
 the homepage.
 
 The second file contains **weekly** county-level timeseries results across
@@ -69,20 +69,22 @@ found in `covidestim-sources/scripts` as `RtLiveConvert.R` (state-level file) an
 
 ## API
 
-The Covidestim API is available at `https://api.covidestim.org`. It is backed by a
+The Covidestim API is available at `https://api2.covidestim.org`. It is backed by a
 Postgres instance running on RDS. The API server itself is an instance of [PostgREST][postgrest],
 running on AWS Fargate which has read-only access to the tables and views required
-to service web clients. No insertions or deletions can be made through PostgREST - 
-those operations are done by `psql` scripts run at the end of the pipeline.
-PostgREST has slightly different syntax from other popular REST API servers.
+to service web clients. No insertions or deletions can be made through the
+public API of PostgREST - those operations are done by `psql` scripts run at
+the end of the pipeline.
+
+For more information about the API, see [covidestim/db](https://github.com/covidestim/db).
 
 ### Example query
 
-To fetch the most recently estimated R_t values for New Haven County, CT for dates after 
-October 1st, perform an HTTP GET on the following URL:
+To fetch the most recently estimated R_t values for New Haven County, CT,
+perform an HTTP GET on the following URL:
 
 ```
-https://api.covidestim.org/latest_results?fips=eq.09009&date=gt.2021-10-01&select=date,Rt
+https://api2.covidestim.org/latest_runs?fips=eq.09009
 ```
 
 [msgpack]: https://msgpack.org/index.html
