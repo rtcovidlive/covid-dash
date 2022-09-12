@@ -339,7 +339,7 @@ export function CountyMetricChart(props) {
         { title: "week ending", value: utcFormat("%b %e")(new Date(d.date)) },
         ...(hasConf
           ? quantiles.map(([suffix, name]) => ({
-              title: `${conf.shortName || outcome}, ${name}`,
+              title: `${name}`,
               value: conf.yTickFormat
                 ? conf.yTickFormat(d[outcome + suffix])
                 : d3format(",.2f")(d[outcome + suffix]),
@@ -354,6 +354,49 @@ export function CountyMetricChart(props) {
             ]),
       ];
     else return [{ title: USCounties[d.geo_name].county, value: "Hmm" }];
+  };
+
+  const getHintContent = (d) => {
+    let formatted = formatHint(d);
+    console.log(formatHint(d));
+    return (
+      <div class="hintContent rv-hint__content">
+        <div class="hintHeader">
+          {formatted[0].title}
+          <h2>{formatted[0].value}</h2>
+        </div>
+        <table>
+          <tr>
+            <th>Percentile</th>
+            <th class="text-right">Value</th>
+          </tr>
+          <tr>
+            <td>{formatted[1].title}</td>
+            <td class="text-right">{formatted[1].value}</td>
+          </tr>
+          <tr>
+            <td>{formatted[2].title}</td>
+            <td class="text-right">{formatted[2].value}</td>
+          </tr>
+          <tr>
+            <td>
+              <b>{formatted[3].title}</b>
+            </td>
+            <td class="text-right">
+              <b>{formatted[3].value}</b>
+            </td>
+          </tr>
+          <tr>
+            <td>{formatted[4].title}</td>
+            <td class="text-right">{formatted[4].value}</td>
+          </tr>
+          <tr>
+            <td>{formatted[5].title}</td>
+            <td class="text-right">{formatted[5].value}</td>
+          </tr>
+        </table>
+      </div>
+    );
   };
 
   const rundateFormatHint = (d) => [
@@ -632,7 +675,11 @@ export function CountyMetricChart(props) {
           />
         )}
 
-      {value && <Hint value={value} format={formatHint} />}
+      {value && (
+        <Hint value={value} format={formatHint}>
+          {getHintContent(value)}
+        </Hint>
+      )}
       {modelRunDate && (
         <Hint
           value={modelRunDate}
