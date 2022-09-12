@@ -367,46 +367,50 @@ export function CountyMetricChart(props) {
         </div>
         {formatted.length == 2 && (
           <table>
-            <tr>
-              <td>
-                <b>{formatted[1].title}</b>
-              </td>
-              <td class="text-right">
-                <b>{formatted[1].value}</b>
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>
+                  <b>{formatted[1].title}</b>
+                </td>
+                <td class="text-right">
+                  <b>{formatted[1].value}</b>
+                </td>
+              </tr>
+            </tbody>
           </table>
         )}
         {formatted.length > 2 && (
           <table>
-            <tr>
-              <th>Percentile</th>
-              <th class="text-right">Value</th>
-            </tr>
-            <tr>
-              <td>{formatted[1].title}</td>
-              <td class="text-right">{formatted[1].value}</td>
-            </tr>
-            <tr>
-              <td>{formatted[2].title}</td>
-              <td class="text-right">{formatted[2].value}</td>
-            </tr>
-            <tr>
-              <td>
-                <b>{formatted[3].title}</b>
-              </td>
-              <td class="text-right">
-                <b>{formatted[3].value}</b>
-              </td>
-            </tr>
-            <tr>
-              <td>{formatted[4].title}</td>
-              <td class="text-right">{formatted[4].value}</td>
-            </tr>
-            <tr>
-              <td>{formatted[5].title}</td>
-              <td class="text-right">{formatted[5].value}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <th>Percentile</th>
+                <th class="text-right">Value</th>
+              </tr>
+              <tr>
+                <td>{formatted[1].title}</td>
+                <td class="text-right">{formatted[1].value}</td>
+              </tr>
+              <tr>
+                <td>{formatted[2].title}</td>
+                <td class="text-right">{formatted[2].value}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>{formatted[3].title}</b>
+                </td>
+                <td class="text-right">
+                  <b>{formatted[3].value}</b>
+                </td>
+              </tr>
+              <tr>
+                <td>{formatted[4].title}</td>
+                <td class="text-right">{formatted[4].value}</td>
+              </tr>
+              <tr>
+                <td>{formatted[5].title}</td>
+                <td class="text-right">{formatted[5].value}</td>
+              </tr>
+            </tbody>
           </table>
         )}
       </div>
