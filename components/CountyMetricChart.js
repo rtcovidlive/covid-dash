@@ -324,11 +324,11 @@ export function CountyMetricChart(props) {
   const hasConf = runLatest && runLatest.geo_type === "state";
 
   const quantiles = [
-    ["_p97_5", "97.5%"],
-    ["_p75", "75%"],
+    ["_p97_5", "97.5"],
+    ["_p75", "75"],
     ["", "median"],
-    ["_p25", "25%"],
-    ["_p2_5", "2.5%"],
+    ["_p25", "25"],
+    ["_p2_5", "2.5"],
   ];
 
   const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
@@ -358,43 +358,57 @@ export function CountyMetricChart(props) {
 
   const getHintContent = (d) => {
     let formatted = formatHint(d);
-    console.log(formatHint(d));
+    // console.log(formatHint(d));
     return (
       <div class="hintContent rv-hint__content">
         <div class="hintHeader">
           {formatted[0].title}
           <h2>{formatted[0].value}</h2>
         </div>
-        <table>
-          <tr>
-            <th>Percentile</th>
-            <th class="text-right">Value</th>
-          </tr>
-          <tr>
-            <td>{formatted[1].title}</td>
-            <td class="text-right">{formatted[1].value}</td>
-          </tr>
-          <tr>
-            <td>{formatted[2].title}</td>
-            <td class="text-right">{formatted[2].value}</td>
-          </tr>
-          <tr>
-            <td>
-              <b>{formatted[3].title}</b>
-            </td>
-            <td class="text-right">
-              <b>{formatted[3].value}</b>
-            </td>
-          </tr>
-          <tr>
-            <td>{formatted[4].title}</td>
-            <td class="text-right">{formatted[4].value}</td>
-          </tr>
-          <tr>
-            <td>{formatted[5].title}</td>
-            <td class="text-right">{formatted[5].value}</td>
-          </tr>
-        </table>
+        {formatted.length == 2 && (
+          <table>
+            <tr>
+              <td>
+                <b>{formatted[1].title}</b>
+              </td>
+              <td class="text-right">
+                <b>{formatted[1].value}</b>
+              </td>
+            </tr>
+          </table>
+        )}
+        {formatted.length > 2 && (
+          <table>
+            <tr>
+              <th>Percentile</th>
+              <th class="text-right">Value</th>
+            </tr>
+            <tr>
+              <td>{formatted[1].title}</td>
+              <td class="text-right">{formatted[1].value}</td>
+            </tr>
+            <tr>
+              <td>{formatted[2].title}</td>
+              <td class="text-right">{formatted[2].value}</td>
+            </tr>
+            <tr>
+              <td>
+                <b>{formatted[3].title}</b>
+              </td>
+              <td class="text-right">
+                <b>{formatted[3].value}</b>
+              </td>
+            </tr>
+            <tr>
+              <td>{formatted[4].title}</td>
+              <td class="text-right">{formatted[4].value}</td>
+            </tr>
+            <tr>
+              <td>{formatted[5].title}</td>
+              <td class="text-right">{formatted[5].value}</td>
+            </tr>
+          </table>
+        )}
       </div>
     );
   };
