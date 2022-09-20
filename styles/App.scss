@@ -491,7 +491,12 @@ p {
 .text-right {
   text-align: right;
 }
-
+.cursorMarker-line {
+  transform: translateX(-1px);
+}
+.cursorMarker-line .rv-crosshair__line {
+  background: #1293827d;
+}
 .rc-dropdown-menu-item {
   cursor: pointer;
 }

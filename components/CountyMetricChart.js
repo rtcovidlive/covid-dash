@@ -8,6 +8,7 @@ import {
   LineSeries,
   MarkSeries,
   AreaSeries,
+  Crosshair,
   Highlight,
   Hint,
   DiscreteColorLegend,
@@ -454,24 +455,6 @@ export function CountyMetricChart(props) {
   const historicalSelectViewIsActive =
     showHistory && runsHistorical && modelRunDate;
 
-  let selectedDatum = null;
-  let selectedX = 0;
-  let selectedY = 0;
-
-  const setSelectedIndex = (innerX, innerY) => {
-    selectedX = innerX;
-    selectedY = innerY;
-  };
-  const getSelectedX = () => selectedX;
-  const getSelectedY = () => selectedY;
-
-  const updateCursor = (datum, innerX, innerY) => {
-    selectedDatum = datum;
-    selectedX = innerX;
-    selectedY = innerY;
-    console.log(selectedDatum);
-  };
-
   return (
     <XYPlot
       className="svg-container"
@@ -482,7 +465,6 @@ export function CountyMetricChart(props) {
       getY={(d) => d[outcome]}
       xType="time-utc"
       onMouseLeave={() => {
-        setSelectedIndex(null, null);
         setValue(false);
         setModelRunDate(false);
         setNeighborKeys(null);
@@ -674,11 +656,15 @@ export function CountyMetricChart(props) {
         size={2.8}
       />
 
+      {/* CURSOR MARKER */}
       {value === false ? null : (
-        <MarkSeries data={[value]} opacity={0.7} stroke={4} />
+        <MarkSeries data={[value]} opacity={1} stroke={"#ffffff"} />
       )}
       {value === false ? null : (
-        <LineSeries data={[value]} opacity={0.7} stroke={4} />
+        <Crosshair values={[value]} className="cursorMarker-line">
+          {/* Divs inside Crosshair Component required to prevent value box render */}
+          <div></div>
+        </Crosshair>
       )}
 
       {neighborViewIsEnabled && neighborKeys !== null && (
@@ -719,14 +705,19 @@ export function CountyMetricChart(props) {
         )}
 
       {value && (
-        <Hint value={value} format={formatHint}>
+        <Hint
+          value={value}
+          format={formatHint}
+          style={{ margin: 10 }}
+          align={{ horizontal: "auto", vertical: "auto" }}
+        >
           {getHintContent(value)}
         </Hint>
       )}
       {modelRunDate && (
         <Hint
           value={modelRunDate}
-          style={{ margin: "10px" }}
+          style={{ margin: "5px" }}
           align={{ horizontal: "right", vertical: "bottom" }}
           format={rundateFormatHint}
         />
