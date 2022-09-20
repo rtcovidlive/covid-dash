@@ -462,6 +462,16 @@ export function CountyMetricChart(props) {
     selectedX = innerX;
     selectedY = innerY;
   };
+  const getSelectedX = () => selectedX;
+  const getSelectedY = () => selectedY;
+
+  const updateCursor = (datum, innerX, innerY) => {
+    selectedDatum = datum;
+    selectedX = innerX;
+    selectedY = innerY;
+    console.log(selectedDatum);
+  };
+
   return (
     <XYPlot
       className="svg-container"
@@ -472,6 +482,7 @@ export function CountyMetricChart(props) {
       getY={(d) => d[outcome]}
       xType="time-utc"
       onMouseLeave={() => {
+        setSelectedIndex(null, null);
         setValue(false);
         setModelRunDate(false);
         setNeighborKeys(null);
@@ -663,6 +674,7 @@ export function CountyMetricChart(props) {
         size={2.8}
       />
 
+      {value === false ? null : (
         <MarkSeries data={[value]} opacity={0.7} stroke={4} />
       )}
       {value === false ? null : (
