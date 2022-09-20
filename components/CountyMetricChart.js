@@ -658,7 +658,12 @@ export function CountyMetricChart(props) {
 
       {/* CURSOR MARKER */}
       {value === false ? null : (
-        <MarkSeries data={[value]} opacity={1} stroke={"#ffffff"} />
+        <MarkSeries
+          data={[value]}
+          opacity={1}
+          stroke={"#ffffff"}
+          fill={"#999999"}
+        />
       )}
       {value === false ? null : (
         <Crosshair values={[value]} className="cursorMarker-line">
