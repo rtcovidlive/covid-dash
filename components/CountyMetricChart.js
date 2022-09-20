@@ -663,12 +663,6 @@ export function CountyMetricChart(props) {
         size={2.8}
       />
 
-        <MarkSeries data={[value]} opacity={0.7} stroke={4} />
-      )}
-      {value === false ? null : (
-        <LineSeries data={[value]} opacity={0.7} stroke={4} />
-      )}
-
       {neighborViewIsEnabled && neighborKeys !== null && (
         <DiscreteColorLegend
           items={[
