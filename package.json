@@ -19,7 +19,7 @@
     "@zeit/next-source-maps": "0.0.4-canary.1",
     "aws-sdk": "^2.706.0",
     "axios": "^0.19.2",
-    "d3": "^5.16.0",
+    "d3": "^7.6.1",
     "execa": "^4.0.2",
     "next": "^9.4.4",
     "node-cache": "^5.1.1",
