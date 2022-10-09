@@ -8,6 +8,7 @@ import {
   LineSeries,
   MarkSeries,
   AreaSeries,
+  Crosshair,
   Highlight,
   Hint,
   DiscreteColorLegend,
@@ -324,11 +325,11 @@ export function CountyMetricChart(props) {
   const hasConf = runLatest && runLatest.geo_type === "state";
 
   const quantiles = [
-    ["_p97_5", "97.5%"],
-    ["_p75", "75%"],
+    ["_p97_5", "97.5"],
+    ["_p75", "75"],
     ["", "median"],
-    ["_p25", "25%"],
-    ["_p2_5", "2.5%"],
+    ["_p25", "25"],
+    ["_p2_5", "2.5"],
   ];
 
   const logitScale = (k, n0) => (n) => 1 / (1 + Math.exp(-k * (n - n0)));
@@ -339,7 +340,7 @@ export function CountyMetricChart(props) {
         { title: "week ending", value: utcFormat("%b %e")(new Date(d.date)) },
         ...(hasConf
           ? quantiles.map(([suffix, name]) => ({
-              title: `${conf.shortName || outcome}, ${name}`,
+              title: `${name}`,
               value: conf.yTickFormat
                 ? conf.yTickFormat(d[outcome + suffix])
                 : d3format(",.2f")(d[outcome + suffix]),
@@ -354,6 +355,66 @@ export function CountyMetricChart(props) {
             ]),
       ];
     else return [{ title: USCounties[d.geo_name].county, value: "Hmm" }];
+  };
+
+  const getHintContent = (d) => {
+    let formatted = formatHint(d);
+    return (
+      <div className="hintContent rv-hint__content">
+        <div className="hintHeader">
+          {formatted[0].title}
+          <h2>{formatted[0].value}</h2>
+        </div>
+        {formatted.length == 2 && (
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <b>{formatted[1].title}</b>
+                </td>
+                <td className="text-right">
+                  <b>{formatted[1].value}</b>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        )}
+        {formatted.length > 2 && (
+          <table>
+            <tbody>
+              <tr>
+                <th>Percentile</th>
+                <th className="text-right">Value</th>
+              </tr>
+              <tr>
+                <td>{formatted[1].title}</td>
+                <td className="text-right">{formatted[1].value}</td>
+              </tr>
+              <tr>
+                <td>{formatted[2].title}</td>
+                <td className="text-right">{formatted[2].value}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>{formatted[3].title}</b>
+                </td>
+                <td className="text-right">
+                  <b>{formatted[3].value}</b>
+                </td>
+              </tr>
+              <tr>
+                <td>{formatted[4].title}</td>
+                <td className="text-right">{formatted[4].value}</td>
+              </tr>
+              <tr>
+                <td>{formatted[5].title}</td>
+                <td className="text-right">{formatted[5].value}</td>
+              </tr>
+            </tbody>
+          </table>
+        )}
+      </div>
+    );
   };
 
   const rundateFormatHint = (d) => [
@@ -595,6 +656,22 @@ export function CountyMetricChart(props) {
         size={2.8}
       />
 
+      {/* CURSOR MARKER */}
+      {value === false ? null : (
+        <MarkSeries
+          data={[value]}
+          opacity={1}
+          stroke={"#ffffff"}
+          fill={"#999999"}
+        />
+      )}
+      {value === false ? null : (
+        <Crosshair values={[value]} className="cursorMarker-line">
+          {/* Divs inside Crosshair Component required to prevent value box render */}
+          <div></div>
+        </Crosshair>
+      )}
+
       {neighborViewIsEnabled && neighborKeys !== null && (
         <DiscreteColorLegend
           items={[
@@ -632,11 +709,20 @@ export function CountyMetricChart(props) {
           />
         )}
 
-      {value && <Hint value={value} format={formatHint} />}
+      {value && (
+        <Hint
+          value={value}
+          format={formatHint}
+          style={{ margin: 10 }}
+          align={{ horizontal: "auto", vertical: "auto" }}
+        >
+          {getHintContent(value)}
+        </Hint>
+      )}
       {modelRunDate && (
         <Hint
           value={modelRunDate}
-          style={{ margin: "10px" }}
+          style={{ margin: "5px" }}
           align={{ horizontal: "right", vertical: "bottom" }}
           format={rundateFormatHint}
         />
