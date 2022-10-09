@@ -24,13 +24,25 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
           </a>
         </div>
         <p>
-          This project was supported by{" "}
-          <a href="https://govtribe.com/award/federal-grant-award/project-grant-nu38ot000297">
+          This project is supported by{" "}
+          <a
+            href="https://govtribe.com/award/federal-grant-award/project-grant-nu38ot000297"
+            target="_blank"
+          >
             Cooperative Agreement NU38OT000297
           </a>{" "}
           from the Centers for Disease Control and Prevention (CDC) and the
-          Council of State and Territorial Epidemiologists (CSTE), and does not
-          necessarily represent the views of CDC or CSTE.
+          Council of State and Territorial Epidemiologists (CSTE),{" "}
+          <a
+            href="https://govtribe.com/file/government-file/2016n17729-fbo-notice-of-award-details-dot-docx"
+            target="_blank"
+          >
+            {" "}
+            SHEPheRD Contract 200-2016-91779
+          </a>{" "}
+          from the CDC, and the CDC Broad Agency Announcement Contract
+          75D30122C14697. This work does not necessarily represent the views of
+          CDC or CSTE.
         </p>
         <p>
           The effective reproductive number (R<sub>t</sub>) is an important
@@ -54,11 +66,12 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
 
         <p>
           We can avoid these biases by estimating R<sub>t</sub> from the number
-          of new infections that occur in a given week. We estimate new infections using a
-          statistical model that combines information about reported cases,
-          reported hospitalizations, reported administered first and booster 
-          doses of COVID-19 vaccines, the percentage of the population vaccinated, 
-          disease stage duration, and disease severity and mortality risks.{" "}
+          of new infections that occur in a given week. We estimate new
+          infections using a statistical model that combines information about
+          reported cases, reported hospitalizations, reported administered first
+          and booster doses of COVID-19 vaccines, the percentage of the
+          population vaccinated, disease stage duration, and disease severity
+          and mortality risks.{" "}
           <strong>
             Our infections metric takes into account the delays mentioned above,
             and includes individuals who haven't tested positive
@@ -69,9 +82,9 @@ export const RTFooter = React.forwardRef(function (props, footerRef) {
             Present-day estimates of R<sub>t</sub> are highly uncertain, and can
             change dramatically over time
           </strong>
-          . We feel most confident about results for dates which are at least 2 weeks
-          in the past. Additionally, R<sub>t</sub> is easy to misinterpret.
-          In many cases, we expect users will find our{" "}
+          . We feel most confident about results for dates which are at least 2
+          weeks in the past. Additionally, R<sub>t</sub> is easy to
+          misinterpret. In many cases, we expect users will find our{" "}
           <i>Infections per capita</i> metric to be more useful. See{" "}
           <a href="https://www.nature.com/articles/d41586-020-02009-w">here</a>{" "}
           for a discussion of the pitfalls of R<sub>t</sub>.
